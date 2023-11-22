@@ -1,0 +1,369 @@
+<?php
+
+namespace App\Http\Controllers\backend;
+
+use App\Models\Exam;
+use App\Models\User;
+use App\Models\Section;
+use App\Models\ExamAnswer;
+use App\Models\ExamResult;
+use Illuminate\Support\Str;
+use App\Models\ExamQuestion;
+use Illuminate\Http\Request;
+use App\Models\ExamResultAnswer;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Stichoza\GoogleTranslate\GoogleTranslate;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
+class ExamController extends Controller
+{
+    use AuthorizesRequests;
+
+    public function index()
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-list');
+
+        $exams = Exam::withoutGlobalScope('active_status')->with(['category'])->orderBy('created_at')->get();
+        return view('backend.pages.exams.index', compact('exams'));
+    }
+
+    public function create()
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-create');
+        return view('backend.pages.exams.create');
+    }
+
+    public function store(Request $request)
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-create');
+
+        $rules = [
+            'duration' => ['required', 'string'],
+            'point' => ['required', 'numeric'],
+            'category_id' => ['required', 'exists:categories,id'],
+            'content' => ['nullable', 'string'],
+        ];
+
+        $request->validate($rules);
+
+        $model = new Exam();
+
+        $image = null;
+        if ($request->hasFile('image')) {
+            $image = image_upload($request->file("image"), 'exams');
+        }
+
+        $name = [
+            'az_name' => trim($request->az_name) ?? " ",
+            'ru_name' => $request->ru_name ?? trim(GoogleTranslate::trans($request->az_name, 'ru')),
+            'en_name' => $request->en_name ?? trim(GoogleTranslate::trans($request->az_name, 'en')),
+        ];
+        $description = [
+            'az_description' => trim($request->az_description) ?? " ",
+            'ru_description' => $request->ru_description ?? trim(GoogleTranslate::trans($request->az_description, 'ru')),
+            'en_description' => $request->en_description ?? trim(GoogleTranslate::trans($request->az_description, 'en')),
+        ];
+
+        $model->category_id = $request->input('category_id');
+        $model->name = $name;
+        $model->slug = Str::slug($name['az_name']);
+        $model->duration = $request->input('duration');
+        $model->point = $request->input('point');
+        $model->content = $description;
+        $model->status = $request->input('status') ? 1 : 0;
+        $model->order_number=$request->input('order_number')??1;
+        $model->price=$request->input('price')??1;
+        $model->endirim_price=$request->input('endirim_price')??1;
+        $model->image = $image;
+
+        $model->save();
+        dbdeactive();
+        return redirect()->route('exams.index')->with(['success' => 'Uğurla!']);
+    }
+
+    public function edit($id)
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-update');
+        $data = Exam::withoutGlobalScope('active_status')->findOrFail($id);
+        return view('backend.pages.exams.create', compact('data'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-update');
+
+        $rules = [
+            'duration' => ['required', 'string'],
+            'point' => ['required', 'numeric'],
+            'category_id' => ['required', 'exists:categories,id'],
+            'content' => ['nullable', 'string']
+        ];
+
+        $request->validate($rules);
+
+        $model = Exam::withoutGlobalScope('active_status')->findOrFail($id);
+
+        if ($request->hasFile('image')) {
+            $image = image_upload($request->file("image"), 'exams');
+            $model->update(['image' => $image]);
+        }
+
+        $name = [
+            'az_name' => trim($request->az_name) ?? " ",
+            'ru_name' => $request->ru_name ?? trim(GoogleTranslate::trans($request->az_name, 'ru')),
+            'en_name' => $request->en_name ?? trim(GoogleTranslate::trans($request->az_name, 'en')),
+        ];
+        $description = [
+            'az_description' => trim($request->az_description) ?? " ",
+            'ru_description' => $request->ru_description ?? trim(GoogleTranslate::trans($request->az_description, 'ru')),
+            'en_description' => $request->en_description ?? trim(GoogleTranslate::trans($request->az_description, 'en')),
+        ];
+
+        $model->category_id = $request->input('category_id');
+        $model->name = $name;
+        $model->slug = Str::slug($name['az_name']);
+        $model->duration = $request->input('duration');
+        $model->point = $request->input('point');
+        $model->content =  $description;
+        $model->status = $request->input('status') ? 1 : 0;
+        $model->order_number=$request->input('order_number')??1;
+        $model->price=$request->input('price')??1;
+        $model->endirim_price=$request->input('endirim_price')??1;
+        $model->save();
+        dbdeactive();
+        return redirect()->route('exams.index')->with(['success' => 'Uğurla!']);
+    }
+
+    public function delete($id)
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-delete');
+
+        $model = Exam::withoutGlobalScope('active_status')->findOrFail($id);
+        $model->delete();
+        dbdeactive();
+        return redirect()->route('exams.index')->with(['success' => 'Uğurla!']);
+    }
+
+    public function questions($exam_id, $section_id = null)
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-question-list');
+
+        $sections = Section::where('exam_id', $exam_id)->orderBy('created_at')->get();
+        $section = $sections->first();
+        if ($section_id) {
+            $section = Section::where('exam_id', $exam_id)->orderBy('created_at')->findOrFail($section_id);
+        }
+        $questions = $section ? ExamQuestion::where('section_id', $section?->id)->orderBy('created_at')->get() : [];
+
+        return view('backend.pages.exams.questions.index', compact('questions', 'exam_id', 'sections', 'section'));
+    }
+
+    public function createQuestion($exam_id, $section_id)
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-question-create');
+
+        return view('backend.pages.exams.questions.create', compact('exam_id', 'section_id'));
+    }
+
+    public function storeQuestion(Request $request, $exam_id, $section_id)
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-question-create');
+
+        $rules = [
+            'question' => ['required', 'string'],
+            'type' => ['required', 'in:' . implode(',', ExamQuestion::TYPES)],
+            'image' => [
+                'file',
+                'sometimes',
+                'mimetypes:' . implode(',', ExamQuestion::ALLOWED_FILE_MIMES),
+                'max:' . ExamQuestion::ALLOWED_FILE_SIZE_KB
+            ],
+        ];
+
+        $request->validate($rules);
+
+        $model = new ExamQuestion();
+
+        $model->question = $request->input('question');
+        $model->type = $request->input('type');
+        $model->section_id = $section_id;
+
+        if ($request->hasFile('image')) {
+            $model->addMedia($request->image)->toMediaCollection("exam_question");
+        }
+
+        $model->save();
+        dbdeactive();
+        return redirect()->route('exams.questions', [$exam_id, $section_id])->with(['success' => 'Uğurla!']);
+    }
+
+    public function editQuestion($exam_id, $section_id, $id)
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-question-update');
+
+        $question = ExamQuestion::where('section_id', $section_id)->findOrFail($id);
+        return view('backend.pages.exams.questions.edit', compact('question', 'exam_id', 'section_id'));
+    }
+
+    public function updateQuestion(Request $request, $exam_id, $section_id, $id)
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-question-update');
+
+        $rules = [
+            'exam_id' => ['required', 'exists:exams,id'],
+            'question' => ['required', 'string'],
+            'type' => ['required', 'in:' . implode(',', ExamQuestion::TYPES)],
+            'image' => ['file', 'sometimes', 'mimetypes:' . implode(',', ExamQuestion::ALLOWED_FILE_MIMES)],
+        ];
+
+        $request->validate($rules);
+
+        $model = ExamQuestion::where('section_id', $section_id)->findOrFail($id);
+
+        $model->question = $request->input('question');
+        $model->type = $request->input('type');
+        $model->section_id = $section_id;
+
+        if ($request->hasFile('image')) {
+            $oldImage = $model->getMedia('exam_question')->first();
+            if ($oldImage) {
+                $oldImage->delete();
+            }
+
+            $model->addMedia($request->image)->toMediaCollection("exam_question");
+        }
+
+        $model->save();
+        dbdeactive();
+        return redirect()->route('exams.questions', [$exam_id, $section_id])->with(['success' => 'Uğurla!']);
+    }
+
+    public function deleteQuestion($exam_id, $section_id, $id)
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-question-delete');
+
+        $model = ExamQuestion::where('section_id', $section_id)->findOrFail($id);
+        $model->clearMediaCollection('exam_question');
+        $model->delete();
+        dbdeactive();
+        return redirect()->route('exams.questions', [$exam_id, $section_id])->with(['success' => 'Uğurla!']);
+    }
+
+    public function answers($exam_id, $section_id, $question_id)
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-answer-list');
+
+        $question = ExamQuestion::findOrFail($question_id);
+        $answers = ExamAnswer::where('question_id', $question_id)->orderBy('created_at')->get();
+        return view('backend.pages.exams.answers.index', compact('answers', 'question_id', 'question', 'section_id', 'exam_id'));
+    }
+
+    public function createAnswer($exam_id, $section_id, $question_id)
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-answer-create');
+        $question = ExamQuestion::findOrFail($question_id);
+        if ($question->type == 3 && $question->answers->count() == 1) {
+            return redirect()->route('exams.answers', [$exam_id,  $section_id, $question_id]);
+        }
+
+        return view('backend.pages.exams.answers.create', compact('exam_id', 'section_id', 'question_id'));
+    }
+
+    public function storeAnswer(Request $request, $exam_id, $section_id, $question_id)
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-answer-create');
+
+        $rules = [
+            'exam_id' => ['required', 'exists:exams,id'],
+            'question_id' => ['required', 'exists:exam_questions,id'],
+            'answer' => ['required', 'string']
+        ];
+
+        $request->validate($rules);
+
+        $model = new ExamAnswer();
+
+        $model->answer = $request->input('answer');
+        $model->correct = $request->input('correct') ? 1 : 0;
+        $model->question_id = $question_id;
+
+        $model->save();
+        dbdeactive();
+        return redirect()->route('exams.answers', [$exam_id, $section_id, $question_id])->with(['success' => 'Uğurla!']);
+    }
+
+    public function editAnswer($exam_id, $section_id, $question_id, $id)
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-answer-update');
+
+        $answer = ExamAnswer::findOrFail($id);
+        return view('backend.pages.exams.answers.edit', compact('answer', 'exam_id', 'section_id', 'question_id'));
+    }
+
+    public function updateAnswer(Request $request, $exam_id, $section_id, $question_id, $id)
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-answer-update');
+
+        $rules = [
+            'exam_id' => ['required', 'exists:exams,id'],
+            'question_id' => ['required', 'exists:exam_questions,id'],
+            'answer' => ['required', 'string'],
+        ];
+
+        $request->validate($rules);
+
+        $model = ExamAnswer::findOrFail($id);
+
+        $model->answer =  $request->input('answer');
+        $model->correct = $request->input('correct') ? 1 : 0;
+        $model->question_id = $question_id;
+
+        $model->save();
+        dbdeactive();
+        return redirect()->route('exams.answers', [$exam_id, $section_id, $question_id])->with(['success' => 'Uğurla!']);
+    }
+
+    public function deleteAnswer($exam_id, $section_id, $question_id, $id)
+    {
+        $this->authorizeForUser(auth('admins')->user(), 'exam-answer-delete');
+
+        $model = ExamAnswer::findOrFail($id);
+        $model->delete();
+        dbdeactive();
+        return redirect()->route('exams.answers', [$exam_id, $section_id, $question_id])->with(['success' => 'Uğurla!']);
+    }
+    public function analyzeview(Request $request)
+    {
+        try {
+            if ($request->method() == "POST") {
+                try {
+
+                    $results = ExamResult::orderBy("id", 'DESC');
+
+                    if ($request->has('user_id') && !empty($request->input("user_id"))) {
+                        $results = $results->where("user_id", $request->input('user_id'));
+                    }
+
+                    if ($request->has('exam_id') && !empty($request->input("exam_id"))) {
+                        $results = $results->where("exam_id", $request->input('exam_id'));
+                    }
+
+                    $results=$results->with('answers','user','exam');
+                    // $results = $results->groupBy('exam_id');
+                    $results = $results->get();
+
+                    return response()->json(['status' => 'success', 'results' => $results]);
+                } catch (\Exception $e) {
+                    return response()->json(['status' => 'error', 'message' => $e->getMessage(), 'line' => $e->getLine()]);
+                }
+            } else {
+                $users = User::orderBy('id', 'DESC')->get();
+                $exams = Exam::orderBy('id', 'DESC')->get();
+                return view('backend.pages.exams.analyze', compact('users', 'exams'));
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage(), 'line' => $e->getLine()]);
+        }
+    }
+}

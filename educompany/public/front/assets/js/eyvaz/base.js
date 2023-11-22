@@ -1,0 +1,130 @@
+function toggleInputFunction(id) {
+    var input = document.querySelector(`input#${id}`);
+    var span = document.querySelector(`span#${id}_icon`);
+    var eyeSlash = span.querySelector('i.fa-eye-slash');
+    var eye = span.querySelector('i.fa-eye');
+    if (eyeSlash) {
+        eyeSlash.classList.remove("fa-eye-slash");
+    }
+    if (eye) {
+        eye.classList.remove("fa-eye");
+    }
+    if (input.getAttribute('type') === 'password') {
+        input.setAttribute('type', 'text');
+        span.querySelector('i').classList.add("fa-eye");
+    } else {
+        input.setAttribute('type', 'password');
+        span.querySelector('i').classList.add("fa-eye-slash");
+    }
+}
+
+function tabselect(id) {
+    var tabs = document.getElementsByClassName('user_or_freelancer_tab');
+    for (var i = 0; i < tabs.length; i++) {
+        tabs[i].classList.remove('active');
+    }
+    var selectedTab = document.getElementsByClassName(`user_or_freelancer_tab_${id}`);
+    if (selectedTab.length > 0) {
+        selectedTab[0].classList.add('active');
+    }
+    var tabfreelancer = document.getElementsByClassName('tab_company_element');
+    var tabstudent = document.getElementsByClassName('tab_student_element');
+    if (id == "company") {
+        tabfreelancer[0].style.display = "block";
+        tabstudent[0].style.display = 'none';
+        document.getElementById('user_type').value = 2;
+    } else {
+        tabfreelancer[0].style.display = "none";
+        tabstudent[0].style.display = 'block';
+        document.getElementById('user_type').value = 1;
+    }
+}
+
+function changedFileLabel(id) {
+    var element = document.getElementById(id);
+    var labelText = element.files.length > 0 ? element.files[0].name : 'fayl';
+    var label = document.querySelector(`label[for="${id}"]`);
+    label.querySelector('.file-name').textContent = labelText;
+}
+
+function change_tabs_elements(class_onpage, key) {
+    var navs = document.getElementById(`${class_onpage}_tab`);
+    var button = document.getElementById(`${class_onpage}-${key}_button`);
+    var tabs = document.getElementById(`${class_onpage}_tabContent`);
+    var tab = document.getElementById(`${class_onpage}-${key}_tab`);
+    var buttons = navs.getElementsByClassName('active');
+
+    Array.from(buttons).forEach(function(btn) {
+        btn.classList.remove('active');
+    });
+    button.classList.add('active');
+    var tabPanes = tabs.getElementsByClassName('tab-pane');
+    Array.from(tabPanes).forEach(function(tp) {
+        tp.classList.remove('show', 'active', 'fade');
+    });
+    tab.classList.add('show', 'active', 'fade');
+}
+
+
+function createalert(e, t, n = null) {
+    if (null != n) var a = document.querySelector(`form#${n} #messages`);
+    else a = document.querySelector("#messages");
+    a.style.display = "none", a.innerHTML = "";
+    var i = document.createElement("div");
+    i.className = "alert " + e, i.textContent = t, a.appendChild(i), a.style.display = "block", setTimeout(function() { fadeOut(i) }, 2e3), window.scrollTo({ top: 0, behavior: "smooth" })
+}
+
+function fadeOut(e) {
+    var t = 1,
+        n = setInterval(function() { t <= .1 && (clearInterval(n), e.style.display = "none", document.querySelector("#messages").style.display = "none"), e.style.opacity = t, t -= .1 }, 50)
+}
+
+function togglepopup(e) {
+    var t = document.getElementById(e);
+    t.classList.contains("active") ? t.classList.remove("active") : t.classList.add("active")
+}
+
+function isValidEmail(e) { return /\S+@\S+\.\S+/.test(e) }
+
+function validPhone(e) { var t = e.replace(/\D/g, "").match(/(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/); return t[2] ? t[1] + " " + t[2] + (t[3] ? " " + t[3] : "") + (t[4] ? " " + t[4] : "") : t[1] }
+
+function searchinfields(e, t, n = "services", a = null) {
+    if (null != a) {
+        if ("category" == a) {
+            var i = { category: e, type: n, action: a };
+            document.querySelectorAll(".category-item").forEach(function(e) { e.classList.remove("active") });
+            for (var l = document.querySelectorAll(".category-item." + e), s = 0; s < l.length; s++) l[s].classList.contains("active") ? l[s].classList.remove("active") : l[s].classList.add("active")
+        }
+    } else i = { query: document.getElementsByName(e)[0].value, type: n, action: a };
+    var r = document.getElementById(t);
+    sendAjaxRequest("/api/searchinfilled", "post", i, function(e, t) {
+        if (e) createalert("error", e);
+        else {
+            let n = JSON.parse(t);
+            r.innerHTML = "", r.innerHTML = n.view
+        }
+    })
+}
+
+function change_filter(e, t = "datas", n = "az", a = "services") {
+    for (var i = document.querySelectorAll(".filter_view"), l = 0; l < i.length; l++) i[l].classList.remove("active");
+    var s = document.querySelector("." + e);
+    s.classList.contains("active") ? s.classList.remove("active") : s.classList.add("active");
+    let r = [];
+    "services" == a && document.querySelectorAll(".service_one").forEach(e => {
+        let t = e.getAttribute("id").replace("service-", "");
+        r.push(t)
+    });
+    var c = document.getElementById(t);
+    sendAjaxRequest("/api/filterelements", "post", { ids: r, type: a, orderby: e, language: n }, function(e, t) {
+        if (e) createalert("error", e);
+        else {
+            let n = JSON.parse(t);
+            c.innerHTML = "", c.innerHTML = n.view
+        }
+    })
+}
+
+function showLoader() { document.getElementById("loader").classList.add("active") }
+
+function hideLoader() { document.getElementById("loader").classList.remove("active") }

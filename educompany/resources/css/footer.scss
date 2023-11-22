@@ -1,0 +1,140 @@
+footer#site_footer {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    display: block;
+    .bg_footer {
+        background-color: $primary-color;
+        .left_column {
+            padding: 20px 20px;
+            padding-bottom: 50px;
+            .logo_footer {
+                height: 40px;
+                margin: 5px 0;
+                a {
+                    width: 100%;
+                    height: 100%;
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: contain;
+                    }
+                }
+            }
+            .social_network {
+                margin: 15px 0;
+                h3.title {
+                    font-size: $subheading_size;
+                    color: #fff;
+                    margin: 15px 0;
+                    font-family: $secondary-font;
+                }
+                .sub_links {
+                    width: 80%;
+                    font-family: $secondary-font;
+                    @extend .classjustifybetween;
+                    margin: 5px 0;
+                    a {
+                        font-size: $page_size;
+                        color: #fff;
+                        position: relative;
+                        transition: all ease 0.7s;
+                        &:nth-child(1) {
+                            &::after {
+                                content: ' ';
+                                width: 2px;
+                                height: 100%;
+                                background-color: #fff;
+                                position: absolute;
+                                right: -20%;
+                            }
+                        }
+                        &:hover,
+                        &:focus,
+                        &:active {
+                            color: $secondary-color;
+                            text-decoration: none;
+                        }
+                    }
+                }
+                .social_media_icon_and_links {
+                    width: 100%;
+                    margin: 15px 0;
+                    ul {
+                        display: flex;
+                        @extend .classjustifstart;
+                        list-style-type: none;
+                        width: 100%;
+                        padding: 0;
+                        li {
+                            width: 30px;
+                            height: 30px;
+                            background-color: #fff;
+                            color: $primary-color;
+                            border-radius: 50%;
+                            transition: all ease 0.9s;
+                            margin-right: 5px;
+                            a {
+                                color: $primary-color;
+                                font-size: $normal_size;
+                                width: 100%;
+                                height: 100%;
+                                @extend .classcenter;
+                                text-decoration: none;
+                            }
+                            &:hover,
+                            &:focus,
+                            &:active {
+                                background-color: $secondary-color;
+                                color: #fff;
+                                text-decoration: none;
+                                a {
+                                    color: #fff;
+                                    text-decoration: none;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .contact_us_links {
+                padding: 0;
+                margin: 15px 0;
+                ul {
+                    margin: 0;
+                    padding: 0;
+                    list-style-type: none;
+                    li {
+                        margin: 10px 0;
+                        font-size: $page_size;
+                        transition: all ease 0.8s;
+                        a {
+                            text-decoration: none;
+                            color: #fff;
+                        }
+                        &:hover,
+                        &:focus,
+                        &:active {
+                            a {
+                                color: $secondary-color;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+        }
+    }
+    .copyright {
+        width: 100%;
+        @extend .classcenter;
+        padding: 10px 0;
+        font-size: 17px;
+    }
+    .chosen_languages {
+        margin: 15px 0;
+    }
+}
