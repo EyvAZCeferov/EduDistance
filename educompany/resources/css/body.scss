@@ -854,4 +854,148 @@ body {
             }
         }
     }
+    .filter_area {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        margin: 0 auto;
+        padding-right: 0;
+        button.filter_toggler {
+            border-radius: 20px;
+            margin-top: 10px;
+        }
+        .filter_elements {
+            display: none;
+            margin: 10px 0;
+            width: 100%;
+            &.active {
+                display: block;
+            }
+            .select_box {
+                width: 100%;
+                .heading {
+                    width: 100%;
+                    border: 1px solid $primary-color;
+                    padding: 6px 10px;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: center;
+                    border-radius: 15px;
+                    background-color: transparent;
+                    transition: all ease 0.7s;
+                    margin-bottom: 10px;
+                    background-color: #fff;
+                    span {
+                        margin: 0 5px;
+                        font-size: 15px;
+                        transition: all ease 0.6s;
+                        &.prefix {
+                            color: $primary-color;
+                        }
+                        &.name,
+                        &.suffix {
+                            color: $primary-color;
+                        }
+                    }
+                    &:hover,
+                    &:focus,
+                    &:active {
+                        background-color: $primary-color;
+                        border-color: #000;
+                        cursor: pointer;
+                        span {
+                            color: #fff;
+                        }
+                    }
+                }
+                .content {
+                    display: none;
+                    width: 100%;
+                    background-color: #fff;
+                    padding: 6px 0;
+                    margin-bottom: 10px;
+                    border-bottom-left-radius: 10px;
+                    border-bottom-right-radius: 10px;
+                    border: 1px solid $primary-color;
+                    border-top-color: transparent;
+                    border-top: none;
+                    .content-element {
+                        width: 100%;
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: space-evenly;
+                        align-items: center;
+                        align-content: center;
+                        padding: 7px 5px;
+                        color: #000;
+                        font-size: 14px;
+                        transition: all ease 0.6s;
+                        i {
+                            font-size: 16px;
+                        }
+                        &:hover,
+                        &:focus,
+                        &:active,
+                        &.active {
+                            background-color: $primary-color;
+                            color: #fff;
+                            cursor: pointer;
+                        }
+                        .input {
+                            width: 100%;
+                            background-color: #fff;
+                            border-radius: 10px;
+                        }
+                        .brand_image {
+                            width: 25px;
+                            height: 25px;
+                            border-radius: 50%;
+                            display: inline-block;
+                            background-repeat: no-repeat;
+                            background-position: center center;
+                            background-size: cover;
+                            margin-right: 5px;
+                        }
+                    }
+                }
+                &.active {
+                    .content {
+                        display: block;
+                    }
+                }
+            }
+        }
+        &.horizontal {
+            padding: 0;
+            .filter_elements {
+                &.active {
+                    display: flex;
+                    flex-direction: column;
+                }
+                .select_box {
+                    width: 100%;
+                    .content {
+                        display: none;
+                        padding: 0;
+                        .content-element {
+                            padding: 10px 0;
+                        }
+                    }
+                    &.active {
+                        .content {
+                            display: flex;
+                            flex-direction: row;
+                            position: relative;
+                            width: 80vw !important;
+                            top: 25%;
+                            left: 0;
+                            overflow-x: scroll;
+                            overflow-y: hidden;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

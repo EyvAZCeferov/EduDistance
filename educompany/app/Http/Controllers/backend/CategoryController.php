@@ -69,6 +69,7 @@ class CategoryController extends Controller
                 $data->description = $description;
                 $data->parent_id = $request->input('parent_id') ?? null;
                 $data->image = $image;
+                $data->icon = $request->input("icon")??null;
                 $data->order_number = $request->input('order_number');
                 $data->save();
 
@@ -98,7 +99,7 @@ class CategoryController extends Controller
             $image = null;
             $data = Category::where("id", $id)->first();
 
-            DB::transaction(function () use (&$name, &$slugs, &$description, &$image, $request, &$data) {
+            // DB::transaction(function () use (&$name, &$slugs, &$description, &$image, $request, &$data) {
                 $name = [
                     'az_name' => trim($request->az_name) ?? " ",
                     'ru_name' => $request->ru_name ?? trim(GoogleTranslate::trans($request->az_name, 'ru')),
@@ -130,10 +131,11 @@ class CategoryController extends Controller
                 if (isset($image) && !empty($image)) {
                     $data->image = $image;
                 }
+                $data->icon = $request->input("icon")??null;
                 $data->update();
 
                 dbdeactive();
-            });
+            // });
 
             return redirect()->route('categories.index')->with(['success' => 'Uğurlu']);
         } catch (\Exception $e) {

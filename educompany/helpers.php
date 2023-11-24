@@ -1,21 +1,23 @@
 <?php
 
+use App\Models\Exam;
+use App\Models\User;
 use App\Models\Blogs;
+use App\Models\Teams;
+use App\Models\Section;
+use App\Models\Sliders;
 use App\Models\Category;
 use App\Models\Counters;
-use App\Models\Exam;
-use App\Models\ExamResult;
 use App\Models\Settings;
-use App\Models\Sliders;
+use App\Models\ExamResult;
 use App\Models\StandartPages;
 use App\Models\StudentRatings;
-use App\Models\Teams;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Storage;
 
 if (!function_exists('answerChoice')) {
     function answerChoice($key): string
@@ -170,6 +172,35 @@ if (!function_exists('categories')) {
             $model = Category::orderBy('order_number', 'DESC')->get();
         }
         return Cache::rememberForever("categories" . $key . $type, fn() => $model);
+    }
+}
+
+if (!function_exists('sections')) {
+    function sections($key = null, $type = "exammed")
+    {
+        if ($type == "exammed") {
+            $model = Section::whereHas('questions')->select('name', DB::raw('MAX(id) as id'))
+            ->groupBy('name')->get();
+        } else {
+            $model = Section::select('name', DB::raw('MAX(id) as id'))
+            ->groupBy('name')
+            ->orderBy('id', 'DESC')->get();
+        }
+        return Cache::rememberForever("sections" . $key . $type, fn() => $model);
+    }
+}
+
+if (!function_exists('users')) {
+    function users($key = null, $type = "exammed")
+    {
+        if ($type == "exammed") {
+            $model = User::where('user_type',2)->orderBy("id","DESC")->whereHas('exams')->get();
+        }else if($type=="company"){
+            $model = User::where('user_type',2)->orderBy("id","DESC")->get();
+        } else {
+            $model = User::orderBy("id","DESC")->whereHas('exams')->get();
+        }
+        return Cache::rememberForever("users" . $key . $type, fn() => $model);
     }
 }
 

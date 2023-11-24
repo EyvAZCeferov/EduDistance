@@ -4,10 +4,13 @@
     <section class="exams">
         @include('frontend.exams.search_filter', ['type' => 'exams'])
         <div class="row my-3">
-            <div class="col-sm-12 col-md-2 col-lg-1">
-                
+            <div class="col-sm-12 col-md-3 col-lg-2">
+                @include('frontend.exams.left_filter', [
+                    'data' => $filters,
+                    'inproductpage' => 'product_page',
+                ])
             </div>
-            <div class="col-sm-12 col-md-10 col-lg-11">
+            <div class="col-sm-12 col-md-9 col-lg-10">
                 <div class="d-block">
 
                     @include('frontend.light_parts.section_title', [
@@ -23,7 +26,7 @@
                     ])
                 </div>
                 <div class="d-block">
-                    @if (!empty($exams) && count($exams)>0)
+                    @if (!empty($exams) && count($exams) > 0)
                         @include('frontend.light_parts.products.products_grid', [
                             'products' => $exams,
                         ])
@@ -31,7 +34,7 @@
                         <p class="text-center text-danger">@lang('additional.messages.examnotfound')</p>
                         <section class="not_found_page">
                             <div class="col-sm-12 col-md-4 col-lg-3 mx-auto text-center">
-                                <a class="btn btn-primary notfound_button" href="{{ route("page.welcome") }}">
+                                <a class="btn btn-primary notfound_button" href="{{ route('page.welcome') }}">
                                     <i class="fa fa-home"></i> @lang('additional.headers.welcome')
                                 </a>
                             </div>

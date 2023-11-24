@@ -49,7 +49,9 @@ return [
             'endirim_with_faiz'=>":count% endirim",
             "company"=>"Şirkət",
             "category"=>"Kateqoriya",
-            "price"=>"Qiymət"
+            "price"=>"Qiymət",
+            'sections'=>"Sektorlar",
+            'companies'=>"Şirkətlər",
         ],
         'blogs'=>[
             'blogs'=>"Bloqlar"
@@ -82,7 +84,8 @@ return [
         "sendrequest"=>"Sorğu göndər",
         "free"=>"Ödənişsiz",
         "back"=>"Geri",
-        "imtahanver"=>"İmtahan ver"
+        "imtahanver"=>"İmtahan ver",
+        'filter'=>"Filter"
     ],
     "forms" => [
         'name' => 'Ad, Soyad',

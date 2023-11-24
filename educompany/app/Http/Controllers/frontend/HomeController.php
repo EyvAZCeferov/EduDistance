@@ -23,6 +23,7 @@ class HomeController extends Controller
             $category = collect();
             $sub_categories = collect();
             $exams = collect();
+            $filters=$request->filters;
             DB::transaction(function () use (&$category, &$sub_categories, &$exams,$request) {
                 if (isset($request->category) && !empty($request->category)) {
                     if (ctype_digit($request->category)) {
@@ -45,7 +46,7 @@ class HomeController extends Controller
                 $exams = $exams->orderBy("order_number", 'ASC')
                     ->get();
             });
-            return view('frontend.exams.index', compact('exams', 'sub_categories','category'));
+            return view('frontend.exams.index', compact('exams', 'sub_categories','category','filters'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

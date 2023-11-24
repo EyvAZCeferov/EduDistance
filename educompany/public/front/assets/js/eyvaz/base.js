@@ -128,3 +128,67 @@ function change_filter(e, t = "datas", n = "az", a = "services") {
 function showLoader() { document.getElementById("loader").classList.add("active") }
 
 function hideLoader() { document.getElementById("loader").classList.remove("active") }
+
+function togglefilterelements(element) {
+    let elements = document.getElementsByClassName(element);
+    for (let i = 0; i < elements.length; i++) {
+        let elem = elements[i];
+        if (elem.classList.contains("active")) {
+            elem.classList.remove("active");
+        } else {
+            elem.classList.add("active");
+        }
+    }
+}
+
+function toggle_filter_contents(event, element) {
+    let elementSelectBox = document.getElementsByClassName(element);
+    for (let i = 0; i < elementSelectBox.length; i++) {
+        let elem = elementSelectBox[i];
+        if (elem.classList.contains("active")) {
+            elem.classList.remove("active");
+        } else {
+            elem.classList.add("active");
+        }
+    }
+}
+
+function setnewparametrandsearch(element, type, id) {
+
+    let formData = new FormData(document.getElementById("filter_inputs"));
+
+    let existingFilters = formData.getAll(`${element}[]`);
+
+    if (type == "select") {
+        if (!existingFilters.includes(id.toString())) {
+            existingFilters.push(id.toString());
+        } else {
+            existingFilters = existingFilters.filter(elem => elem !== id.toString());
+        }
+        let newFormData = new FormData();
+        existingFilters.forEach(elem => {
+            newFormData.append(`${element}[]`, elem);
+        });
+
+        let inputElement = document.querySelector(`[name="${element}[]"]`);
+        inputElement.value = existingFilters.join(',');
+
+    }
+
+    let newFormDataForUrl = new FormData(document.getElementById("filter_inputs"));
+    let newUrl = `/search?`;
+    for (const [key, value] of newFormDataForUrl.entries()) {
+        formData.append(key, value);
+        newUrl += `${key}=${encodeURIComponent(value)}&`;
+    }
+
+    let oem = document.getElementById('oem').value;
+    newUrl += `oem=${encodeURIComponent(oem)}`;
+
+    window.location.href = newUrl;
+}
+
+function sendAjaxRequest(e, t = "post", n = null, a) {
+    var i = new XMLHttpRequest;
+    i.onreadystatechange = function() { 4 === i.readyState && (200 === i.status ? a(null, i.responseText) : a(i.statusText)) }, "post" == t ? (i.open("POST", e), i.setRequestHeader("Content-Type", "application/json"), i.send(JSON.stringify(n))) : (i.open("GET", e), i.send())
+}

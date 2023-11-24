@@ -171,6 +171,21 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
+                                        <label for="">Ikon</label>
+                                        <div>
+                                            Ikon kitabxanası1 : <a href="https://icons8.com/line-awesome"
+                                                target="_blank">https://icons8.com/line-awesome</a>
+                                        </div>
+                                        <div>
+                                            Ikon kitabxanası2 : <a href="https://fontawesome.com/v5/search?q=icon"
+                                                target="_blank">https://fontawesome.com/v5/search?q=icon</a>
+                                        </div>
+                                        <input class="form-control" type="text" name="icon" value="{{ isset($data) && !empty($data) && isset($data->icon) && !empty($data->icon) ? $data->icon : null }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
                                         <label for="">Şəkil</label>
                                         @if (!empty($data) && isset($data->image) && !empty($data->image))
                                             <img src="{{ getImageUrl($data->image, 'category') }}" alt="image"

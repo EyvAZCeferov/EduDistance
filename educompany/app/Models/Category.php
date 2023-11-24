@@ -18,7 +18,8 @@ class Category extends Model implements HasMedia
         'description',
         'order_number',
         'parent_id',
-        'image'
+        'image',
+        'icon'
     ];
 
     protected $casts = [
