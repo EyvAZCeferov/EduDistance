@@ -51,7 +51,7 @@
 
                 <div class="my-2">
                     @if (auth('users')->check())
-                        <a href="{{ route('user.exams.redirect_exam') }}"
+                        <a href="{{ route('user.exams.redirect_exam',['exam_id'=>$data->id]) }}"
                             class="btn btn-block btn-imtahanver">@lang('additional.buttons.imtahanver')</a>
                     @else
                         <a href="{{ route('login',['savethisurl'=>url()->current()]) }}"

@@ -32,7 +32,9 @@ class Exam extends Model
         'status',
         'order_number',
         'price',
-        'endirim_price'
+        'endirim_price',
+        'user_id',
+        'start_page_id'
     ];
 
 

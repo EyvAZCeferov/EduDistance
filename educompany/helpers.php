@@ -10,6 +10,8 @@ use App\Models\Category;
 use App\Models\Counters;
 use App\Models\Settings;
 use App\Models\ExamResult;
+use App\Models\CouponCodes;
+use App\Models\ExamStartPage;
 use App\Models\StandartPages;
 use App\Models\StudentRatings;
 use Illuminate\Support\Facades\DB;
@@ -289,5 +291,29 @@ if (!function_exists('exam_answered')) {
     {
         $model = ExamResult::where('user_id', $auth_id)->where('exam_id', $exam_id)->first();
         return Cache::rememberForever("exam_answered" . $auth_id . $exam_id, fn() => $model);
+    }
+}
+
+if (!function_exists('exam_start_page')) {
+    function exam_start_page($key = null, $type = "default")
+    {
+        if ($type == "default") {
+            $model = ExamStartPage::orderBy("order_number",'ASC')->where('default',true)->first();
+        }else {
+            $model =ExamStartPage::orderBy("order_number",'ASC')->get();
+        }
+        return Cache::rememberForever("exam_start_page" . $key . $type, fn() => $model);
+    }
+}
+
+if (!function_exists('coupon_codes')) {
+    function coupon_codes($key = null, $type = "default")
+    {
+        if ($type == "default") {
+            $model = ExamStartPage::where("status",'ASC')->orderBy('id','DESC')->first();
+        }else {
+            $model =CouponCodes::orderBy('id','DESC')->get();
+        }
+        return Cache::rememberForever("coupon_codes" . $key . $type, fn() => $model);
     }
 }

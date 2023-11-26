@@ -52,6 +52,7 @@ return [
             "price"=>"Qiymət",
             'sections'=>"Sektorlar",
             'companies'=>"Şirkətlər",
+            "iamagreewithyou"=>"Yuxarıdakı şərtlər/qaydalar ilə razıyam."
         ],
         'blogs'=>[
             'blogs'=>"Bloqlar"
@@ -72,6 +73,11 @@ return [
             "random" => "Qarışıq",
             "forpriceasc" => "Qiymət azdan-çoxa",
             "forpricedesc" => "Qiymət çoxdan-az",
+        ],
+        "payments"=>[
+            'coupon_code'=>"Kupon kodu yazın",
+            "new_price"=>"Yeni məbləğ",
+            'coupon_info'=>'Kupon məlumatları'
         ],
     ],
     "buttons" => [
@@ -105,6 +111,8 @@ return [
     ],
     "messages"=>[
         "passwords_incorrect"=>"Şifrəniz yanlışdır",
-        'examnotfound'=>"Sınaq tapılmadı"
+        'examnotfound'=>"Sınaq tapılmadı",
+        "notacceptedterms"=>"Şərtləri qəbul etmədiniz",
+        'nocodefound'=>"Kupon Kod mövcud deyil"
     ],
 ];

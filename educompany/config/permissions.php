@@ -76,5 +76,7 @@ return [
     'blogs-create',
     'blogs-update',
 
+    'exam_start_page',
+    'coupon_codes',
 
 ];

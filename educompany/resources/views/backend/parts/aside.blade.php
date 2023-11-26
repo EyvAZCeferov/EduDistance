@@ -37,6 +37,20 @@
                 </li>
             @endif
 
+            @if (auth('admins')->user()->hasPermissionFor('exam_start_page'))
+                <li class="{{ url()->current() == route('exam_start_page.index') ? 'active' : '' }}">
+                    <a href="{{ route('exam_start_page.index') }}"><i class="fa fa-gears"></i> <span
+                            class="nav-label">İmtahan giriş səhifəsi</span></a>
+                </li>
+            @endif
+
+            @if (auth('admins')->user()->hasPermissionFor('coupon_codes'))
+                <li class="{{ url()->current() == route('coupon_codes.index') ? 'active' : '' }}">
+                    <a href="{{ route('coupon_codes.index') }}"><i class="fa fa-percent"></i> <span
+                            class="nav-label">Kupon Kodlar</span></a>
+                </li>
+            @endif
+
             @if (auth('admins')->user()->hasPermissionFor('exam-analyze'))
                 <li class="{{ url()->current() == route('exams.analyze') ? 'active' : '' }}">
                     <a href="{{ route('exams.analyze') }}"><i class="fa fa-filter"></i> <span

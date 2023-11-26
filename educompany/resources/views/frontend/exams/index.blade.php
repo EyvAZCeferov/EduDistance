@@ -25,7 +25,7 @@
                         'button' => true,
                     ])
                 </div>
-                <div class="d-block">
+                <div class="d-block" id="datas">
                     @if (!empty($exams) && count($exams) > 0)
                         @include('frontend.light_parts.products.products_grid', [
                             'products' => $exams,

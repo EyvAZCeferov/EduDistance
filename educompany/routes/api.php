@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\frontend\ApisController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,3 +20,6 @@ Route::get("flush",function(){
     Cache::flush();
     return "Cache OK";
 });
+Route::post('searchinfilled', [ApisController::class, 'searchinfilled'])->name("api.searchinfilled");
+Route::post('filterelements', [ApisController::class, 'filterelements'])->name("api.filterelements");
+Route::post("check_coupon_code",[ApisController::class,'check_coupon_code'])->name("api.check_coupon_code");

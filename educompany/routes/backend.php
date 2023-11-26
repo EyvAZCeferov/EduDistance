@@ -1,23 +1,25 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\backend\AuthController;
-use App\Http\Controllers\backend\BlogsController;
-use App\Http\Controllers\backend\AdminController;
-use App\Http\Controllers\backend\DashboardController;
-use App\Http\Controllers\backend\SectionController;
-use App\Http\Controllers\backend\SettingsController;
-use App\Http\Controllers\backend\UserController;
-use App\Http\Controllers\backend\ManagerController;
-use App\Http\Controllers\backend\RoleController;
-use App\Http\Controllers\backend\CommonController;
 use App\Http\Controllers\backend\ExamController;
+use App\Http\Controllers\backend\RoleController;
+use App\Http\Controllers\backend\UserController;
+use App\Http\Controllers\backend\AdminController;
+use App\Http\Controllers\backend\BlogsController;
+use App\Http\Controllers\backend\TeamsController;
+use App\Http\Controllers\backend\CommonController;
+use App\Http\Controllers\backend\ManagerController;
+use App\Http\Controllers\backend\SectionController;
+use App\Http\Controllers\backend\SlidersController;
 use App\Http\Controllers\backend\CategoryController;
 use App\Http\Controllers\backend\CountersController;
-use App\Http\Controllers\backend\SlidersController;
+use App\Http\Controllers\backend\SettingsController;
+use App\Http\Controllers\backend\DashboardController;
+use App\Http\Controllers\backend\CouponCodesController;
+use App\Http\Controllers\backend\ExamStartPageController;
 use App\Http\Controllers\backend\StandartPagesController;
 use App\Http\Controllers\backend\StudentRatingsController;
-use App\Http\Controllers\backend\TeamsController;
-use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -159,5 +161,7 @@ Route::group([
         Route::post('delete_image', [BlogsController::class, 'deleteimage'])->name("delete.image");
         Route::resource('teams', TeamsController::class);
         Route::resource('settings', SettingsController::class);
+        Route::resource('exam_start_page', ExamStartPageController::class);
+        Route::resource('coupon_codes', CouponCodesController::class);
     });
 });

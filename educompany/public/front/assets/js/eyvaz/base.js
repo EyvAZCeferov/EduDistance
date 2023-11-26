@@ -65,7 +65,6 @@ function change_tabs_elements(class_onpage, key) {
     tab.classList.add('show', 'active', 'fade');
 }
 
-
 function createalert(e, t, n = null) {
     if (null != n) var a = document.querySelector(`form#${n} #messages`);
     else a = document.querySelector("#messages");
@@ -88,7 +87,9 @@ function isValidEmail(e) { return /\S+@\S+\.\S+/.test(e) }
 
 function validPhone(e) { var t = e.replace(/\D/g, "").match(/(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/); return t[2] ? t[1] + " " + t[2] + (t[3] ? " " + t[3] : "") + (t[4] ? " " + t[4] : "") : t[1] }
 
-function searchinfields(e, t, n = "services", a = null) {
+function searchinfields(e, t, n = "exams", a = null) {
+    event.preventDefault();
+
     if (null != a) {
         if ("category" == a) {
             var i = { category: e, type: n, action: a };
@@ -191,4 +192,50 @@ function setnewparametrandsearch(element, type, id) {
 function sendAjaxRequest(e, t = "post", n = null, a) {
     var i = new XMLHttpRequest;
     i.onreadystatechange = function() { 4 === i.readyState && (200 === i.status ? a(null, i.responseText) : a(i.statusText)) }, "post" == t ? (i.open("POST", e), i.setRequestHeader("Content-Type", "application/json"), i.send(JSON.stringify(n))) : (i.open("GET", e), i.send())
+}
+
+function getserializedlang(data, type, lang) {
+    var dat;
+    if (data != null) {
+        if (type == "name") {
+            if (lang == "az") {
+                dat = data.az_name;
+            } else if (lang == "ru") {
+                dat = data.ru_name;
+            } else if (lang == "en") {
+                dat = data.en_name;
+            } else if (lang == "tr") {
+                dat = data.tr_name;
+            } else {
+                dat = data.az_name;
+            }
+        } else if (type == "slug") {
+            if (lang == "az") {
+                dat = data.az_slug;
+            } else if (lang == "ru") {
+                dat = data.ru_slug;
+            } else if (lang == "en") {
+                dat = data.en_slug;
+            } else if (lang == "tr") {
+                dat = data.tr_slug;
+            } else {
+                dat = data.az_slug;
+            }
+        } else if (type == "description") {
+            if (lang == "az") {
+                dat = data.az_description;
+            } else if (lang == "ru") {
+                dat = data.ru_description;
+            } else if (lang == "en") {
+                dat = data.en_description;
+            } else if (lang == "tr") {
+                dat = data.tr_description;
+            } else {
+                dat = data.az_description;
+            }
+        }
+    } else {
+        dat = '';
+    }
+    return dat != null ? dat : '';
 }
