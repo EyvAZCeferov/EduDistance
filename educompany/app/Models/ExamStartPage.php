@@ -30,6 +30,7 @@ class ExamStartPage extends Model
         return $this->belongsTo(Admin::class);
     }
     public function exams(){
-        return $this->hasMany(Exam::class,'start_page_id','id');
+        return $this->hasMany(ExamStartPageIds::class,'start_page_id','id');
     }
+
 }

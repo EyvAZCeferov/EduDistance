@@ -144,6 +144,14 @@ class CouponCodesController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try{
+            $data=CouponCodes::where("id",$id)->first();
+            $data->delete();
+            return redirect()->back()->with('success',"Silindi");
+        }catch(\Exception $e){
+            return redirect()->back()->with('error',$e->getMessage());
+        }finally{
+            dbdeactive();
+        }
     }
 }

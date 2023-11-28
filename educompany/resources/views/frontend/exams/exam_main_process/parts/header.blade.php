@@ -1,0 +1,26 @@
+<div class="header_columns">
+    <h1 id="section_name">{{ $exam->sections[0]->name }}</h1>
+    <div class="timer_section" id="timer_section">
+        <div class="hour_area">
+            <span id="minutes">
+            </span>:<span id="seconds"></span>
+        </div>
+        <div class="icon_area">
+            <i class="fas fa-stopwatch"></i>
+        </div>
+        <button onclick="togglehours()" type="button" class="btn btn-sm timer_button" id="timer_button">
+            @lang('additional.buttons.hide')
+        </button>
+    </div>
+
+    <div class="right_section">
+        <a class="section calculator" href="javascript:void(0)" onclick="togglecalculator()">
+            <i class="fa fa-calculator"></i>
+            @lang('additional.pages.exams.calculator')
+        </a>
+        <a class="section referances" href="javascript:void(0)" onclick="togglereferances()">
+            <i class="fa fa-superscript"></i>
+            @lang('additional.pages.exams.referances')
+        </a>
+    </div>
+</div>

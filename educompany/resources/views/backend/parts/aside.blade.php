@@ -37,6 +37,13 @@
                 </li>
             @endif
 
+            @if (auth('admins')->user()->hasPermissionFor('references'))
+                <li class="{{ url()->current() == route('references.index') ? 'active' : '' }}">
+                    <a href="{{ route('references.index') }}"><i class="fa fa-superscript"></i> <span
+                            class="nav-label">Referanslar</span></a>
+                </li>
+            @endif
+
             @if (auth('admins')->user()->hasPermissionFor('exam_start_page'))
                 <li class="{{ url()->current() == route('exam_start_page.index') ? 'active' : '' }}">
                     <a href="{{ route('exam_start_page.index') }}"><i class="fa fa-gears"></i> <span

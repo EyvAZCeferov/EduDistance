@@ -29,6 +29,8 @@
 
     <link rel="stylesheet" href="{{ asset('front/assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('front/assets/css/fontawesome-all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/assets/js/eyvaz/vendor/jquery-ui/jquery-ui.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/assets/js/eyvaz/vendor/jquery-ui/jquery-ui.theme.min.css') }}">
     @stack('css')
 
     @vite(['resources/css/app.scss', 'resources/js/app.js'])
@@ -36,12 +38,13 @@
 
 <body>
     <div class="container container-xxl">
-        @include('frontend.layouts.parts.header')
+        {{-- @include('frontend.layouts.parts.header_exam') --}}
 
         @yield('content')
     </div>
-    @include('frontend.layouts.parts.footer')
+
     <script type="text/javascript" src="{{ asset('front/assets/js/jquery.min.js') }}"></script>
+    <script type="text/javascript" defer src="{{ asset("front/assets/js/eyvaz/vendor/jquery-ui/jquery-ui.min.js") }}"></script>
     <script type="text/javascript" src="{{ asset('front/assets/js/eyvaz/base.js') }}"></script>
     <script async crossorigin defer>
         $(function() {

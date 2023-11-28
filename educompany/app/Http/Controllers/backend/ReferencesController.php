@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\backend;
 
+use App\Models\References;
 use Illuminate\Http\Request;
-use App\Models\ExamStartPage;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use Stichoza\GoogleTranslate\GoogleTranslate;
 
-class ExamStartPageController extends Controller
+class ReferencesController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,8 +18,8 @@ class ExamStartPageController extends Controller
     public function index()
     {
         try{
-            $data=exam_start_page(null,null);
-            return view("backend.pages.exam_start_page.index",compact("data"));
+            $data=references(null,null);
+            return view("backend.pages.exams.references.index",compact("data"));
         }catch(\Exception $e){
             return redirect()->back()->with('error',$e->getMessage());
         }
@@ -34,7 +33,7 @@ class ExamStartPageController extends Controller
     public function create()
     {
         try{
-            return view("backend.pages.exam_start_page.create_edit");
+            return view("backend.pages.exams.references.create_edit");
         }catch(\Exception $e){
             return redirect()->back()->with('error',$e->getMessage());
         }
@@ -50,10 +49,10 @@ class ExamStartPageController extends Controller
     {
         try{
             DB::transaction(function() use($request){
-                $model = new ExamStartPage();
+                $model = new References();
                 $image = null;
                 if ($request->hasFile('image')) {
-                    $image = image_upload($request->file("image"), 'exam_start_page');
+                    $image = image_upload($request->file("image"), 'references');
                 }
                 $name = [
                     'az_name' => trim($request->az_name) ?? " ",
@@ -68,15 +67,12 @@ class ExamStartPageController extends Controller
 
                 $model->name = $name;
                 $model->description = $description;
-                $model->default = $request->input('default') ? 1 : 0;
                 $model->order_number=$request->input('order_number')??1;
                 $model->image = $image;
-                $model->type = $request->input("type")??'info';
-                $model->user_id = Auth::guard('admins')->id();
                 $model->save();
 
             });
-            return redirect(route("exam_start_page.index"))->with("info",'Əlavə edildi');
+            return redirect(route("references.index"))->with("success",'Əlavə edildi');
         }catch(\Exception $e){
             return redirect()->back()->with('error',$e->getMessage());
         }finally{
@@ -104,8 +100,8 @@ class ExamStartPageController extends Controller
     public function edit($id)
     {
         try{
-            $data=ExamStartPage::where("id",$id)->first();
-            return view("backend.pages.exam_start_page.create_edit",compact('data'));
+            $data=References::where("id",$id)->first();
+            return view("backend.pages.exams.references.create_edit",compact("data"));
         }catch(\Exception $e){
             return redirect()->back()->with('error',$e->getMessage());
         }
@@ -122,10 +118,10 @@ class ExamStartPageController extends Controller
     {
         try{
             DB::transaction(function() use($request,$id){
-                $model = ExamStartPage::where('id',$id)->first();
+                $model = References::where('id',$id)->first();
                 if ($request->hasFile('image')) {
-                    $image = image_upload($request->file("image"), 'exam_start_page');
-                    $model->image = $image;
+                    $image = image_upload($request->file("image"), 'references');
+                    $model->update(['image'=>$image]);
                 }
                 $name = [
                     'az_name' => trim($request->az_name) ?? " ",
@@ -140,13 +136,11 @@ class ExamStartPageController extends Controller
 
                 $model->name = $name;
                 $model->description = $description;
-                $model->default = $request->input('default') ? 1 : 0;
                 $model->order_number=$request->input('order_number')??1;
-                $model->type = $request->input("type")??'info';
                 $model->update();
 
             });
-            return redirect(route("exam_start_page.index"))->with("success",'Yeniləndi');
+            return redirect(route("references.index"))->with("success",'Yeniləndi');
         }catch(\Exception $e){
             return redirect()->back()->with('error',$e->getMessage());
         }finally{
@@ -163,7 +157,7 @@ class ExamStartPageController extends Controller
     public function destroy($id)
     {
         try{
-            $data=ExamStartPage::where("id",$id)->first();
+            $data=References::where("id",$id)->first();
             $data->delete();
             return redirect()->back()->with('success',"Silindi");
         }catch(\Exception $e){

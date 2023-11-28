@@ -52,7 +52,14 @@ return [
             "price"=>"Qiymət",
             'sections'=>"Sektorlar",
             'companies'=>"Şirkətlər",
-            "iamagreewithyou"=>"Yuxarıdakı şərtlər/qaydalar ilə razıyam."
+            "iamagreewithyou"=>"Yuxarıdakı şərtlər/qaydalar ilə razıyam.",
+            "questions_on_exam_page"=>"Sual <span id='current_question'>:current</span>-:total",
+            "questions_title_on_exam_page"=>"Suallar",
+            "cari"=>"Cari",
+            "cavablandirilmamis"=>"Cavablandırılmamış",
+            "saved"=>"Yenidən baxış",
+            "calculator"=>"Kalkulyator",
+            "referances"=>"İstinadlar"
         ],
         'blogs'=>[
             'blogs'=>"Bloqlar"
@@ -91,7 +98,10 @@ return [
         "free"=>"Ödənişsiz",
         "back"=>"Geri",
         "imtahanver"=>"İmtahan ver",
-        'filter'=>"Filter"
+        'filter'=>"Filter",
+        "gotohome"=>"Əsas səhifəyə keçin",
+        'hide'=>"Gizlət",
+        'show'=>"Göstər"
     ],
     "forms" => [
         'name' => 'Ad, Soyad',

@@ -10,10 +10,13 @@ use App\Models\Category;
 use App\Models\Counters;
 use App\Models\Settings;
 use App\Models\ExamResult;
+use App\Models\References;
 use App\Models\CouponCodes;
 use App\Models\ExamStartPage;
 use App\Models\StandartPages;
+use App\Models\ExamReferences;
 use App\Models\StudentRatings;
+use App\Models\ExamStartPageIds;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Cache;
@@ -129,13 +132,13 @@ if (!function_exists('queuework')) {
 }
 
 if (!function_exists('count_endirim_faiz')) {
-    function count_endirim_faiz($price,$endirim_price)
+    function count_endirim_faiz($price, $endirim_price)
     {
-        $model=0;
-        if($price!=0){
-            $model=($endirim_price/$price)*100;
+        $model = 0;
+        if ($price != 0) {
+            $model = ($endirim_price / $price) * 100;
         }
-        return Cache::rememberForever("count_endirim_faiz".$price.$endirim_price, fn() => $model);
+        return Cache::rememberForever("count_endirim_faiz" . $price . $endirim_price, fn() => $model);
     }
 }
 
@@ -182,11 +185,11 @@ if (!function_exists('sections')) {
     {
         if ($type == "exammed") {
             $model = Section::whereHas('questions')->select('name', DB::raw('MAX(id) as id'))
-            ->groupBy('name')->get();
+                ->groupBy('name')->get();
         } else {
             $model = Section::select('name', DB::raw('MAX(id) as id'))
-            ->groupBy('name')
-            ->orderBy('id', 'DESC')->get();
+                ->groupBy('name')
+                ->orderBy('id', 'DESC')->get();
         }
         return Cache::rememberForever("sections" . $key . $type, fn() => $model);
     }
@@ -196,11 +199,11 @@ if (!function_exists('users')) {
     function users($key = null, $type = "exammed")
     {
         if ($type == "exammed") {
-            $model = User::where('user_type',2)->orderBy("id","DESC")->whereHas('exams')->get();
-        }else if($type=="company"){
-            $model = User::where('user_type',2)->orderBy("id","DESC")->get();
+            $model = User::where('user_type', 2)->orderBy("id", "DESC")->whereHas('exams')->get();
+        } else if ($type == "company") {
+            $model = User::where('user_type', 2)->orderBy("id", "DESC")->get();
         } else {
-            $model = User::orderBy("id","DESC")->whereHas('exams')->get();
+            $model = User::orderBy("id", "DESC")->whereHas('exams')->get();
         }
         return Cache::rememberForever("users" . $key . $type, fn() => $model);
     }
@@ -230,12 +233,14 @@ if (!function_exists('exams')) {
                 ->orWhereRaw('LOWER(JSON_EXTRACT(`description`, "$.en_description")) like ?', ['%' . $key . '%'])
                 ->orderBy("order_number", 'ASC')
                 ->get();
-        }else if(empty($key) && $type=="most_used_tests"){
-            $model = Exam::with(['results' => function ($query) {
-                $query->orderBy('point', 'DESC');
-            }])
-            ->orderByDesc('id')
-            ->get();
+        } else if (empty($key) && $type == "most_used_tests") {
+            $model = Exam::with([
+                'results' => function ($query) {
+                    $query->orderBy('point', 'DESC');
+                }
+            ])
+                ->orderByDesc('id')
+                ->get();
         } else {
             $model = Exam::where('status', true)->orderBy("order_number", 'ASC')->get();
         }
@@ -298,9 +303,11 @@ if (!function_exists('exam_start_page')) {
     function exam_start_page($key = null, $type = "default")
     {
         if ($type == "default") {
-            $model = ExamStartPage::orderBy("order_number",'ASC')->where('default',true)->first();
-        }else {
-            $model =ExamStartPage::orderBy("order_number",'ASC')->get();
+            $model = ExamStartPage::orderBy("order_number", 'ASC')->where('default', true)->first();
+        } else if ($type == "expectdefault") {
+            $model = ExamStartPage::orderBy("order_number", 'ASC')->where('default', false)->get();
+        } else {
+            $model = ExamStartPage::orderBy("order_number", 'ASC')->get();
         }
         return Cache::rememberForever("exam_start_page" . $key . $type, fn() => $model);
     }
@@ -310,10 +317,35 @@ if (!function_exists('coupon_codes')) {
     function coupon_codes($key = null, $type = "default")
     {
         if ($type == "default") {
-            $model = ExamStartPage::where("status",'ASC')->orderBy('id','DESC')->first();
-        }else {
-            $model =CouponCodes::orderBy('id','DESC')->get();
+            $model = ExamStartPage::where("status", 'ASC')->orderBy('id', 'DESC')->first();
+        } else {
+            $model = CouponCodes::orderBy('id', 'DESC')->get();
         }
         return Cache::rememberForever("coupon_codes" . $key . $type, fn() => $model);
+    }
+}
+
+if (!function_exists('references')) {
+    function references($key = null, $type = "asc")
+    {
+        if ($type == "asc") {
+            $model = References::orderBy('order_number', 'ASC')->get();
+        } else {
+            $model = References::orderBy('id', 'DESC')->get();
+        }
+        return Cache::rememberForever("references" . $key . $type, fn() => $model);
+    }
+}
+
+if (!function_exists('exist_on_model')) {
+    function exist_on_model($key = null, $data_id = null, $type = "references")
+    {
+        if ($type == "references") {
+            $model = ExamReferences::where("exam_id", $data_id)->where("reference_id", $key)->first();
+        } elseif ($type == "start_page") {
+            $model = ExamStartPageIds::where("exam_id", $data_id)->where("start_page_id", $key)->first();
+            ;
+        }
+        return Cache::rememberForever("exist_on_model" . $key . $data_id . $type, fn() => $model);
     }
 }

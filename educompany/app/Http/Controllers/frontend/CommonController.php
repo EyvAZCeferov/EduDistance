@@ -122,7 +122,9 @@ class CommonController extends Controller
     {
         try {
             if (Auth::guard('users')->check()) {
-                $exam = Exam::where('id', $request->exam_id)->first();
+                $exam = Exam::where('id', $request->exam_id)
+                    ->with(['sections'])
+                    ->first();
                 $exam_start_pages = collect();
                 if (!empty($exam)) {
                     $exam_result = ExamResult::where("exam_id", $request->exam_id)
@@ -134,10 +136,10 @@ class CommonController extends Controller
                             $exam_start_pages = ExamStartPage::where('id', $exam->start_page_id)->first();
                             if (empty($exam_start_pages)) {
                                 $exam_start_pages = exam_start_page();
-                            }else{
-                                if($exam_start_pages->default==false){
+                            } else {
+                                if ($exam_start_pages->default == false) {
                                     $default = exam_start_page();
-                                    $exam_start_pages=collect([$exam_start_pages,$default]);
+                                    $exam_start_pages = collect([$exam_start_pages, $default]);
                                     $exam_start_pages = $exam_start_pages->sortBy('order_number')->values();
                                 }
                             }
@@ -146,12 +148,12 @@ class CommonController extends Controller
                         }
 
                         if (empty($exam_start_pages)) {
-                            return view("frontend.exams.exam_main_process.index"); // imtahan
+                            return view("frontend.exams.exam_main_process.index", compact("exam")); // imtahan
                         } else {
                             return view("frontend.exams.exam_main_process.start_page", compact("exam", 'exam_start_pages'));
                         }
                     } else {
-                        return view("frontend.exams.exam_main_process.index"); // imtahan
+                        return view("frontend.exams.exam_main_process.index", compact('exam')); // imtahan
                     }
                 } else {
                     return $this->notfound();
@@ -172,44 +174,42 @@ class CommonController extends Controller
                 ->where('user_id', Auth::guard('users')->id())
                 ->whereNull("point")
                 ->first();
+            $exam = Exam::where("id", $request->exam_id)
+                ->with(['sections'])
+                ->first();
             if (empty($exam_result)) {
-                $exam_price=0;
-                $exam=Exam::where("id",$request->exam_id)->first();
-
-                if($exam->price>0){
-                    if($exam->endirim_price!=null && $exam->endirim_price!=$exam->price){
-                        $exam_price=$exam->endirim_price;
-                    }else{
-                        $exam_price=$exam->price;
+                $exam_price = 0;
+                if ($exam->price > 0) {
+                    if ($exam->endirim_price != null && $exam->endirim_price != $exam->price) {
+                        $exam_price = $exam->endirim_price;
+                    } else {
+                        $exam_price = $exam->price;
                     }
                 }
-
                 $exam_result = new ExamResult();
                 $exam_result->user_id = Auth::guard('users')->id();
                 $exam_result->exam_id = $request->exam_id;
-                $exam_result->payed = $exam_price==0?true: false;
+                $exam_result->payed = $exam_price == 0 ? true : false;
                 $exam_result->save();
             }
 
             if ($exam_result->payed == true) {
-                return view("frontend.exams.exam_main_process.index");
+                return view("frontend.exams.exam_main_process.index", compact('exam'));
             } else {
-
-                $exam=Exam::where("id",$request->exam_id)->first();
                 $payment_dat = [
                     'exam_id' => $request->exam_id,
-                    'exam_name' => $exam->name[app()->getLocale().'_name'],
-                    'exam_image' => getImageUrl($exam->image,'exams'),
+                    'exam_name' => $exam->name[app()->getLocale() . '_name'],
+                    'exam_image' => getImageUrl($exam->image, 'exams'),
                     'exam_result_id' => $exam_result->id,
                     'user_id' => Auth::guard('users')->id(),
                     'token' => Str::uuid(),
-                    'price'=>$exam->price,
-                    'endirim_price'=>$exam->endirim_price,
-                    'amount'=>$exam_price,
-                    'coupon_id'=>'coupon_id',
-                    'coupon_code'=>'coupon_code',
-                    'coupon_value'=>'coupon_code',
-                    'coupon_type'=>'coupon_code',
+                    'price' => $exam->price,
+                    'endirim_price' => $exam->endirim_price,
+                    'amount' => $exam_price,
+                    'coupon_id' => 'coupon_id',
+                    'coupon_code' => 'coupon_code',
+                    'coupon_value' => 'coupon_code',
+                    'coupon_type' => 'coupon_code',
                 ];
                 $apiscontroller = new ApisController();
                 $response = $apiscontroller->create_payment($payment_dat);

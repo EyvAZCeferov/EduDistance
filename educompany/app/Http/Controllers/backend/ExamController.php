@@ -10,7 +10,9 @@ use App\Models\ExamResult;
 use Illuminate\Support\Str;
 use App\Models\ExamQuestion;
 use Illuminate\Http\Request;
+use App\Models\ExamReferences;
 use App\Models\ExamResultAnswer;
+use App\Models\ExamStartPageIds;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Stichoza\GoogleTranslate\GoogleTranslate;
@@ -127,10 +129,41 @@ class ExamController extends Controller
         $model->point = $request->input('point');
         $model->content =  $description;
         $model->status = $request->input('status') ? 1 : 0;
+        $model->show_calc = $request->input('show_calc') ? 1 : 0;
         $model->order_number=$request->input('order_number')??1;
         $model->price=$request->input('price')??1;
         $model->endirim_price=$request->input('endirim_price')??1;
         $model->save();
+
+        $exam_start_pages=ExamStartPageIds::where("exam_id",$model->id)->get();
+        foreach($exam_start_pages as $val){
+            $val->delete();
+        }
+
+        if(!empty($request->exam_start_page_id)){
+            foreach($request->exam_start_page_id as $id){
+                $page=new ExamStartPageIds();
+                $page->exam_id=$model->id;
+                $page->start_page_id=$id;
+                $page->save();
+            }
+        }
+
+        $references=ExamReferences::where("exam_id",$model->id)->get();
+        foreach($references as $val){
+            $val->delete();
+        }
+
+        if(!empty($request->exam_references)){
+            foreach($request->exam_references as $id){
+                $page=new ExamReferences();
+                $page->exam_id=$model->id;
+                $page->reference_id=$id;
+                $page->save();
+            }
+        }
+
+
         dbdeactive();
         return redirect()->route('exams.index')->with(['success' => 'Uğurla!']);
     }

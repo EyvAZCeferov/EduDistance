@@ -239,3 +239,22 @@ function getserializedlang(data, type, lang) {
     }
     return dat != null ? dat : '';
 }
+
+function toggleModalnow(idelement, status = 'open') {
+    var modal = document.getElementById(idelement);
+    var overlay = document.getElementById("myModalOverlay");
+
+    if (status === 'open') {
+        modal.style.display = "block";
+        overlay = document.createElement("div");
+        overlay.id = "myModalOverlay";
+        overlay.className = "modal-overlay";
+        document.body.appendChild(overlay);
+    } else {
+        if (overlay) {
+            overlay.remove();
+        }
+        modal.style.display = "none";
+
+    }
+}

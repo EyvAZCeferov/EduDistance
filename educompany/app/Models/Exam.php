@@ -30,6 +30,7 @@ class Exam extends Model
         'image',
         'category_id',
         'status',
+        'show_calc',
         'order_number',
         'price',
         'endirim_price',
@@ -37,12 +38,6 @@ class Exam extends Model
         'start_page_id'
     ];
 
-
-    protected $with = [
-        'results',
-        'category',
-        'sections',
-    ];
 
     protected static function booted()
     {
@@ -73,7 +68,7 @@ class Exam extends Model
 
     public function sections(): HasMany
     {
-        return $this->hasMany(Section::class, 'exam_id', 'id');
+        return $this->hasMany(Section::class, 'exam_id', 'id')->with("questions");
     }
 
     public function category(): HasOne
@@ -90,5 +85,8 @@ class Exam extends Model
         //            return true;
         //        }
         return $results;
+    }
+    public function start_pages(){
+        return $this->hasMany(ExamStartPageIds::class,'exam_id','id')->with('exam','start_page')->orderByRaw('start_page.id');
     }
 }

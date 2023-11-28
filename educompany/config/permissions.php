@@ -78,5 +78,6 @@ return [
 
     'exam_start_page',
     'coupon_codes',
+    'references',
 
 ];

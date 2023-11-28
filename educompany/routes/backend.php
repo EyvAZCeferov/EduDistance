@@ -16,6 +16,7 @@ use App\Http\Controllers\backend\CategoryController;
 use App\Http\Controllers\backend\CountersController;
 use App\Http\Controllers\backend\SettingsController;
 use App\Http\Controllers\backend\DashboardController;
+use App\Http\Controllers\backend\ReferencesController;
 use App\Http\Controllers\backend\CouponCodesController;
 use App\Http\Controllers\backend\ExamStartPageController;
 use App\Http\Controllers\backend\StandartPagesController;
@@ -163,5 +164,6 @@ Route::group([
         Route::resource('settings', SettingsController::class);
         Route::resource('exam_start_page', ExamStartPageController::class);
         Route::resource('coupon_codes', CouponCodesController::class);
+        Route::resource('references', ReferencesController::class);
     });
 });

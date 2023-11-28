@@ -1,11 +1,20 @@
 @extends('backend.layouts.main')
-
+@push('css')
+    <link rel="stylesheet" href="https://unpkg.com/multiple-select@1.7.0/dist/multiple-select.min.css">
+@endpush
 @push('js')
-    <script>
-        var elem = document.querySelector('.js-switch');
-        var switchery = new Switchery(elem, {
-            color: '#1AB394'
+    <script src="https://unpkg.com/multiple-select@1.7.0/dist/multiple-select.min.js"></script>
+    <script defer>
+        var elem = document.getElementsByClassName('js-switch');
+        var elemArray = Array.from(elem); // HTML koleksiyonunu diziye dönüştür
+
+        elemArray.forEach(function(item) {
+            var switchery = new Switchery(item, {
+                color: '#1AB394'
+            });
         });
+
+        $('.multiselect').multipleSelect()
     </script>
 @endpush
 
@@ -202,6 +211,44 @@
                                 </div>
                             </div>
 
+
+                            <hr>
+                            <br />
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="d-block w-100" for="">Giriş səhifələri</label>
+                                        <select name="exam_start_page_id[]" multiple class="multiselect d-block w-100">
+                                            @foreach (exam_start_page(null, 'expectdefault') as $key => $value)
+                                                <option @if (isset($data) && !empty($data) && !empty(exist_on_model($value->id, $data->id, 'start_page'))) selected @endif
+                                                    value="{{ $value->id }}">
+                                                    {{ $value->name[app()->getLocale() . '_name'] }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="d-block w-100" for="">Referanslar</label>
+                                        <select name="exam_references[]" multiple class="multiselect d-block w-100">
+                                            @foreach (references(null, 'asc') as $key => $value)
+                                                <option @if (isset($data) && !empty($data) && !empty(exist_on_model($value->id, $data->id, 'references'))) selected @endif
+                                                    value="{{ $value->id }}">
+                                                    {{ $value->name[app()->getLocale() . '_name'] }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="" class="w-100">Kalkulyator göstərilsin</label>
+                                        <input type="checkbox" checked value="1" name="show_calc"
+                                            {{ isset($data) && !empty($data) && $data->show_calc ? 'checked' : '' }}
+                                            class="js-switch {{ $errors->first('show_calc') ? 'is-invalid' : '' }}">
+                                    </div>
+                                </div>
+                            </div>
 
                             <hr>
 
