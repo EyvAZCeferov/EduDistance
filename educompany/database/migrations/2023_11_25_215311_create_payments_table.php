@@ -21,6 +21,17 @@ return new class extends Migration
             $table->boolean("payment_status")->default(false);
             $table->json("data")->nullable();
             $table->json("frompayment")->nullable();
+            $table->unsignedBigInteger("exam_id");
+            $table->foreign('exam_id')->references("id")->on("exams")->onDelete('cascade');
+            $table->unsignedBigInteger("user_id");
+            $table->foreign('user_id')->references("id")->on("users")->onDelete('cascade');
+            $table->unsignedBigInteger("coupon_id");
+            $table->foreign('coupon_id')->references("id")->on("coupon_codes")->onDelete('cascade');
+            $table->unsignedBigInteger("exam_result_id");
+            $table->foreign('exam_result_id')->references("id")->on("exam_results")->onDelete('cascade');
+            $table->json("exam_data")->nullable();
+            $table->json("user_data")->nullable();
+            $table->json("coupon_data")->nullable();
             $table->timestamps();
         });
     }

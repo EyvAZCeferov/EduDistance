@@ -12,10 +12,13 @@ use App\Models\Settings;
 use App\Models\ExamResult;
 use App\Models\References;
 use App\Models\CouponCodes;
+use App\Models\ExamQuestion;
 use App\Models\ExamStartPage;
+use App\Models\MarkQuestions;
 use App\Models\StandartPages;
 use App\Models\ExamReferences;
 use App\Models\StudentRatings;
+use App\Models\ExamResultAnswer;
 use App\Models\ExamStartPageIds;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -347,5 +350,84 @@ if (!function_exists('exist_on_model')) {
             ;
         }
         return Cache::rememberForever("exist_on_model" . $key . $data_id . $type, fn() => $model);
+    }
+}
+
+if (!function_exists('question_is_marked')) {
+    function question_is_marked($question_id, $exam_id, $exam_result_id, $user_id)
+    {
+        $model = MarkQuestions::where("exam_id", $exam_id)
+            ->where("exam_result_id", $exam_result_id)
+            ->where("question_id", $question_id)
+            ->where("user_id", $user_id)->first();
+        return Cache::rememberForever("question_is_marked" . $question_id . $exam_id . $exam_result_id . $user_id, fn() => $model);
+    }
+}
+
+if (!function_exists('int_to_abcd_value')) {
+    function int_to_abcd_value($key)
+    {
+        $model = '';
+        if ($key == 0) {
+            $model = "A";
+        } else if ($key == 1) {
+            $model = "B";
+        } else if ($key == 2) {
+            $model = "C";
+        } else if ($key == 3) {
+            $model = "D";
+        } else if ($key == 4) {
+            $model = "E";
+        } else if ($key == 5) {
+            $model = "F";
+        } else if ($key == 6) {
+            $model = "G";
+        } else if ($key == 7) {
+            $model = "H";
+        }
+        return Cache::rememberForever("int_to_abcd_value" . $key, fn() => $model);
+    }
+}
+
+if (!function_exists('answer_result_true_or_false')) {
+    function answer_result_true_or_false($question_id, $value)
+    {
+        $model = null;
+        if ($value != null) {
+            $question = ExamQuestion::where("id", $question_id)->first();
+
+            if ($question->type == 1) {
+                if ($question->correctAnswer()->id == $value) {
+                    $model = true;
+                } else {
+                    $model = false;
+                }
+            } else if ($question->type == 2) {
+
+            } else if ($question->type == 3) {
+
+            } else if ($question->type == 4) {
+
+            }
+        }
+        return Cache::rememberForever("answer_result_true_or_false" . $question_id . $value, fn() => $model);
+    }
+}
+
+if (!function_exists('your_answer_result_true_or_false')) {
+    function your_answer_result_true_or_false($question_id, $value, $result_id)
+    {
+        $model = null;
+        $question_result = ExamResultAnswer::where("question_id", $question_id)
+            ->where('result_id', $result_id)
+            ->first();
+        if (!empty($question_result)) {
+            if ($question_result->answer_id == $value) {
+                $model = true;
+            } else {
+                $model = false;
+            }
+        }
+        return Cache::rememberForever("your_answer_result_true_or_false" . $question_id . $result_id . $value, fn() => $model);
     }
 }

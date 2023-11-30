@@ -125,20 +125,47 @@ class ApisController extends Controller
     public function create_payment($req)
     {
         try {
+            $user=[
+                'name'=>$req['user_name'],
+                'email'=>$req['user_email'],
+                'phone'=>$req['user_phone'],
+                'id'=>$req['user_id']
+            ];
+            $exam=[
+                'name'=>$req['exam_name'],
+                'image'=>$req['exam_image'],
+                'id'=>$req['exam_id']
+            ];
+            $coupon=[
+                'name'=>$req['coupon_name']??null,
+                'discount'=>$req['coupon_discount']??null,
+                'code'=>$req['coupon_code']??null,
+                'type'=>$req['coupon_type']??null,
+                'id'=>$req['coupon_id']??null
+            ];
             $payment = new Payments();
             $payment->token = $req['token'];
             $payment->amount = $req['amount'];
             $payment->payment_status = 0;
             $payment->data = $req;
+            $payment->user_id=$req['user_id'];
+            $payment->exam_id=$req['exam_id'];
+            $payment->coupon_id=$req['coupon_id']??null;
+            $payment->exam_result_id=$req['exam_result_id'];
+            $payment->exam_data=$exam;
+            $payment->user_data=$user;
+            $payment->coupon_data=$coupon;
             $payment->save();
 
             // 'transaction_id',
             // 'frompayment'
-
-            $epoint = new Epoint();
-            $epoint = $epoint->typeCard($payment->id, $payment->amount, $req['exam_name']);
-            dd($epoint);
-            return $epoint;
+            if ($req['amount'] > 0) {
+                $epoint = new Epoint();
+                $epoint = $epoint->typeCard($payment->id, $payment->amount, $req['exam_name']);
+                return $epoint;
+            } else {
+                return $payment;
+            }
 
         } catch (\Exception $e) {
             return [$e->getMessage(), $e->getLine()];
@@ -169,7 +196,7 @@ class ApisController extends Controller
                         }
                     }
 
-                    $result = '<span class="text text-info">' . trans('additional.pages.payments.coupon_info', [], $request->language) .': '. $code->name[$request->language . '_name'] . ': ' . $code->discount . ($code->type == 'percent' ? '%' : '₼') . '<br/>' . trans('additional.pages.payments.new_price', [], $request->language) . ' <span class="font-weight-bold text text-danger">' . $new_price . '₼</span> </span>';
+                    $result = '<span class="text text-info">' . trans('additional.pages.payments.coupon_info', [], $request->language) . ': ' . $code->name[$request->language . '_name'] . ': ' . $code->discount . ($code->type == 'percent' ? '%' : '₼') . '<br/>' . trans('additional.pages.payments.new_price', [], $request->language) . ' <span class="font-weight-bold text text-danger">' . $new_price . '₼</span> </span>';
 
                     return response()->json(['status' => 'success', 'data' => $result]);
                 } else {

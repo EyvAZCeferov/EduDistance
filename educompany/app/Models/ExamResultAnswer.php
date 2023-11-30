@@ -11,14 +11,28 @@ class ExamResultAnswer extends Model
     use HasFactory;
 
     protected $table = 'exam_result_answers';
+    protected $fillable=[
+        'result_id',
+        'section_id',
+        'question_id',
+        'answer_id',
+        'answers',
+        'value',
+        'result',
+    ];
 
     protected $casts = [
-        'answers' => 'json'
+        'answers' => 'json',
+        'result_id'=>"integer",
+        'section_id'=>"integer",
+        'question_id'=>"integer",
+        'answer_id'=>"integer",
+        'result'=>"boolean",
     ];
-    protected $with=[
-        'question',
-        'answer'
-    ];
+    // protected $with=[
+    //     'question',
+    //     'answer'
+    // ];
 
     public function question(): HasOne
     {

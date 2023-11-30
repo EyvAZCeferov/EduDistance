@@ -248,6 +248,15 @@
                                             class="js-switch {{ $errors->first('show_calc') ? 'is-invalid' : '' }}">
                                     </div>
                                 </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="" class="w-100">Modullar / Bölmələr arasındaki vaxd <span
+                                                class="badge badge-sm badge-warning">Saniyə</span> </label>
+                                        <input type="number"
+                                            value="{{ isset($data) && !empty($data) ? $data->time_range_sections : 0 }}"
+                                            name="time_range_sections" class="form-control">
+                                    </div>
+                                </div>
                             </div>
 
                             <hr>

@@ -53,13 +53,18 @@ return [
             'sections'=>"Sektorlar",
             'companies'=>"Şirkətlər",
             "iamagreewithyou"=>"Yuxarıdakı şərtlər/qaydalar ilə razıyam.",
-            "questions_on_exam_page"=>"Sual <span id='current_question'>:current</span>-:total",
+            "questions_on_exam_page"=>"Sual <span id='current_question_text'>:current</span>-:total",
             "questions_title_on_exam_page"=>"Suallar",
             "cari"=>"Cari",
             "cavablandirilmamis"=>"Cavablandırılmamış",
             "saved"=>"Yenidən baxış",
             "calculator"=>"Kalkulyator",
-            "referances"=>"İstinadlar"
+            "referances"=>"İstinadlar",
+            "references_open"=>"Hamısını aç",
+            "references_hide"=>"Hamısını bağla",
+            "question_info_text"=>"Baxış üçün işarələyin",
+            "question_text_area_placeholder"=>"Cavabınızı qeyd edin...",
+            "section_arasi_vaxd_gozle"=>':time saniyə sonra yenidən davam edəcək'
         ],
         'blogs'=>[
             'blogs'=>"Bloqlar"
@@ -101,7 +106,9 @@ return [
         'filter'=>"Filter",
         "gotohome"=>"Əsas səhifəyə keçin",
         'hide'=>"Gizlət",
-        'show'=>"Göstər"
+        'show'=>"Göstər",
+        'finish'=>"Bitir",
+        'nextsection'=>'Sonrakı bölmə'
     ],
     "forms" => [
         'name' => 'Ad, Soyad',
@@ -123,6 +130,11 @@ return [
         "passwords_incorrect"=>"Şifrəniz yanlışdır",
         'examnotfound'=>"Sınaq tapılmadı",
         "notacceptedterms"=>"Şərtləri qəbul etmədiniz",
-        'nocodefound'=>"Kupon Kod mövcud deyil"
+        'nocodefound'=>"Kupon Kod mövcud deyil",
+        "noprint"=>"Ekran şəkli çəkmək/ Print etmək qadağandır",
+        "yenidenbaxisucunisaretlendi"=>'Yenidən baxış üçün işarələndi',
+        "yenidenbaxisdancixarildi"=>'Yenidən baxış siyahısından çıxarıldı',
+        "answersnotfound"=>"Heç bir suala cavab vermədiniz",
+        'exam_finished'=>"İmtahan yekunlaşdı. Nəticələr səhifəsinə yönləndirilirsiniz..."
     ],
 ];

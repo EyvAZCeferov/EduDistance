@@ -14,13 +14,17 @@
     </div>
 
     <div class="right_section">
-        <a class="section calculator" href="javascript:void(0)" onclick="togglecalculator()">
-            <i class="fa fa-calculator"></i>
-            @lang('additional.pages.exams.calculator')
-        </a>
-        <a class="section referances" href="javascript:void(0)" onclick="togglereferances()">
-            <i class="fa fa-superscript"></i>
-            @lang('additional.pages.exams.referances')
-        </a>
+        @if ($exam->show_calc == true)
+            <a class="section calculator" href="javascript:void(0)" onclick="togglecalculator()">
+                <i class="fa fa-calculator"></i>
+                @lang('additional.pages.exams.calculator')
+            </a>
+        @endif
+        @if (!empty($exam->references))
+            <a class="section referances" href="javascript:void(0)" onclick="togglereferances()">
+                <i class="fa fa-superscript"></i>
+                @lang('additional.pages.exams.referances')
+            </a>
+        @endif
     </div>
 </div>

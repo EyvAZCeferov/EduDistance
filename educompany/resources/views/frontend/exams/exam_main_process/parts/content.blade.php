@@ -1,1 +1,70 @@
-Content
+@foreach ($questions as $key => $value)
+    <div class="content_exam @if ($key == 0) show @endif" data-key="{{ $key + 1 }}"
+        data-id="{{ $value->id }}" id="content_exam_{{ $value->id }}"
+        data-section_id="{{ $value->section_id }}"
+        data-section_name="{{ $value->section->name }}"
+        >
+        <div class="col left_col">
+            <div class="buttons_top_aplusandminus">
+                <div></div>
+                <div class="buttons">
+                    <a href="javascript:void(0)" class="button left" onclick="increase_decrease_font('increase')">A+</a>
+                    <a href="javascript:void(0)" class="button right"
+                        onclick="increase_decrease_font('decrease')">A-</a>
+                </div>
+            </div>
+            <div class="content_exam_info">
+                {!! $value->question !!}
+            </div>
+        </div>
+        <div class="col right_col">
+            <div class="question_header">
+                <div>
+                    <span class="question_number">{{ $key + 1 }}</span>
+                    <a href="javascript:void(0)" onclick="mark_unmark_question({{ $value->id }})"
+                        id="mark_question_button_{{ $value->id }}"
+                        class="mark_button @if (!empty(question_is_marked($value->id, $exam->id, $exam_result->id, auth('users')->id()))) active @endif">
+                        @if (!empty(question_is_marked($value->id, $exam->id, $exam_result->id, auth('users')->id())))
+                            <i class="fa fa-bookmark"></i>
+                        @else
+                            <i class="far fa-bookmark"></i>
+                        @endif
+                    </a>
+                    <span class="info_text">@lang('additional.pages.exams.question_info_text')</span>
+                </div>
+                <div>
+                    @if ($value->type != 3 && !isset($hide_abc))
+                        <a href="javascript:void(0)" class="remove_button" onclick="remove_button_toggler()">
+                            ABC
+                        </a>
+                    @endif
+                </div>
+
+            </div>
+            <div class="question_content">
+                @if ($value->type == 1)
+                    @include('frontend.exams.exam_main_process.parts.question_radio', [
+                        'question' => $value,
+                        'exam_result'=>$exam_result
+                    ])
+                @elseif($value->type == 2)
+                    @include('frontend.exams.exam_main_process.parts.question_checkbox', [
+                        'question' => $value,
+                        'exam_result'=>$exam_result
+                    ])
+                @elseif($value->type == 3)
+                    @include('frontend.exams.exam_main_process.parts.question_textbox', [
+                        'question' => $value,
+                        'exam_result'=>$exam_result
+                    ])
+                @elseif($value->type == 4)
+                    @include('frontend.exams.exam_main_process.parts.question_match', [
+                        'question' => $value,
+                        'exam_result'=>$exam_result
+                    ])
+                @endif
+            </div>
+
+        </div>
+    </div>
+@endforeach

@@ -20,6 +20,7 @@ class ExamQuestion extends Model implements HasMedia
          'Tək Seçimli' => 1,
          'Çox Seçimli' => 2,
          'Açıq' => 3,
+         'Uzlaşma' => 4,
      ];
 
     public const ALLOWED_FILE_SIZE_KB = 20 * 1024;
@@ -56,8 +57,14 @@ class ExamQuestion extends Model implements HasMedia
             return $this->answers?->where('correct', true)?->first();
         } elseif ($this->type == 2) {
             return $this->answers?->where('correct', true);
+        }elseif ($this->type == 3) {
+            return $this->answers?->where('correct', true)->first();
+        }else{
+            return $this->answers?->where('correct', true)?->first();
         }
+    }
 
-        return $this->answers?->where('correct', true)?->first();
+    public function section(){
+        return $this->hasOne(Section::class,'id','section_id');
     }
 }

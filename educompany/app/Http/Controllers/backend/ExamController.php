@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\backend;
 
 use App\Models\Exam;
+use App\Models\MarkQuestions;
 use App\Models\User;
 use App\Models\Section;
 use App\Models\ExamAnswer;
@@ -74,9 +75,10 @@ class ExamController extends Controller
         $model->point = $request->input('point');
         $model->content = $description;
         $model->status = $request->input('status') ? 1 : 0;
-        $model->order_number=$request->input('order_number')??1;
-        $model->price=$request->input('price')??1;
-        $model->endirim_price=$request->input('endirim_price')??1;
+        $model->order_number = $request->input('order_number') ?? 1;
+        $model->price = $request->input('price') ?? 1;
+        $model->endirim_price = $request->input('endirim_price') ?? 1;
+        $model->time_range_sections = $request->input('time_range_sections') ?? 0;
         $model->image = $image;
 
         $model->save();
@@ -127,38 +129,39 @@ class ExamController extends Controller
         $model->slug = Str::slug($name['az_name']);
         $model->duration = $request->input('duration');
         $model->point = $request->input('point');
-        $model->content =  $description;
+        $model->content = $description;
         $model->status = $request->input('status') ? 1 : 0;
         $model->show_calc = $request->input('show_calc') ? 1 : 0;
-        $model->order_number=$request->input('order_number')??1;
-        $model->price=$request->input('price')??1;
-        $model->endirim_price=$request->input('endirim_price')??1;
+        $model->order_number = $request->input('order_number') ?? 1;
+        $model->price = $request->input('price') ?? 1;
+        $model->endirim_price = $request->input('endirim_price') ?? 1;
+        $model->time_range_sections = $request->input('time_range_sections') ?? 0;
         $model->save();
 
-        $exam_start_pages=ExamStartPageIds::where("exam_id",$model->id)->get();
-        foreach($exam_start_pages as $val){
+        $exam_start_pages = ExamStartPageIds::where("exam_id", $model->id)->get();
+        foreach ($exam_start_pages as $val) {
             $val->delete();
         }
 
-        if(!empty($request->exam_start_page_id)){
-            foreach($request->exam_start_page_id as $id){
-                $page=new ExamStartPageIds();
-                $page->exam_id=$model->id;
-                $page->start_page_id=$id;
+        if (!empty($request->exam_start_page_id)) {
+            foreach ($request->exam_start_page_id as $id) {
+                $page = new ExamStartPageIds();
+                $page->exam_id = $model->id;
+                $page->start_page_id = $id;
                 $page->save();
             }
         }
 
-        $references=ExamReferences::where("exam_id",$model->id)->get();
-        foreach($references as $val){
+        $references = ExamReferences::where("exam_id", $model->id)->get();
+        foreach ($references as $val) {
             $val->delete();
         }
 
-        if(!empty($request->exam_references)){
-            foreach($request->exam_references as $id){
-                $page=new ExamReferences();
-                $page->exam_id=$model->id;
-                $page->reference_id=$id;
+        if (!empty($request->exam_references)) {
+            foreach ($request->exam_references as $id) {
+                $page = new ExamReferences();
+                $page->exam_id = $model->id;
+                $page->reference_id = $id;
                 $page->save();
             }
         }
@@ -230,7 +233,6 @@ class ExamController extends Controller
         dbdeactive();
         return redirect()->route('exams.questions', [$exam_id, $section_id])->with(['success' => 'Uğurla!']);
     }
-
     public function editQuestion($exam_id, $section_id, $id)
     {
         $this->authorizeForUser(auth('admins')->user(), 'exam-question-update');
@@ -297,7 +299,7 @@ class ExamController extends Controller
         $this->authorizeForUser(auth('admins')->user(), 'exam-answer-create');
         $question = ExamQuestion::findOrFail($question_id);
         if ($question->type == 3 && $question->answers->count() == 1) {
-            return redirect()->route('exams.answers', [$exam_id,  $section_id, $question_id]);
+            return redirect()->route('exams.answers', [$exam_id, $section_id, $question_id]);
         }
 
         return view('backend.pages.exams.answers.create', compact('exam_id', 'section_id', 'question_id'));
@@ -348,7 +350,7 @@ class ExamController extends Controller
 
         $model = ExamAnswer::findOrFail($id);
 
-        $model->answer =  $request->input('answer');
+        $model->answer = $request->input('answer');
         $model->correct = $request->input('correct') ? 1 : 0;
         $model->question_id = $question_id;
 
@@ -382,7 +384,7 @@ class ExamController extends Controller
                         $results = $results->where("exam_id", $request->input('exam_id'));
                     }
 
-                    $results=$results->with('answers','user','exam');
+                    $results = $results->with('answers', 'user', 'exam');
                     // $results = $results->groupBy('exam_id');
                     $results = $results->get();
 
@@ -397,6 +399,44 @@ class ExamController extends Controller
             }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage(), 'line' => $e->getLine()]);
+        }
+    }
+
+    public function mark_unmark_question(Request $request)
+    {
+        try {
+            $data = MarkQuestions::where("exam_id", $request->input('exam_id'))
+                ->where("exam_result_id", $request->input('exam_result_id'))
+                ->where("question_id", $request->input('question_id'))
+                ->where("user_id", $request->input('user_id'))->first();
+                $type="warning";
+                $message=trans("additional.messages.yenidenbaxisdancixarildi", [], $request->language ?? 'az');
+            if (empty($data)) {
+                $data = new MarkQuestions();
+                $data->exam_id = $request->input('exam_id');
+                $data->exam_result_id = $request->input('exam_result_id');
+                $data->question_id = $request->input('question_id');
+                $data->user_id = $request->input('user_id');
+                $data->save();
+                $type="success";
+                $message=trans("additional.messages.yenidenbaxisdancixarildi", [], $request->language ?? 'az');
+
+            } else {
+                $type="warning";
+                $message=trans("additional.messages.yenidenbaxisdancixarildi", [], $request->language ?? 'az');
+                $data->delete();
+            }
+
+            $markedquestions=MarkQuestions::where("exam_id", $request->input('exam_id'))
+                ->where("exam_result_id", $request->input('exam_result_id'))
+                ->where("user_id", $request->input('user_id'))->pluck('question_id')->toArray();
+
+            return response()->json(['status' => $type, 'data' => $markedquestions, 'message' => $message]);
+
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        } finally {
+            dbdeactive();
         }
     }
 }

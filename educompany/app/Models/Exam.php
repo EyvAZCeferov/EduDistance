@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Builder;
+use League\CommonMark\Reference\Reference;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Exam extends Model
 {
@@ -17,8 +18,8 @@ class Exam extends Model
     protected $casts = [
         'name' => 'json',
         'content' => 'json',
-        'price'=>'double',
-        'endirim_price'=>'double'
+        'price' => 'double',
+        'endirim_price' => 'double'
     ];
 
     protected $fillable = [
@@ -35,7 +36,8 @@ class Exam extends Model
         'price',
         'endirim_price',
         'user_id',
-        'start_page_id'
+        'start_page_id',
+        'time_range_sections'
     ];
 
 
@@ -86,7 +88,22 @@ class Exam extends Model
         //        }
         return $results;
     }
-    public function start_pages(){
-        return $this->hasMany(ExamStartPageIds::class,'exam_id','id')->with('exam','start_page')->orderByRaw('start_page.id');
+    public function start_pages()
+    {
+        return $this->hasMany(ExamStartPageIds::class, 'exam_id', 'id')
+            ->with([
+                'start_page' => function ($query) {
+                    $query->orderBy('order_number', 'ASC');
+                }
+            ])
+            ->with('exam');
+    }
+    public function references()
+    {
+        return $this->hasMany(ExamReferences::class, 'exam_id', 'id')->with([
+            'reference' => function ($query) {
+                $query->orderBy('order_number', 'ASC');
+            }
+        ])->with(['exam']);
     }
 }

@@ -17,7 +17,7 @@
                         @if ($exam_start_page->type == 'coupon')
                             <div class="row my-4">
                                 <input class="form-control coupon_code_input" onkeyup="searchcoupon_code(event)"
-                                    name="coupon_code" placeholder="@lang('additional.pages.payments.coupon_code')" />
+                                    name="coupon_code" id="coupon_code" placeholder="@lang('additional.pages.payments.coupon_code')" />
                             </div>
 
                             <div class="row my-4" id="coupon_code_used">
@@ -71,6 +71,7 @@
 
         function tonextpage(nowid, process = null) {
             var nowelement = $(`#${nowid}_start_page`);
+            var coupon_code_inp=$("#coupon_code").val()??'';
             if (process == 'next') {
                 var new_id = nowid + 1;
                 var nextelement = $(`#${new_id}_start_page`);
@@ -81,7 +82,7 @@
                 nextelement.addClass("show");
                 nextelement.removeClass("hide");
             } else {
-                window.location.href = '{{ route('user.exams.set_exam', ['exam_id' => $exam->id]) }}';
+                window.location.href = `/exam/exams/set_exam?exam_id={{ $exam->id }}&coupon_code=${coupon_code_inp}`;
             }
         }
 

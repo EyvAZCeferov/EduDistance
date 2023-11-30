@@ -46,7 +46,7 @@ Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalizati
                 Route::get("exams/redirect_exam",[CommonController::class,'redirect_exam'])->name("exams.redirect_exam");
                 Route::any("exams/set_exam",[CommonController::class,'set_exam'])->name("exams.set_exam");
                 // Route::get('/{exam_id}', [CommonController::class, 'exam'])->name('exam');
-                // Route::post('/{exam_id}/finish', [CommonController::class, 'examFinish'])->name('exam.finish')->middleware('remove.null_value');
+                Route::any('/finish', [CommonController::class, 'examFinish'])->name('exam.finish')->middleware('remove.null_value');
             });
         });
 

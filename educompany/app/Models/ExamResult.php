@@ -15,11 +15,13 @@ class ExamResult extends Model
         'id',
         'user_id',
         'exam_id',
-        'point'
+        'point',
+        'time_reply'
     ];
     protected $casts=[
         'user_id'=>'integer',
         'exam_id'=>'integer',
+        'time_reply'=>'integer'
     ];
 
     public function user(): HasOne
@@ -40,5 +42,8 @@ class ExamResult extends Model
     public function correctAnswers(): int
     {
         return $this->answers->where('result', 1)->count();
+    }
+    public function marked(){
+        return $this->hasMany(MarkQuestions::class,'exam_result_id','id');
     }
 }

@@ -13,15 +13,15 @@
     </div>
     <div class="questions_row">
         @foreach ($questions as $key => $value)
-            <button class="btn btn-sm btn-question not_answered @if ($key == 1) answered @endif"
-                type="button" id="question_row_button_{{ $key + 1 }}"
-                onclick="getquestion({{ $key + 1 }})">{{ $key + 1 }}</button>
+            <button class="btn btn-sm btn-question not_answered" type="button"
+                id="question_row_button_{{ $value->id }}"
+                onclick="getquestion({{ $value->id }})">{{ $key + 1 }}</button>
         @endforeach
     </div>
     <div class="center_back_button">
         <button type="button" onclick="togglequestions()" class="center_back">
             <i class="fas fa-list-ul"></i>
-            @lang("additional.buttons.gotohome")
+            @lang('additional.buttons.gotohome')
         </button>
     </div>
     <div class="bottomcorner"></div>
@@ -35,7 +35,7 @@
         @lang('additional.pages.exams.questions_on_exam_page', ['current' => 1, 'total' => count($questions)])
         <i class="fa fa-chevron-up"></i>
     </button>
-    <button class="btn btn-secondary next_button" type="button" onclick="tonext()">
+    <button class="btn btn-secondary next_button" id="next_button" type="button" onclick="tonext()">
         @lang('additional.buttons.next')
         <i class="fa fa-angle-right"></i>
     </button>
