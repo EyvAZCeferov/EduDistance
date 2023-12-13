@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Exam extends Model
 {
     use HasFactory, SoftDeletes;
-
+    protected $table='exams';
     protected $casts = [
         'name' => 'json',
         'content' => 'json',
@@ -36,8 +36,11 @@ class Exam extends Model
         'price',
         'endirim_price',
         'user_id',
-        'start_page_id',
-        'time_range_sections'
+        'user_type',
+        'time_range_sections',
+        'repeat_sound',
+        'show_result_user',
+        'start_time',
     ];
 
 

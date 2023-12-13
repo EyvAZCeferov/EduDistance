@@ -15,7 +15,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Admin extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasPermission, AuthorizeTrait, AuthenticatableTrait; // SoftDeletes
+    use HasApiTokens, HasFactory, Notifiable, HasPermission, AuthorizeTrait, AuthenticatableTrait, SoftDeletes;
 
     protected $with = [
         'role'
@@ -30,12 +30,9 @@ class Admin extends Authenticatable
         'name',
         'email',
         'password',
-        'position',
-        'username',
         'phone',
         'avatar',
         'role_id',
-        'tfa_secret',
         'password_changed_at',
     ];
 

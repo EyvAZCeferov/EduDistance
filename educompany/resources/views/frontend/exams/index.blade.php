@@ -2,8 +2,8 @@
 @section('title', trans('additional.pages.exams.exams'))
 @section('content')
     <section class="exams">
-        @include('frontend.exams.search_filter', ['type' => 'exams'])
-        <div class="row my-3">
+        @include('frontend.exams.search_filter', ['type' => 'exams','value'=>$search])
+        <div class="row mt-1 my-3">
             <div class="col-sm-12 col-md-3 col-lg-2">
                 @include('frontend.exams.left_filter', [
                     'data' => $filters,

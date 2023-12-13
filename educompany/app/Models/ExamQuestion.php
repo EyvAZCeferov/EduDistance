@@ -21,6 +21,12 @@ class ExamQuestion extends Model implements HasMedia
          'Çox Seçimli' => 2,
          'Açıq' => 3,
          'Uzlaşma' => 4,
+         'Səs' => 5,
+     ];
+
+     CONST LAYOUTS=[
+        'standart'=>'Sol tərəfdə sual, sağ tərəfdə cavablar',
+        'onepage'=>'Yuxarıda sual, aşağıda cavab',
      ];
 
     public const ALLOWED_FILE_SIZE_KB = 20 * 1024;

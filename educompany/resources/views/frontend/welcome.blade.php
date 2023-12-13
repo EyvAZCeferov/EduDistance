@@ -1,6 +1,6 @@
 @push('css')
-    <link rel="stylesheet" href="{{ asset("front/assets/js/slick/slick.css") }}">
-    <link rel="stylesheet" href="{{ asset("front/assets/js/slick/slick-theme.css") }}">
+    <link rel="stylesheet" href="{{ asset('front/assets/js/slick/slick.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/assets/js/slick/slick-theme.css') }}">
 @endpush
 
 @extends('frontend.layouts.app')
@@ -25,5 +25,18 @@
                 });
             });
         });
+
+        function searchnow(event) {
+            var parentDiv = event.target.parentNode.parentNode;
+            var input = parentDiv.querySelector('input[type="text"]');
+            if (input !== null) {
+                var value = input.value;
+                if (value.trim() !== '') {
+                    window.location.href = `/exams?search=${value}`;
+                } else {
+                    toast('@lang('additional.messages.required_fill')', 'error');
+                }
+            }
+        }
     </script>
 @endpush

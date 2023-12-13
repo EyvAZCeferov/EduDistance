@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('exam_start_pages', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references("id")->on("admins")->onDelete('cascade');
             $table->string("image")->nullable();
             $table->integer("order_number")->default(1);
             $table->json("name")->nullable();

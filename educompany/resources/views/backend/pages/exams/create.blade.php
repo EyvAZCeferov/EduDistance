@@ -195,7 +195,7 @@
                                     <div class="form-group">
                                         <label for="" class="w-100">Qiyməti</label>
                                         <input type="number"
-                                            value="{{ isset($data) && !empty($data) && $data->price ? $data->price : 1 }}"
+                                            value="{{ isset($data) && !empty($data) && $data->price ? $data->price : 0 }}"
                                             name="price"
                                             class="form-control {{ $errors->first('price') ? 'is-invalid' : '' }}">
                                     </div>
@@ -204,7 +204,7 @@
                                     <div class="form-group">
                                         <label for="" class="w-100">Endirim Qiyməti</label>
                                         <input type="number"
-                                            value="{{ isset($data) && !empty($data) && $data->endirim_price ? $data->endirim_price : 1 }}"
+                                            value="{{ isset($data) && !empty($data) && $data->endirim_price ? $data->endirim_price : 0 }}"
                                             name="endirim_price"
                                             class="form-control {{ $errors->first('endirim_price') ? 'is-invalid' : '' }}">
                                     </div>
@@ -216,6 +216,31 @@
                             <br />
 
                             <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="" class="w-100">Audio təkrar etsin</label>
+                                        <input type="checkbox" checked value="1" name="repeat_sound"
+                                            {{ isset($data) && !empty($data) && $data->repeat_sound ? 'checked' : '' }}
+                                            class="js-switch {{ $errors->first('repeat_sound') ? 'is-invalid' : '' }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="" class="w-100">Cavab tələbəyə göstərilsin</label>
+                                        <input type="checkbox" checked value="1" name="show_result_user"
+                                            {{ isset($data) && !empty($data) && $data->show_result_user ? 'checked' : '' }}
+                                            class="js-switch {{ $errors->first('show_result_user') ? 'is-invalid' : '' }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="" class="w-100">İmtahanın başlama vaxtı</label>
+                                        <input type="datetime-local" name="start_time"
+                                            value="{{ isset($data) && !empty($data) && $data->start_time ? $data->start_time : null }}"
+                                            class="form-control {{ $errors->first('start_time') ? 'is-invalid' : '' }}">
+                                    </div>
+                                </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="d-block w-100" for="">Giriş səhifələri</label>

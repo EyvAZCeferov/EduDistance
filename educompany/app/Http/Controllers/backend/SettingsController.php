@@ -46,7 +46,6 @@ class SettingsController extends Controller
         try {
             $name = [];
             $address = [];
-            $address_2 = [];
             $description = [];
             $social_media = [];
             $logo = null;
@@ -68,11 +67,6 @@ class SettingsController extends Controller
                     'az_address' => trim($request->az_address) ?? " ",
                     'ru_address' => $request->ru_address ?? trim(GoogleTranslate::trans($request->az_address, 'ru')),
                     'en_address' => $request->en_address ?? trim(GoogleTranslate::trans($request->az_address, 'en')),
-                ];
-                $address_2 = [
-                    'az_address_2' => trim($request->az_address_2) ?? " ",
-                    'ru_address_2' => $request->ru_address_2 ?? isset($request->az_address_2) && !empty($request->az_address_2)? trim(GoogleTranslate::trans($request->az_address_2, 'ru')) : ' ',
-                    'en_address_2' => $request->en_address_2 ?? isset($request->az_address_2) && !empty($request->az_address_2)? trim(GoogleTranslate::trans($request->az_address_2, 'en')) : ' ',
                 ];
                 $social_media = [
                     'twitter' => isset($request->twitter) && !empty($request->twitter) ? $request->twitter : " ",
@@ -97,7 +91,6 @@ class SettingsController extends Controller
                 $data = new Settings();
                 $data->name = $name;
                 $data->address = $address;
-                $data->address_2 = $address_2;
                 $data->description = $description;
                 $data->social_media = $social_media;
                 $data->logo = $logo;
@@ -146,7 +139,6 @@ class SettingsController extends Controller
         try {
             $name = [];
             $address = [];
-            $address_2 = [];
             $description = [];
             $social_media = [];
             $logo = null;
@@ -164,11 +156,6 @@ class SettingsController extends Controller
                     'az_description' => trim($request->az_description) ?? " ",
                     'ru_description' => $request->ru_description ?? trim(GoogleTranslate::trans($request->az_description, 'ru')),
                     'en_description' => $request->en_description ?? trim(GoogleTranslate::trans($request->az_description, 'en')),
-                ];
-                $address = [
-                    'az_address' => trim($request->az_address) ?? " ",
-                    'ru_address' => $request->ru_address ?? trim(GoogleTranslate::trans($request->az_address, 'ru')),
-                    'en_address' => $request->en_address ?? trim(GoogleTranslate::trans($request->az_address, 'en')),
                 ];
                 $address = [
                     'az_address' => trim($request->az_address) ?? " ",
@@ -198,7 +185,6 @@ class SettingsController extends Controller
 
                 $data->name = $name;
                 $data->address = $address;
-                $data->address_2 = $address_2;
                 $data->description = $description;
                 $data->social_media = $social_media;
                 $data->update();

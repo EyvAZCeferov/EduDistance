@@ -135,6 +135,7 @@ return [
         "yenidenbaxisucunisaretlendi"=>'Yenidən baxış üçün işarələndi',
         "yenidenbaxisdancixarildi"=>'Yenidən baxış siyahısından çıxarıldı',
         "answersnotfound"=>"Heç bir suala cavab vermədiniz",
-        'exam_finished'=>"İmtahan yekunlaşdı. Nəticələr səhifəsinə yönləndirilirsiniz..."
+        'exam_finished'=>"İmtahan yekunlaşdı. Nəticələr səhifəsinə yönləndirilirsiniz...",
+        "required_fill"=>"Məcburi xanaları doldurun"
     ],
 ];

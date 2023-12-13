@@ -19,6 +19,8 @@ return new class extends Migration {
             $table->integer("discount")->default(0);
             $table->boolean("status")->default(true);
             $table->string("type")->default('value'); //value,percent
+            $table->unsignedBigInteger('user_id');
+            $table->string("user_type")->default("admin");
             $table->timestamps();
             $table->softDeletes();
         });

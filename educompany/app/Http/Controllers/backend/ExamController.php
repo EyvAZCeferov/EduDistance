@@ -79,6 +79,12 @@ class ExamController extends Controller
         $model->price = $request->input('price') ?? 1;
         $model->endirim_price = $request->input('endirim_price') ?? 1;
         $model->time_range_sections = $request->input('time_range_sections') ?? 0;
+        $model->user_id = auth('admins')->id();
+        $model->user_type = "admins";
+        $model->repeat_sound=$request->input('repeat_sound') ? 1 : 0;
+        $model->show_result_user=$request->input('show_result_user') ? 1 : 0;
+        $model->start_time=$request->input('start_time') ?? null;
+        $model->end_time=$request->input('end_time') ?? null;
         $model->image = $image;
 
         $model->save();
@@ -207,7 +213,6 @@ class ExamController extends Controller
         $this->authorizeForUser(auth('admins')->user(), 'exam-question-create');
 
         $rules = [
-            'question' => ['required', 'string'],
             'type' => ['required', 'in:' . implode(',', ExamQuestion::TYPES)],
             'image' => [
                 'file',
@@ -220,8 +225,14 @@ class ExamController extends Controller
         $request->validate($rules);
 
         $model = new ExamQuestion();
-
-        $model->question = $request->input('question');
+        if ($request->input('type') != 5) {
+            $model->question = $request->input('question');
+        } else {
+            if ($request->hasFile('question_audio')) {
+                $audio_file = file_upload($request->file("question_audio"), 'exam_questions');
+                $model->question = $audio_file;
+            }
+        }
         $model->type = $request->input('type');
         $model->section_id = $section_id;
 
@@ -246,17 +257,27 @@ class ExamController extends Controller
         $this->authorizeForUser(auth('admins')->user(), 'exam-question-update');
 
         $rules = [
-            'exam_id' => ['required', 'exists:exams,id'],
-            'question' => ['required', 'string'],
             'type' => ['required', 'in:' . implode(',', ExamQuestion::TYPES)],
-            'image' => ['file', 'sometimes', 'mimetypes:' . implode(',', ExamQuestion::ALLOWED_FILE_MIMES)],
+            'image' => [
+                'file',
+                'sometimes',
+                'mimetypes:' . implode(',', ExamQuestion::ALLOWED_FILE_MIMES),
+                'max:' . ExamQuestion::ALLOWED_FILE_SIZE_KB
+            ],
         ];
 
         $request->validate($rules);
 
         $model = ExamQuestion::where('section_id', $section_id)->findOrFail($id);
 
-        $model->question = $request->input('question');
+        if ($request->input('type') != 5) {
+            $model->question = $request->input('question');
+        } else {
+            if ($request->hasFile('question_audio')) {
+                $audio_file = file_upload($request->file("question_audio"), 'exam_questions');
+                $model->question = $audio_file;
+            }
+        }
         $model->type = $request->input('type');
         $model->section_id = $section_id;
 
@@ -409,8 +430,8 @@ class ExamController extends Controller
                 ->where("exam_result_id", $request->input('exam_result_id'))
                 ->where("question_id", $request->input('question_id'))
                 ->where("user_id", $request->input('user_id'))->first();
-                $type="warning";
-                $message=trans("additional.messages.yenidenbaxisdancixarildi", [], $request->language ?? 'az');
+            $type = "warning";
+            $message = trans("additional.messages.yenidenbaxisdancixarildi", [], $request->language ?? 'az');
             if (empty($data)) {
                 $data = new MarkQuestions();
                 $data->exam_id = $request->input('exam_id');
@@ -418,21 +439,19 @@ class ExamController extends Controller
                 $data->question_id = $request->input('question_id');
                 $data->user_id = $request->input('user_id');
                 $data->save();
-                $type="success";
-                $message=trans("additional.messages.yenidenbaxisdancixarildi", [], $request->language ?? 'az');
-
+                $type = "success";
+                $message = trans("additional.messages.yenidenbaxisdancixarildi", [], $request->language ?? 'az');
             } else {
-                $type="warning";
-                $message=trans("additional.messages.yenidenbaxisdancixarildi", [], $request->language ?? 'az');
+                $type = "warning";
+                $message = trans("additional.messages.yenidenbaxisdancixarildi", [], $request->language ?? 'az');
                 $data->delete();
             }
 
-            $markedquestions=MarkQuestions::where("exam_id", $request->input('exam_id'))
+            $markedquestions = MarkQuestions::where("exam_id", $request->input('exam_id'))
                 ->where("exam_result_id", $request->input('exam_result_id'))
                 ->where("user_id", $request->input('user_id'))->pluck('question_id')->toArray();
 
             return response()->json(['status' => $type, 'data' => $markedquestions, 'message' => $message]);
-
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         } finally {

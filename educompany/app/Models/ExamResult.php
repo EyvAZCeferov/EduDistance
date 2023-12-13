@@ -16,12 +16,14 @@ class ExamResult extends Model
         'user_id',
         'exam_id',
         'point',
-        'time_reply'
+        'time_reply',
+        'payed'
     ];
     protected $casts=[
         'user_id'=>'integer',
         'exam_id'=>'integer',
-        'time_reply'=>'integer'
+        'time_reply'=>'integer',
+        'payed'=>'boolean'
     ];
 
     public function user(): HasOne

@@ -23,8 +23,9 @@ class HomeController extends Controller
             $category = collect();
             $sub_categories = collect();
             $exams = collect();
-            $filters=$request->filters;
-            DB::transaction(function () use (&$category, &$sub_categories, &$exams,$request) {
+            $filters = $request->filters;
+            $search = $request->search ?? null;
+            DB::transaction(function () use (&$category, &$sub_categories, &$exams, $request, $search) {
                 if (isset($request->category) && !empty($request->category)) {
                     if (ctype_digit($request->category)) {
                         $category = Category::findOrFail($request->category);
@@ -43,10 +44,19 @@ class HomeController extends Controller
                 if (!empty($category) && isset($category->id) && !empty($category->id)) {
                     $exams = $exams->where('category_id', $category->id);
                 }
+
+                if (!empty($search)) {
+                    $exams = $exams->whereRaw('LOWER(JSON_EXTRACT(`name`, "$.az_name")) like ?', ['%' . $search . '%'])
+                        ->orWhereRaw('LOWER(JSON_EXTRACT(`name`, "$.ru_name")) like ?', ['%' . $search . '%'])
+                        ->orWhereRaw('LOWER(JSON_EXTRACT(`name`, "$.en_name")) like ?', ['%' . $search . '%'])
+                        ->orWhereRaw('LOWER(JSON_EXTRACT(`content`, "$.az_description")) like ?', ['%' . $search . '%'])
+                        ->orWhereRaw('LOWER(JSON_EXTRACT(`content`, "$.ru_description")) like ?', ['%' . $search . '%'])
+                        ->orWhereRaw('LOWER(JSON_EXTRACT(`content`, "$.en_description")) like ?', ['%' . $search . '%']);
+                }
                 $exams = $exams->orderBy("order_number", 'ASC')
                     ->get();
             });
-            return view('frontend.exams.index', compact('exams', 'sub_categories','category','filters'));
+            return view('frontend.exams.index', compact('exams', 'sub_categories', 'category', 'filters','search'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -65,5 +75,4 @@ class HomeController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
-
 }

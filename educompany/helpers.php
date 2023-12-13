@@ -108,6 +108,16 @@ if (!function_exists('image_upload')) {
     }
 }
 
+if (!function_exists('file_upload')) {
+    function file_upload($file, $clasor, $name = null)
+    {
+        $filename = $name ?? time() . '.' . $file->getClientOriginalExtension();
+        $file->storeAs($clasor, $filename, 'uploads');
+        return $filename;
+    }
+}
+
+
 if (!function_exists('delete_image')) {
 
     function delete_image($image, $clasor)

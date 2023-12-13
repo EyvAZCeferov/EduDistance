@@ -6,6 +6,18 @@
         var elem = document.querySelector('.js-switch');
         var switchery = new Switchery(elem, { color: '#1AB394' });
     </script>
+
+    <script>
+        function onchange_type(event){
+            if(event.target.value==5){
+                $("#question_content_audio").removeClass('d-none');
+                $("#question_content_textbox").addClass('d-none');
+            }else{
+                $("#question_content_textbox").removeClass('d-none');
+                $("#question_content_audio").addClass('d-none');
+            }
+        }
+    </script>
 @endpush
 
 @section('content')
@@ -63,26 +75,41 @@
                             <input type="hidden" name="exam_id" value="{{ $exam_id }}">
                             <div class="row" >
                                 <div class="col-12">
-                                    <div class="form-group">
+                                    <div class="form-group" id="question_content_textbox">
                                         <label for="">Sual</label>
                                         <textarea name="question" class="form-control summernote {{ $errors->first('question') ? 'is-invalid' : '' }}">{{ old('question') }}</textarea>
+                                    </div>
+                                    <div class="form-group d-none" id="question_content_audio">
+                                        <label for="">Səs faylı</label>
+                                        <input type="file" name="question_audio" class="file" accept="audio/*">
                                     </div>
                                 </div>
                             </div>
 
                             <div class="row" >
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Sual tipi</label>
-                                        <select name="type" class="form-control {{ $errors->first('type') ? 'is-invalid' : '' }}">
-                                            <option disabled hidden selected>Tip</option>
+                                        <select name="type" onchange="onchange_type(event)" class="form-control {{ $errors->first('type') ? 'is-invalid' : '' }}">
                                             @foreach(\App\Models\ExamQuestion::TYPES as $key => $type)
                                                 <option {{ old('type') == $type ? 'selected' : '' }} value="{{ $type }}">{{ $key }}</option>
                                             @endforeach
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Sual görünüşü</label>
+                                        <select name="layout" class="form-control {{ $errors->first('type') ? 'is-invalid' : '' }}">
+                                            @foreach(\App\Models\ExamQuestion::LAYOUTS as $key => $type)
+                                                <option {{ old('layout') == $type ? 'selected' : '' }} value="{{ $key }}">{{ $type }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Şəkil</label>
                                         <input type="file" name="image" class="form-control {{ $errors->first('image') ? 'is-invalid' : '' }}">
