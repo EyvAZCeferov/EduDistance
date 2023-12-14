@@ -64,7 +64,13 @@ return [
             "references_hide"=>"Hamısını bağla",
             "question_info_text"=>"Baxış üçün işarələyin",
             "question_text_area_placeholder"=>"Cavabınızı qeyd edin...",
-            "section_arasi_vaxd_gozle"=>':time saniyə sonra yenidən davam edəcək'
+            "section_arasi_vaxd_gozle"=>':time saniyə sonra yenidən davam edəcək',
+            "stillwait"=>':timestamp tarixində aktivləşəcək',
+            "true_answers"=>"Düzgün cavablar",
+            "false_answers"=>"Yanlış cavablar",
+            "notanswered_answers"=>"Cavabsız",
+            'true_false_counts'=>'Düzgün cavablar: :true, Yanlış cavablar: :false',
+            'your_result'=>'İmtahan nəticəsi: :point',
         ],
         'blogs'=>[
             'blogs'=>"Bloqlar"

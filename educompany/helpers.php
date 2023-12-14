@@ -441,3 +441,20 @@ if (!function_exists('your_answer_result_true_or_false')) {
         return Cache::rememberForever("your_answer_result_true_or_false" . $question_id . $result_id . $value, fn() => $model);
     }
 }
+
+
+if (!function_exists('exam_result_answer_true_or_false')) {
+    function exam_result_answer_true_or_false($question_id,$result_id)
+    {
+        $result='null';
+        $model = ExamResultAnswer::where('question_id',$question_id)->where('result_id',$result_id)->first();
+        if(!empty($model) && isset($model->id)){
+            if($model->result==true){
+                $result='true';
+            }else{
+                $result='false';
+            }
+        }
+        return Cache::rememberForever("exam_result_answer_true_or_false"  .$question_id.$result_id, fn() => $result);
+    }
+}

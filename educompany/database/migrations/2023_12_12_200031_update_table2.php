@@ -31,6 +31,9 @@ return new class extends Migration
             $table->integer("user_type")->default(1);
             $table->boolean("payed")->default(false);
         });
+        Schema::table('sections', function (Blueprint $table) {
+            $table->integer("time_range_sections")->default(0);
+        });
     }
 
     /**

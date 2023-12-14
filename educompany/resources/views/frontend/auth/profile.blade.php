@@ -2,8 +2,10 @@
 @section('title', trans('additional.headers.profile'))
 @section('content')
     <section class="profile_page_header my-3">
-        <h2 class="my-3 py-3">@lang('additional.pages.auth.welcome', ['name_surname' => auth('users')->user()->name])</h2>
-
+        <div class="row classjustifybetween">
+            <h2 class="my-3 py-3 d-inline-block" style="width:max-content;">@lang('additional.pages.auth.welcome', ['name_surname' => auth('users')->user()->name])</h2>
+            <a href="{{ route("user.logout") }}" style="width:max-content;" class="d-inline-block logout">@lang('additional.headers.logout')</a>
+        </div>
         @include('frontend.light_parts.exam_profile_column', [
             'title' => 'yourexams',
             'nav_id' => 'pills',

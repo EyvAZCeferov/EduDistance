@@ -113,6 +113,17 @@
                                     </div>
                                 </div>
 
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Sual görünüşü</label>
+                                        <select name="layout" class="form-control {{ $errors->first('type') ? 'is-invalid' : '' }}">
+                                            @foreach(\App\Models\ExamQuestion::LAYOUTS as $key => $type)
+                                                <option {{ old('layout',$question->layout) == $type ? 'selected' : '' }} value="{{ $key }}">{{ $type }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="">Şəkil</label>

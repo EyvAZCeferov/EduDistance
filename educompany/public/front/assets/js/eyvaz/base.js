@@ -30,12 +30,16 @@ function tabselect(id) {
     var tabfreelancer = document.getElementsByClassName('tab_company_element');
     var tabstudent = document.getElementsByClassName('tab_student_element');
     if (id == "company") {
-        tabfreelancer[0].style.display = "block";
-        tabstudent[0].style.display = 'none';
+        if(tabfreelancer[0] && tabfreelancer[0]!=null)
+            tabfreelancer[0].style.display = "block";
+        if(tabstudent[0] && tabstudent[0]!=null)
+            tabstudent[0].style.display = 'none';
         document.getElementById('user_type').value = 2;
     } else {
-        tabfreelancer[0].style.display = "none";
-        tabstudent[0].style.display = 'block';
+        if(tabfreelancer[0] && tabfreelancer[0]!=null)
+            tabfreelancer[0].style.display = "none";
+        if(tabstudent[0] && tabstudent[0]!=null)
+            tabstudent[0].style.display = 'block';
         document.getElementById('user_type').value = 1;
     }
 }

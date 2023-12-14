@@ -237,7 +237,7 @@
                                     <div class="form-group">
                                         <label for="" class="w-100">İmtahanın başlama vaxtı</label>
                                         <input type="datetime-local" name="start_time"
-                                            value="{{ isset($data) && !empty($data) && $data->start_time ? $data->start_time : null }}"
+                                            value="{{ isset($data) && !empty($data) && $data->start_time ? date('Y-m-d\TH:i:s', $data->start_time) : null }}"
                                             class="form-control {{ $errors->first('start_time') ? 'is-invalid' : '' }}">
                                     </div>
                                 </div>
@@ -275,11 +275,12 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="" class="w-100">Modullar / Bölmələr arasındaki vaxd <span
-                                                class="badge badge-sm badge-warning">Saniyə</span> </label>
-                                        <input type="number"
-                                            value="{{ isset($data) && !empty($data) ? $data->time_range_sections : 0 }}"
-                                            name="time_range_sections" class="form-control">
+                                        <label for="">İmtahan tipi</label>
+                                        <select name="layout_type" class="form-control {{ $errors->first('layout_type') ? 'is-invalid' : '' }}">
+                                            @foreach(\App\Models\Exam::LAYOUTS as $key => $type)
+                                                <option {{ old('layout_type',isset($data) && !empty($data) ? $data->layout_type:null) == $type ? 'selected' : '' }} value="{{ $key }}">{{ $type }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                             </div>

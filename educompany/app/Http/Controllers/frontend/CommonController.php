@@ -43,66 +43,66 @@ class CommonController extends Controller
             if (!$request->answers || count($request->answers) === 0) {
                 return response()->json(['status' => 'eror', 'message' => trans("additional.messages.answersnotfound", [], $request->language ?? 'az')]);
             }
-            // DB::transaction(function () use ($request) {
-            $exam = Exam::findOrFail($request->exam_id);
-            $result = ExamResult::where("id", $request->exam_result_id)->first();
-            $result->update([
-                'time_reply' => $request->time_exam,
-            ]);
-
-            if ($exam->time_range_sections > 0) {
-
-            } else {
+            $result=collect();
+            DB::transaction(function () use ($request,&$result) {
+                $exam = Exam::findOrFail($request->exam_id);
+                $result = ExamResult::where("id", $request->exam_result_id)->first();
                 $result->update([
-                    'point' => $exam->point
+                    'time_reply' => $request->time_exam,
                 ]);
-            }
+                foreach ($request->answers as $section_id => $answers) {
+                    foreach ($answers as $question_id => $answer) {
+                        $section = $exam->sections->find($section_id);
+                        $question = ExamQuestion::where("id", $question_id)->first();
+                        if ($question && $section) {
+                            if ($question->type === 1) {
+                                $resultAnswer = new ExamResultAnswer();
+                                $resultAnswer->result_id = $result->id;
+                                $resultAnswer->section_id = $section_id;
+                                $resultAnswer->question_id = $question->id;
+                                $resultAnswer->answer_id = $answer;
+                                $resultAnswer->result = $answer == $question->correctAnswer()?->id ? 1 : 0;
+                                $resultAnswer->save();
+                            } else if ($question->type === 2) {
+                                $answer = array_map('intval', $answer);
+                                $user_answer = serialize($answer);
+                                $correct_answer = serialize($question->correctAnswer()?->pluck('id')->toArray());
 
-            foreach ($request->answers as $section_id => $answers) {
-
-                foreach ($answers as $question_id => $answer) {
-                    $section = $exam->sections->find($section_id);
-                    $question = ExamQuestion::where("id", $question_id)->first();
-                    if ($question && $section) {
-                        if ($question->type === 1) {
-                            $resultAnswer = new ExamResultAnswer();
-                            $resultAnswer->result_id = $result->id;
-                            $resultAnswer->section_id = $section_id;
-                            $resultAnswer->question_id = $question->id;
-                            $resultAnswer->answer_id = $answer;
-                            $resultAnswer->result = $answer == $question->correctAnswer()?->id ? 1 : 0;
-                            $resultAnswer->save();
-                        } else if ($question->type === 2) {
-                            $answer = array_map('intval', $answer);
-                            $user_answer = serialize($answer);
-                            $correct_answer = serialize($question->correctAnswer()?->pluck('id')->toArray());
-
-                            $resultAnswer = new ExamResultAnswer();
-                            $resultAnswer->result_id = $result->id;
-                            $resultAnswer->section_id = $section_id;
-                            $resultAnswer->question_id = $question->id;
-                            $resultAnswer->answers = $answer;
-                            $resultAnswer->result = $user_answer == $correct_answer ? 1 : 0;
-                            $resultAnswer->save();
-                        } else if ($question->type == 3) {
-                            $resultAnswer = new ExamResultAnswer();
-                            $resultAnswer->result_id = $result->id;
-                            $resultAnswer->section_id = $section_id;
-                            $resultAnswer->question_id = $question->id;
-                            $resultAnswer->value = $answer;
-                            $resultAnswer->result = strip_tags_with_whitespace($answer) == strip_tags_with_whitespace($question->correctAnswer()?->answer) ? 1 : 0;
-                            $resultAnswer->save();
+                                $resultAnswer = new ExamResultAnswer();
+                                $resultAnswer->result_id = $result->id;
+                                $resultAnswer->section_id = $section_id;
+                                $resultAnswer->question_id = $question->id;
+                                $resultAnswer->answers = $answer;
+                                $resultAnswer->result = $user_answer == $correct_answer ? 1 : 0;
+                                $resultAnswer->save();
+                            } else if ($question->type == 3) {
+                                $resultAnswer = new ExamResultAnswer();
+                                $resultAnswer->result_id = $result->id;
+                                $resultAnswer->section_id = $section_id;
+                                $resultAnswer->question_id = $question->id;
+                                $resultAnswer->value = $answer;
+                                $resultAnswer->result = strip_tags_with_whitespace($answer) == strip_tags_with_whitespace($question->correctAnswer()?->answer) ? 1 : 0;
+                                $resultAnswer->save();
+                            }
                         }
-
                     }
                 }
-            }
-            // });
+                if ($exam->time_range_sections > 0) {
+                } else {
+                    $point = $exam->point * $result->correctAnswers();
+                    app()->setLocale(session()->get('changedLang'));
+                    session()->put('language', session()->get('changedLang'));
+                    session()->put('lang', session()->get('changedLang'));
+                    $result->update([
+                        'point' => $point
+                    ]);
+                }
+            });
 
             return response()->json([
                 'status' => 'success',
                 'message' => trans("additional.messages.exam_finished", [], $request->language ?? 'az'),
-                'url' => route("user.exam.result", $result->id)
+                'url' => route("user.exam.resultpage", $result->id)
             ]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
@@ -118,6 +118,15 @@ class CommonController extends Controller
             ->get();
 
         return view('frontend.pages.exam.results', compact('results'));
+    }
+
+    public function examResultPage($result_id){
+        $exam_result = ExamResult::where('user_id', auth('users')->user()->id)
+            ->with('answers.answer')
+            ->orderByDesc('id')
+            ->findOrFail($result_id);
+
+        return view('frontend.exams.resultpage', compact('exam_result'));
     }
 
     public function examResult($result_id)
@@ -143,6 +152,12 @@ class CommonController extends Controller
                     ->first();
                 $exam_start_pages = collect();
                 session()->put('selected_section', $request->selected_section ?? 0);
+                session()->put('changedLang', app()->getLocale() ?? 'az');
+                if ($exam->layout_type == "sat") {
+                    app()->setLocale('en');
+                    session()->put('language', 'en');
+                    session()->put('lang', 'en');
+                }
                 if (!empty($exam)) {
                     $exam_result = ExamResult::where("exam_id", $request->exam_id)
                         ->where('user_id', Auth::guard('users')->id())
@@ -236,7 +251,6 @@ class CommonController extends Controller
                 // return view("frontend.exams.exam_main_process.index", compact('exam','exam_result'));
                 return $this->redirect_exam($request);
             }
-
         } catch (\Exception $e) {
             // return redirect()->back()->with("error", $e->getMessage());
             dd($e->getMessage(), $e->getLine());

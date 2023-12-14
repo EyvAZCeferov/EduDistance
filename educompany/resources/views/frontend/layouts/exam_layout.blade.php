@@ -37,15 +37,14 @@
 </head>
 
 <body>
-    <div class="container container-xxl">
-        {{-- @include('frontend.layouts.parts.header_exam') --}}
-
+    <div class="container-xxl">
         @yield('content')
     </div>
 
     <script type="text/javascript" src="{{ asset('front/assets/js/jquery.min.js') }}"></script>
     <script type="text/javascript" defer src="{{ asset("front/assets/js/eyvaz/vendor/jquery-ui/jquery-ui.min.js") }}"></script>
     <script type="text/javascript" src="{{ asset('front/assets/js/eyvaz/base.js') }}"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script async crossorigin defer>
         $(function() {
             @if (Session::has('message'))

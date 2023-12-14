@@ -19,8 +19,14 @@ class Exam extends Model
         'name' => 'json',
         'content' => 'json',
         'price' => 'double',
-        'endirim_price' => 'double'
+        'endirim_price' => 'double',
+        'start_time'=>'timestamp'
     ];
+
+    CONST LAYOUTS=[
+        'standart'=>'Standart Rənglər (sarı və mavi)',
+        'sat'=>'SAT rənglər (qara)',
+     ];
 
     protected $fillable = [
         'name',
@@ -37,10 +43,10 @@ class Exam extends Model
         'endirim_price',
         'user_id',
         'user_type',
-        'time_range_sections',
         'repeat_sound',
         'show_result_user',
         'start_time',
+        'layout_type'
     ];
 
 

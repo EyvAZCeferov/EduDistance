@@ -20,7 +20,7 @@
                 @lang('additional.pages.exams.calculator')
             </a>
         @endif
-        @if (!empty($exam->references))
+        @if (!empty($exam->references) && count($exam->references)>0)
             <a class="section referances" href="javascript:void(0)" onclick="togglereferances()">
                 <i class="fa fa-superscript"></i>
                 @lang('additional.pages.exams.referances')

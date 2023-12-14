@@ -63,6 +63,14 @@
                                         <label for="">Ad </label>
                                         <input type="text" value="{{ old('name') }}" name="name" class="form-control {{ $errors->first('name') ? 'is-invalid' : '' }}">
                                     </div>
+
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">Gözləmə müddəti </label>
+                                        <input type="text" value="{{ old('time_range_sections') }}" name="time_range_sections" class="form-control {{ $errors->first('time_range_sections') ? 'is-invalid' : '' }}">
+                                    </div>
+
                                 </div>
                             </div>
 

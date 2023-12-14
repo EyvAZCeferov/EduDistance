@@ -32,18 +32,20 @@
 
     <form action="" id="exam" class="d-block" method="POST">
         @csrf
+        <input type="hidden" name="first_question" id="first_question" value="{{ $questions[0]->id }}">
         <input type="hidden" name="current_question" id="current_question" value="{{ $questions[0]->id }}">
         <input type="hidden" name="current_section" id="current_section" value="{{ $questions[0]->section_id }}">
         <input type="hidden" name="current_section_name" id="current_section_name"
             value="{{ $questions[0]->section->name }}">
         <input type="hidden" name="selected_section" id="selected_section"
             value="{{ session()->get('selected_section') }}">
-        <input type="hidden" name="time_range_sections" id="time_range_sections" value="{{ $exam->time_range_sections }}">
+        <input type="hidden" name="time_range_sections" id="time_range_sections" value="{{ $questions[0]->section->time_range_sections }}">
         <input type="hidden" name="next_section" id="next_section"
             value="{{ !empty($exam->sections[session()->get('selected_section')]) ? true : false }}">
         <input type="hidden" name="all_questions" id="all_questions" value="{{ count($questions) }}">
         <input type="hidden" name="show_time" id="show_time" value="true">
         <input type="hidden" name="time_exam" id="time_exam" value="0">
+        <input type="hidden" name="time_end_exam" id="time_end_exam" value="{{ $exam->duration }}">
         <input type="hidden" name="section_start_time" id="section_start_time" value="0">
         <input type="hidden" name="marked_questions[]" id="marked_questions"
             value="{{ $exam_result->marked->pluck('question_id') }}">
@@ -53,7 +55,7 @@
         <input type="hidden" name="exam_id" id="exam_id" value="{{ $exam->id }}">
         <input type="hidden" name="exam_result_id" id="exam_result_id" value="{{ $exam_result->id }}">
         <input type="hidden" name="language" id="language" value="{{ app()->getLocale() }}">
-        <section class="exam_page">
+        <section class="exam_page {{ $exam->layout_type }}">
             @include('frontend.exams.exam_main_process.parts.header', [
                 'exam' => $exam,
                 'questions' => $questions,
@@ -63,6 +65,7 @@
                 'questions' => $questions,
                 'exam_result' => $exam_result,
             ])
+
             @include('frontend.exams.exam_main_process.parts.footer', [
                 'exam' => $exam,
                 'questions' => $questions,
@@ -178,6 +181,7 @@
     {{-- Header Buttons --}}
     <script defer>
         let intervalTimerID;
+
         function togglehours() {
             var clock_area = document.getElementById("timer_section");
             var clock_toggle_button = document.getElementById("timer_button");
@@ -204,10 +208,13 @@
     {{-- Header Buttons --}}
     {{-- Footer Buttons --}}
     <script defer>
+        let finishmodalshowed = false;
+
         function toback() {
             var current_question = document.getElementById("current_question").value;
             var first_question = document.getElementsByClassName('content_exam')[0];
             var currentDivQuestion = document.getElementById(`content_exam_${current_question}`);
+            showfinishmodal('hide');
             if (current_question == first_question.dataset.id) {
                 window.location.href = '/exams';
             } else {
@@ -225,6 +232,7 @@
 
         function togglequestions() {
             var footer_questions = document.getElementById('footer_questions');
+            showfinishmodal('hide');
             if (footer_questions.classList.contains('active')) {
                 footer_questions.classList.remove("active");
             } else {
@@ -241,36 +249,41 @@
             var section_start_time = document.getElementById("section_start_time");
             var loader_for_sections = document.getElementById("loader_for_sections");
             var form = document.getElementById("exam");
+            console.log(finishmodalshowed);
             if (all_questions == currentDivQuestion.dataset.key) {
-                clearInterval(intervalTimerID);
-                var forum = document.getElementById("exam");
-                var formData = new FormData(forum);
-                fetch("{{ route('finish_exam') }}", {
-                        method: "POST",
-                        body: formData
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error("Network response was not ok.");
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        toast(data.message, data.status);
-                        if(data.url!=null && data.url!='' && data.url!=' '){
-                            window.location.href=data.url;
-                        }
-                    })
-                    .catch(error => {
-                        toast(error.message, "error");
-                    });
+                if (finishmodalshowed == false) {
+                    showfinishmodal('open');
+                } else {
+                    clearInterval(intervalTimerID);
+                    var forum = document.getElementById("exam");
+                    var formData = new FormData(forum);
+                    fetch("{{ route('finish_exam') }}", {
+                            method: "POST",
+                            body: formData
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("Network response was not ok.");
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            toast(data.message, data.status);
+                            if (data.url != null && data.url != '' && data.url != ' ') {
+                                window.location.href = data.url;
+                            }
+                        })
+                        .catch(error => {
+                            toast(error.message, "error");
+                        });
 
-                if (time_range_sections > 0) {
-                    if (next_section == 1) {
-                        section_start_time.value = document.getElementById("time_exam").value;
-                        form.classList.remove('d-block');
-                        form.style.display = "none";
-                        loader_for_sections.classList.add("active");
+                    if (time_range_sections > 0) {
+                        if (next_section == 1) {
+                            section_start_time.value = document.getElementById("time_exam").value;
+                            form.classList.remove('d-block');
+                            form.style.display = "none";
+                            loader_for_sections.classList.add("active");
+                        }
                     }
                 }
             } else {
@@ -284,11 +297,31 @@
                     document.getElementById("current_section").value = element.dataset.section_id;
                 });
             }
+        }
 
+        function showfinishmodal(action){
+            var showfinishmodal=document.getElementById('showfinishmodal');
+            var content_area_exam=document.getElementById('content_area_exam');
+            if(action=="open"){
+                finishmodalshowed = true;
+                showfinishmodal.classList.remove('hide');
+                content_area_exam.classList.add('hide');
+            }else{
+                finishmodalshowed = false;
+                showfinishmodal.classList.add('hide');
+                content_area_exam.classList.remove('hide');
+            }
         }
 
         function updatepad() {
             var current_question = document.getElementById("current_question").value;
+            var first_question = document.getElementById("first_question").value;
+            if (current_question == first_question) {
+                document.getElementById("to_back").classList.add('hide');
+            } else {
+                if (document.getElementById("to_back").classList.contains('hide'))
+                    document.getElementById("to_back").classList.remove('hide');
+            }
             var all_questions = document.getElementById("all_questions").value;
             var footer_active_button = document.getElementById(`question_row_button_${current_question}`);
             var buttons = document.getElementsByClassName("btn-question");
@@ -302,17 +335,17 @@
 
                 if (time_range_sections > 0) {
                     if (next_section == 1) {
-                        next_button.innerHTML = `@lang('additional.buttons.nextsection') <i class="fa fa-angle-right"></i>`;
+                        next_button.innerHTML = `@lang('additional.buttons.nextsection') @if($exam->layout_type=="standart")<i class="fa fa-angle-right"></i>@endif`;
                     } else {
-                        next_button.innerHTML = `@lang('additional.buttons.finish') <i class="fa fa-check"></i>`;
+                        next_button.innerHTML = `@lang('additional.buttons.finish') @if($exam->layout_type=="standart")<i class="fa fa-check"></i>@endif`;
                     }
                 } else {
-                    next_button.innerHTML = `@lang('additional.buttons.finish') <i class="fa fa-check"></i>`;
+                    next_button.innerHTML = `@lang('additional.buttons.finish') @if($exam->layout_type=="standart")<i class="fa fa-check"></i>@endif`;
                 }
             } else {
                 next_button.classList.add("btn-secondary");
                 next_button.classList.remove("active");
-                next_button.innerHTML = `@lang('additional.buttons.next') <i class="fa fa-angle-right"></i>`;
+                next_button.innerHTML = `@lang('additional.buttons.next')@if($exam->layout_type=="standart") <i class="fa fa-angle-right"></i> @endif`;
             }
 
             var current_question_text = document.getElementById("current_question_text");
@@ -342,6 +375,7 @@
 
         function getquestion(id) {
             var activecontentquestions = document.getElementsByClassName("content_exam");
+            showfinishmodal('hide');
             for (var i = 0; i < activecontentquestions.length; i++) {
                 activecontentquestions[i].classList.remove("show");
             }
@@ -353,6 +387,7 @@
         }
 
         setInterval(updatepad, 500);
+
     </script>
     {{-- Footer Buttons --}}
 
@@ -364,14 +399,29 @@
             return val.toString().padStart(2, '0');
         }
 
+        function pad_new(val) {
+            return val < 10 ? "0" + val : val;
+        }
+
+        let difference = 0;
+        let endTime;
+
         function updateClock() {
             sec++;
+            var nowTimeStamp;
             var inputtimeinput = document.getElementById("time_exam");
             var section_start_time = document.getElementById("section_start_time");
             var time_range_sections = document.getElementById("time_range_sections");
             var loader_for_sections = document.getElementById("loader_for_sections");
             var form = document.getElementById("exam");
+            var time_end_exam = document.getElementById("time_end_exam").value;
 
+            var splitTimeEndTime = time_end_exam.split(":");
+            var hoursEndTime = parseInt(splitTimeEndTime[0], 10);
+            var minutesEndTime = parseInt(splitTimeEndTime[1], 10);
+            var secondsEndTime = parseInt(splitTimeEndTime[2], 10);
+            nowTimeStamp = new Date().getTime();
+            difference = tracktime(nowTimeStamp, hoursEndTime, minutesEndTime, secondsEndTime);
             inputtimeinput.value = sec;
             if (loader_for_sections.classList.contains('active') && section_start_time.value > 0) {
                 var qalan_vaxt = time_range_sections.value - section_start_time.value;
@@ -395,16 +445,27 @@
                 form.classList.add('d-block');
             }
 
+            var minutesDifference = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            var secondsDifference = Math.floor((difference % (1000 * 60)) / 1000);
+
             if (document.getElementById('seconds')) {
-                document.getElementById('seconds').innerHTML = pad(sec % 60);
+                document.getElementById('seconds').innerHTML = pad_new(secondsDifference);
             }
 
             if (document.getElementById('minutes')) {
-                document.getElementById('minutes').innerHTML = pad(parseInt(sec / 60, 10) % 60);
+                document.getElementById('minutes').innerHTML = pad_new(minutesDifference);
             }
-
         }
-        intervalTimerID= setInterval(updateClock, 1000);
+
+        function tracktime(nowT, hoursEndTime, minutesEndTime, secondsEndTime) {
+            var nowTTT = moment();
+            var endTTT = moment().add(hoursEndTime, 'hours').add(minutesEndTime, 'minutes').add(secondsEndTime,
+            'seconds'); // Belirtilen süreyi ekler
+            let difference = endTTT.diff(nowTTT);
+            return difference;
+        }
+
+        intervalTimerID = setInterval(updateClock, 1000);
     </script>
     {{-- Create Timer --}}
 
@@ -493,7 +554,7 @@
             }
             if (all_questions != currentDivQuestion.dataset.key) {
                 if (type == "radio") {
-                    tonext();
+                    // tonext();
                 }
             }
 
@@ -538,6 +599,51 @@
                 }
             });
         }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            var oneTimeAudios = document.querySelectorAll('.only1time');
+            oneTimeAudios.forEach(function(audio) {
+                audio.addEventListener('play', function() {
+                    oneTimeAudios.forEach(function(otherAudio) {
+                        if (otherAudio !== audio) {
+                            otherAudio.pause(); // Diğer audio dosyalarını durdur
+                            otherAudio.disabled =
+                                true; // Diğer audio dosyalarını devre dışı bırak
+                        }
+                    });
+                }, {
+                    once: true
+                }); // 'once' parametresi sayesinde bu eventListener yalnızca bir kez çalışır
+            });
+        });
+
+        const leftCol = document.getElementById('left_col');
+        const resizer = document.getElementById('resizer');
+
+        function draggingleftandrightcolumns() {
+            resizer.addEventListener("mousedown", (e) => {
+                e.preventDefault();
+                document.addEventListener("mousemove", resize);
+                document.addEventListener("mouseup", () => {
+                    document.removeEventListener("mousemove", resize);
+                });
+            });
+            resizer.addEventListener("mouseover", (e) => {
+                resizer.style.opacity = 1;
+            });
+            resizer.addEventListener("mouseleave", (e) => {
+                resizer.style.opacity = 0.5;
+            });
+        }
+
+        function resize(e) {
+            const size = `${e.clientX}px`;
+            leftCol.style.width = size;
+        }
+
+        window.addEventListener('load', function() {
+            draggingleftandrightcolumns();
+        });
     </script>
     {{-- Exam Functions --}}
     {{-- Content Functions --}}
@@ -588,6 +694,7 @@
             }
         });
     </script>
+
     <script type="text/javascript">
         window.onbeforeunload = function() {
             return "Dude, are you sure you want to leave? Think of the kittens!";

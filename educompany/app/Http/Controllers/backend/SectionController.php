@@ -30,6 +30,7 @@ class SectionController extends Controller
 
         $model->exam_id = $exam_id;
         $model->name = $request->input('name');
+        $model->time_range_sections = $request->input('time_range_sections')??0;
         $model->save();
 
         return redirect()->route('exams.questions', $exam_id)->with(['success' => 'Uğurla!']);
@@ -52,9 +53,8 @@ class SectionController extends Controller
         $request->validate($rules);
 
         $model = Section::where('exam_id', $exam_id)->findOrFail($id);
-
         $model->name = $request->input('name');
-
+        $model->time_range_sections = $request->input('time_range_sections')??0;
         $model->save();
 
         return redirect()->route('exams.questions', $exam_id)->with(['success' => 'Uğurla!']);

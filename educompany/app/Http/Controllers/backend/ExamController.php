@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Stichoza\GoogleTranslate\GoogleTranslate;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Carbon\Carbon;
 
 class ExamController extends Controller
 {
@@ -68,6 +69,10 @@ class ExamController extends Controller
             'en_description' => $request->en_description ?? trim(GoogleTranslate::trans($request->az_description, 'en')),
         ];
 
+        $start_time=null;
+        if($request->input('start_time')!=null)
+            $start_time = Carbon::parse($request->input('start_time'));
+
         $model->category_id = $request->input('category_id');
         $model->name = $name;
         $model->slug = Str::slug($name['az_name']);
@@ -78,15 +83,13 @@ class ExamController extends Controller
         $model->order_number = $request->input('order_number') ?? 1;
         $model->price = $request->input('price') ?? 1;
         $model->endirim_price = $request->input('endirim_price') ?? 1;
-        $model->time_range_sections = $request->input('time_range_sections') ?? 0;
         $model->user_id = auth('admins')->id();
         $model->user_type = "admins";
         $model->repeat_sound=$request->input('repeat_sound') ? 1 : 0;
         $model->show_result_user=$request->input('show_result_user') ? 1 : 0;
-        $model->start_time=$request->input('start_time') ?? null;
-        $model->end_time=$request->input('end_time') ?? null;
+        $model->start_time=$start_time ?? null;
         $model->image = $image;
-
+        $model->layout_type=$request->layout_type ?? 'standart';
         $model->save();
         dbdeactive();
         return redirect()->route('exams.index')->with(['success' => 'Uğurla!']);
@@ -129,6 +132,9 @@ class ExamController extends Controller
             'ru_description' => $request->ru_description ?? trim(GoogleTranslate::trans($request->az_description, 'ru')),
             'en_description' => $request->en_description ?? trim(GoogleTranslate::trans($request->az_description, 'en')),
         ];
+        $start_time=null;
+        if($request->input('start_time')!=null)
+            $start_time = Carbon::parse($request->input('start_time'));
 
         $model->category_id = $request->input('category_id');
         $model->name = $name;
@@ -141,7 +147,9 @@ class ExamController extends Controller
         $model->order_number = $request->input('order_number') ?? 1;
         $model->price = $request->input('price') ?? 1;
         $model->endirim_price = $request->input('endirim_price') ?? 1;
-        $model->time_range_sections = $request->input('time_range_sections') ?? 0;
+        $model->start_time = $start_time ?? null;
+        $model->layout_type=$request->layout_type ?? 'standart';
+        $model->show_result_user=$request->input('show_result_user') ? 1 : 0;
         $model->save();
 
         $exam_start_pages = ExamStartPageIds::where("exam_id", $model->id)->get();
@@ -235,6 +243,7 @@ class ExamController extends Controller
         }
         $model->type = $request->input('type');
         $model->section_id = $section_id;
+        $model->layout = $request->layout;
 
         if ($request->hasFile('image')) {
             $model->addMedia($request->image)->toMediaCollection("exam_question");
@@ -280,6 +289,7 @@ class ExamController extends Controller
         }
         $model->type = $request->input('type');
         $model->section_id = $section_id;
+        $model->layout = $request->layout;
 
         if ($request->hasFile('image')) {
             $oldImage = $model->getMedia('exam_question')->first();
