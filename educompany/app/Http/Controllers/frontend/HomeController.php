@@ -56,7 +56,7 @@ class HomeController extends Controller
                 $exams = $exams->orderBy("order_number", 'ASC')
                     ->get();
             });
-            return view('frontend.exams.index', compact('exams', 'sub_categories', 'category', 'filters','search'));
+            return view('frontend.exams.index', compact('exams', 'sub_categories', 'category', 'filters', 'search'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -71,6 +71,20 @@ class HomeController extends Controller
             } else {
                 return redirect('/notfound')->with('error', trans("additional.messages.examnotfound"));
             }
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+    public function createoreditexam(Request $request)
+    {
+        try {
+            $data = collect();
+            $slug = strip_tags_with_whitespace($request->get("slug"));
+            if (isset($slug) && !empty($slug)) {
+                $data = Exam::where('slug', $slug)->first();
+                // $data = Exam::where('slug',"yeni-imtahan-1")->first();
+            }
+            return view('frontend.exams.create_edit_exams.index', compact('data'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

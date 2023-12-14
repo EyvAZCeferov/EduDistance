@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}" dir="ltr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,7 +36,6 @@
 <body>
     <div class="container container-xxl">
         @include('frontend.layouts.parts.header')
-
         @yield('content')
     </div>
     @include('frontend.layouts.parts.footer')

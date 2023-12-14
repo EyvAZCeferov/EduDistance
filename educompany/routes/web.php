@@ -21,6 +21,7 @@ Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalizati
         Route::get("blogs_front/{slugs}", [RoutesController::class, 'blogs_front'])->name("blogs_front.show");
         Route::get("teams_front/{slugs}", [RoutesController::class, 'teams_front'])->name("teams_front.show");
         Route::get('/exams', [HomeController::class, 'exams'])->name('exams_front.index');
+        Route::get('/createoreditexam', [HomeController::class, 'createoreditexam'])->name('exams_front.createoredit');
         Route::get('/exams/{slug}', [HomeController::class, 'showexam'])->name('exams.show');
         Route::get('/exams/{category_id?}', [HomeController::class, 'exams'])->name('exams');
         Route::get('/category_exam/{category?}', [HomeController::class, 'exams'])->name('category_exam');
@@ -41,6 +42,7 @@ Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalizati
             Route::any('/logout', [AuthController::class, 'logout'])->name('logout');
 
             Route::group(['prefix' => 'exam'], function () {
+                Route::post('add_edit_exam',[CommonController::class,'add_edit_exam'])->name("exam.add_edit_exam");
                 Route::get('results', [CommonController::class, 'examResults'])->name('exam.results');
                 Route::get('resultpage/{result_id}', [CommonController::class, 'examResultPage'])->name('exam.resultpage');
                 Route::get('results/{result_id}', [CommonController::class, 'examResult'])->name('exam.result');

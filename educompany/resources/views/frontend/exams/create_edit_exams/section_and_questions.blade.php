@@ -1,0 +1,34 @@
+<div class="row classjustifstart sections_area" id="sections_area">
+    <div id="section_elements" class="d-inline-block element">
+        @if (!empty($data->sections) && count($data->sections) > 0)
+            @foreach ($data->sections as $key => $value)
+                @if ($key == 0)
+                    <script defer>
+                        document.getElementById('current_section').value = {{ $value->id }};
+                        window.addEventListener('load', function() {
+                            get_section({{ $value->id }});
+                        });
+                    </script>
+                @endif
+                <div class="section_element" onclick="get_section($value->id)" id="section_element_{{ $value->id }}">
+                    {{ $value->name }}
+                </div>
+            @endforeach
+        @endif
+    </div>
+    <div class="d-inline-block element">
+        <button class="btn btn-sm btn-primary create_section_button" onclick="toggleModalnow('create_sections', 'open')"
+            type="button">@lang('additional.pages.exams.sections') @lang('additional.buttons.add') </button>
+    </div>
+</div>
+<div class="row section_and_questions hide" id="section_and_questions">
+    <div class="left" id="section_and_questions_left">
+        <button type="button" class="btn btn-primary create_question" onclick="create_question()">@lang('additional.buttons.createquestion') <i class="fa fa-plus"></i></button>
+        <div class="question_type_element">
+
+        </div>
+    </div>
+    <div class="right" id="section_and_questions_right">
+        
+    </div>
+</div>

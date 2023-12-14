@@ -206,7 +206,11 @@ class ExamController extends Controller
         }
         $questions = $section ? ExamQuestion::where('section_id', $section?->id)->orderBy('created_at')->get() : [];
 
-        return view('backend.pages.exams.questions.index', compact('questions', 'exam_id', 'sections', 'section'));
+        if (isset(request()->responseType) && request()->responseType == "json") {
+            return response()->json(['status' => 'success', 'data' => $questions]);
+        } else {
+            return view('backend.pages.exams.questions.index', compact('questions', 'exam_id', 'sections', 'section'));
+        }
     }
 
     public function createQuestion($exam_id, $section_id)

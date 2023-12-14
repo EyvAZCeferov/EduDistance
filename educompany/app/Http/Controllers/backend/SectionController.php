@@ -11,13 +11,15 @@ class SectionController extends Controller
 {
     use AuthorizesRequests;
 
-    public function create ($exam_id) {
+    public function create($exam_id)
+    {
         $this->authorizeForUser(auth('admins')->user(), 'section-create');
 
         return view('backend.pages.sections.create', compact('exam_id'));
     }
 
-    public function store (Request $request, $exam_id) {
+    public function store(Request $request, $exam_id)
+    {
         $this->authorizeForUser(auth('admins')->user(), 'section-create');
 
         $rules = [
@@ -30,20 +32,27 @@ class SectionController extends Controller
 
         $model->exam_id = $exam_id;
         $model->name = $request->input('name');
-        $model->time_range_sections = $request->input('time_range_sections')??0;
+        $model->time_range_sections = $request->input('time_range_sections') ?? 0;
         $model->save();
 
-        return redirect()->route('exams.questions', $exam_id)->with(['success' => 'Uğurla!']);
+        if (isset($request->responseType) && $request->responseType == "json") {
+            $sections = Section::where("exam_id", $exam_id)->orderBy("id", 'DESC')->get();
+            return response()->json(['status' => 'success', 'message' => 'Yaradıldı!', 'data' => $sections]);
+        } else {
+            return redirect()->route('exams.questions', $exam_id)->with(['success' => 'Uğurla!']);
+        }
     }
 
-    public function edit ($exam_id, $id) {
+    public function edit($exam_id, $id)
+    {
         $this->authorizeForUser(auth('admins')->user(), 'section-update');
 
         $section = Section::where('exam_id', $exam_id)->findOrFail($id);
         return view('backend.pages.sections.edit', compact('section', 'exam_id'));
     }
 
-    public function update (Request $request, $exam_id, $id) {
+    public function update(Request $request, $exam_id, $id)
+    {
         $this->authorizeForUser(auth('admins')->user(), 'section-update');
 
         $rules = [
@@ -54,13 +63,14 @@ class SectionController extends Controller
 
         $model = Section::where('exam_id', $exam_id)->findOrFail($id);
         $model->name = $request->input('name');
-        $model->time_range_sections = $request->input('time_range_sections')??0;
+        $model->time_range_sections = $request->input('time_range_sections') ?? 0;
         $model->save();
 
         return redirect()->route('exams.questions', $exam_id)->with(['success' => 'Uğurla!']);
     }
 
-    public function delete ($exam_id, $id) {
+    public function delete($exam_id, $id)
+    {
         $this->authorizeForUser(auth('admins')->user(), 'section-delete');
 
         $model = Section::where('exam_id', $exam_id)->findOrFail($id);

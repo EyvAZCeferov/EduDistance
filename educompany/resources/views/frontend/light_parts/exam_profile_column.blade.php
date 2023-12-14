@@ -1,5 +1,10 @@
 <div class="my-4 py-2">
-    @include('frontend.light_parts.section_title',['title'=>trans('additional.pages.exams.' .$title)])
+    <div class="row section_title">
+        <h3>{{ trans('additional.pages.exams.' . $title) }}</h3>
+        <a href="{{ route("exams_front.createoredit") }}" class="btn btn-primary">@lang('additional.buttons.add') <i
+                class="fa-solid fa-circle-plus"></i>
+        </a>
+    </div>
     <ul class="nav nav-pills custom_nav-pills mb-3" id="{{ $nav_id }}_tab" role="tablist">
         @foreach ($tab_datas as $key => $value)
             <li class="nav-item" role="presentation">

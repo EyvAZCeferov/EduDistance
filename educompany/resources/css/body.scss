@@ -1674,6 +1674,7 @@ body {
 
                     .right_section {
                         .section {
+
                             &:hover,
                             &:focus,
                             &:active {
@@ -1700,6 +1701,7 @@ body {
                                 .buttons {
                                     .button {
                                         border-color: #000;
+
                                         &:hover,
                                         &:focus,
                                         &:active {
@@ -1715,10 +1717,13 @@ body {
                                 background-color: $gray-color;
                                 border-radius: 0;
                                 color: #000;
+
                                 div {
+
                                     span,
                                     a {
-                                        color:#000;
+                                        color: #000;
+
                                         &.question_number {
                                             background-color: #000;
                                             color: #fff;
@@ -1730,6 +1735,7 @@ body {
                                         }
 
                                         &.mark_button {
+
                                             &:hover,
                                             &:focus,
                                             &:active,
@@ -1740,9 +1746,10 @@ body {
 
                                         &.remove_button {
                                             border-color: #000;
-                                            color:#000;
-                                            border-radius:10px;
-                                            border-width:2px;
+                                            color: #000;
+                                            border-radius: 10px;
+                                            border-width: 2px;
+
                                             &:hover,
                                             &:focus,
                                             &:active,
@@ -1766,7 +1773,7 @@ body {
                                         &.rowNumber {
                                             background-color: #fff;
                                             border-color: #000;
-                                            color:#000;
+                                            color: #000;
                                         }
                                     }
 
@@ -1774,15 +1781,16 @@ body {
                                     &:focus,
                                     &:active,
                                     &.selected {
-                                        border-color:#000;
-                                        background-color:#000;
-                                        color:#fff;
+                                        border-color: #000;
+                                        background-color: #000;
+                                        color: #fff;
 
                                         .rowNumber,
                                         .question,
                                         .question * {
                                             color: #fff;
                                             border-color: #fff;
+
                                             &.rowNumber {
                                                 background-color: #fff;
                                                 color: #000;
@@ -1807,7 +1815,7 @@ body {
 
                     .question_info_row {
                         @extend .classjustifybetween;
-                        border-color:#000;
+                        border-color: #000;
 
                         i {
                             color: #000;
@@ -1818,7 +1826,7 @@ body {
                         .btn-question {
 
                             &.not_answered {
-                                border-color:#000;
+                                border-color: #000;
                                 color: #000;
                             }
 
@@ -1826,6 +1834,7 @@ body {
                                 background-color: #000;
                                 color: #fff;
                                 border-color: #000;
+
                                 &:hover,
                                 &:focus,
                                 &:active {
@@ -1836,33 +1845,33 @@ body {
                             }
 
                             &.saved {
-                                border-color:#000;
+                                border-color: #000;
                                 background-color: #fff;
-                                color:#000;
+                                color: #000;
                             }
 
                             &.current {
-                                border-color:#000;
-                                background-color:#000;
+                                border-color: #000;
+                                background-color: #000;
                                 color: #fff;
                             }
 
                             &:hover,
                             &:focus,
                             &:active {
-                                border-color:#000;
-                                color:#000;
+                                border-color: #000;
+                                color: #000;
                             }
                         }
                     }
 
                     .bottomcorner {
-                        border-top-color:#000;
+                        border-top-color: #000;
                     }
 
                     .center_back_button {
                         .center_back {
-                            border-color:#000;
+                            border-color: #000;
                             background-color: #000;
                             color: #fff;
                         }
@@ -1872,6 +1881,7 @@ body {
                 .footer_buttons {
                     button {
                         color: #fff;
+
                         &.back_button {
                             background-color: $primary-color;
                             border-color: $primary-color;
@@ -1882,7 +1892,7 @@ body {
                             &.active {
                                 background-color: #fff;
                                 border-color: #000;
-                                color:#fff;
+                                color: #fff;
                             }
                         }
 
@@ -1896,7 +1906,7 @@ body {
                             &.active {
                                 background-color: #fff;
                                 border-color: #000;
-                                color:#000;
+                                color: #000;
                             }
                         }
 
@@ -1910,7 +1920,7 @@ body {
                             &.active {
                                 background-color: #fff;
                                 border-color: #000;
-                                color:#000;
+                                color: #000;
                             }
                         }
 
@@ -2031,84 +2041,280 @@ body {
             }
         }
 
-        &.result_page{
-            box-shadow:0 0 10px 5px rgba(0, 0, 0, 0.25);
-            width:80%;
-            margin:40px auto;
-            min-height:300px;
-            padding:10px 15px;
-            .header{
+        &.result_page {
+            box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.25);
+            width: 80%;
+            margin: 40px auto;
+            min-height: 300px;
+            padding: 10px 15px;
+
+            .header {
                 font-family: $secondary-font;
-                color:#000;
+                color: #000;
                 font-weight: bold;
-                padding:10px 0;
+                padding: 10px 0;
                 @extend .classcenter;
-                font-size:$subheading_size;
-                flex-direction:column;
-                width:100%;
-                .header_bottom_row{
-                    border-bottom:1px solid $gray-color;
-                    border-top:1px solid $gray-color;
-                    padding:10px 0;
-                    width:100%;
+                font-size: $subheading_size;
+                flex-direction: column;
+                width: 100%;
+
+                .header_bottom_row {
+                    border-bottom: 1px solid $gray-color;
+                    border-top: 1px solid $gray-color;
+                    padding: 10px 0;
+                    width: 100%;
                     @extend .classjustifstart;
-                    .col{
-                        font-size:$small_size;
-                        color:#000;
-                        font-weight:500;
+
+                    .col {
+                        font-size: $small_size;
+                        color: #000;
+                        font-weight: 500;
                         @extend .classjustifstart;
-                        .blockwithbg{
-                            margin-left:5px;
-                            width:30px;
-                            height:30px;
-                            background-color:$gray-color;
+
+                        .blockwithbg {
+                            margin-left: 5px;
+                            width: 30px;
+                            height: 30px;
+                            background-color: $gray-color;
                         }
-                        &.true{
-                            .blockwithbg{
-                                background-color:$success-color;
+
+                        &.true {
+                            .blockwithbg {
+                                background-color: $success-color;
                             }
                         }
-                        &.false{
-                            .blockwithbg{
-                                background-color:$error-color;
+
+                        &.false {
+                            .blockwithbg {
+                                background-color: $error-color;
                             }
                         }
                     }
                 }
             }
-            .content{
-                .btn-question{
-                    width:45px;
-                    height:30px;
+
+            .content {
+                .btn-question {
+                    width: 45px;
+                    height: 30px;
                     background-color: $gray-color;
-                    color:#000;
-                    border:1px solid $gray-color;
-                    font-size:$page_size;
-                    border-radius:0;
-                    -webkit-border-radius:0;
-                    -moz-border-radius:0;
-                    -ms-border-radius:0;
-                    -o-border-radius:0;
-                    &.true{
+                    color: #000;
+                    border: 1px solid $gray-color;
+                    font-size: $page_size;
+                    border-radius: 0;
+                    -webkit-border-radius: 0;
+                    -moz-border-radius: 0;
+                    -ms-border-radius: 0;
+                    -o-border-radius: 0;
+
+                    &.true {
                         background-color: $success-color;
-                        color:#fff;
+                        color: #fff;
                     }
-                    &.false{
+
+                    &.false {
                         background-color: $error-color;
-                        color:#fff;
+                        color: #fff;
                     }
-}
+                }
             }
-            .footer{
-                width:100%;
+
+            .footer {
+                width: 100%;
                 @extend .classjustifyaround;
-                padding:25px 10px;
+                padding: 25px 10px;
                 border-top: 2px solid $gray-color;
-                margin-top:10px;
+                margin-top: 10px;
                 font-weight: bold;
                 padding-bottom: 0;
             }
-            
+
+        }
+
+        &.add_edit_exam {
+            .sections_area {
+                @extend .classjustifybetween;
+
+                .element {
+                    width: max-content;
+                }
+
+                .section_element {
+                    width: max-content;
+                    padding: 5px 10px;
+                    display: inline-block;
+                    margin: 5px 0;
+                    margin-right: 7px;
+                    color: #000;
+                    background-color: #fff;
+                    border: 1px solid #000;
+                    transition: all ease 0.6s;
+                    -webkit-transition: all ease 0.6s;
+                    -moz-transition: all ease 0.6s;
+                    -ms-transition: all ease 0.6s;
+                    -o-transition: all ease 0.6s;
+                    border-radius: 10px;
+
+                    &:hover,
+                    &:focus,
+                    &:active,
+                    &.active {
+                        background-color: #000;
+                        color: #fff;
+                        border-color: #000;
+                        cursor: pointer;
+                    }
+                }
+
+                .create_section_button {
+                    width: max-content;
+                    padding: 5px 10px;
+                    background-color: $primary-color;
+                    color: #fff;
+                    transition: all ease 0.7s;
+                    border-color: $primary-color;
+
+                    &:hover {
+                        background-color: $secondary-color;
+                        border-color: $secondary-color;
+                    }
+                }
+            }
+
+            .section_and_questions {
+                @extend .classjustifybetween;
+                margin: 15px 0;
+                height:600px;
+
+                &.hide {
+                    display: none;
+                }
+
+                .left {
+                    width: 40%;
+                    @extend .classjustifstart;
+                    height:100%;
+                    overflow-y:auto;
+                    overflow-x:hidden;
+
+                    .create_question {
+                        font-size: $normal_size;
+                        color: $primary-color;
+                        border: 2px solid $primary-color;
+                        background-color: #fff;
+                        border-radius: 25px;
+                        -webkit-border-radius: 25px;
+                        -moz-border-radius: 25px;
+                        -ms-border-radius: 25px;
+                        -o-border-radius: 25px;
+
+                        &:hover,
+                        &:focus,
+                        &:active {
+                            background-color: $primary-color;
+                            color: #fff;
+                        }
+                    }
+                }
+
+                .right {
+                    width: 60%;
+                    background-color: rgba(217, 217, 217, 0.26);
+                    padding: 10px 15px;
+                    height:100%;
+                    overflow-y:auto;
+                    overflow-x:hidden;
+
+                    .left_area {
+                        width: 100%;
+                        @extend .classjustifstart;
+                        flex-direction: column;
+                        margin:10px 0;
+
+                        .dropdown-toggle {
+                            background-color: #fff;
+                            border: 2px solid $primary-color;
+                            color: $primary-color;
+                            font-size: $page_size;
+                            transition: all ease 0.7s;
+                            -webkit-transition: all ease 0.7s;
+                            -moz-transition: all ease 0.7s;
+                            -ms-transition: all ease 0.7s;
+                            -o-transition: all ease 0.7s;
+                            border-radius:10px;
+                            -webkit-border-radius:10px;
+                            -moz-border-radius:10px;
+                            -ms-border-radius:10px;
+                            -o-border-radius:10px;
+                            &:hover,&:focus,&:active{
+                                background-color: $primary-color;
+                                color: #fff;
+                            }
+                        }
+                    }
+
+                    .answers{
+                        width:100%;
+                        .answer{
+                            width:100%;
+                            background-color:transparent;
+                            border:2px solid #000;
+                            color:#000;
+                            font-size:$page_size;
+                            border-radius:10px;
+                            margin-bottom:10px;
+                            @extend .classcenter;      
+                            -webkit-border-radius:10px;
+                            -moz-border-radius:10px;
+                            -ms-border-radius:10px;
+                            -o-border-radius:10px;
+                            padding:4px 0;
+                            label{
+                                margin-bottom: 0;
+                                margin-top:5px;
+                            }
+                            input[type="radio"]{
+                                width:25px;
+                                height:25px;
+                                border:2px solid #000;
+                            }
+                            input[type="text"],
+                            textarea{
+                                display:inline-block;
+                                width: 93%;
+                                background-color:transparent;
+                                font-size:13px;
+                                font-family:$secondary-font;
+                                border:none;
+                                outline:none;
+                                height:100%;
+                            }
+                        }
+                    }
+                    .submit_answer{
+                        width:max-content;
+                        padding:5px 10px;
+                        background-color: $primary-color;
+                        color:#fff;
+                        border:2px solid $primary-color;
+                        font-size:$small_size;
+                        font-family: $secondary-font;
+                        border-radius: 10px;
+                        -webkit-border-radius:10px;
+                        -moz-border-radius:10px;
+                        -ms-border-radius:10px;
+                        -o-border-radius:10px;
+                        &:hover,&:focus,&:active{
+                            background-color:$secondary-color;
+                            color:$secondary-color;
+                            border-color:$secondary-color;
+                        }
+                        &.hide{
+                            display:none;
+                        }
+                    }
+                }
+            }
         }
     }
 
