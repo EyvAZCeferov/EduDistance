@@ -123,26 +123,6 @@
                 </div>
 
                 <div class="col-sm-12 col-md-6 col-lg-3 my-1">
-                    <label for="references">@lang('additional.forms.exam_references')</label>
-                    <select name="references[]" id="references" multiple class="multiselect d-block w-100">
-                        @foreach (references(null, 'asc') as $key => $value)
-                            <option @if (isset($data) && !empty($data) && isset($data->id) && !empty(exist_on_model($value->id, $data->id, 'references'))) selected @endif value="{{ $value->id }}">
-                                {{ $value->name[app()->getLocale() . '_name'] }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="col-sm-12 col-md-6 col-lg-3 my-1">
-                    <label for="startpages">@lang('additional.forms.exam_startpages')</label>
-                    <select name="start_pages[]" id="startpages" multiple class="multiselect d-block w-100">
-                        @foreach (exam_start_page(null, 'expectdefault') as $key => $value)
-                            <option @if (isset($data) && !empty($data) && isset($data->id) && !empty(exist_on_model($value->id, $data->id, 'start_page'))) selected @endif value="{{ $value->id }}">
-                                {{ $value->name[app()->getLocale() . '_name'] }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="col-sm-12 col-md-6 col-lg-3 my-1">
                     <label for="layout">@lang('additional.forms.exam_layout')</label>
                     <select name="layout_type"
                         class="form-control {{ $errors->first('layout_type') ? 'is-invalid' : '' }}">
@@ -178,7 +158,7 @@
             </div>
         </form>
         {{-- Suallar, Section lar --}}
-        @if (isset($data) && !empty($data))
+        @if (isset($data) && !empty($data) && isset($data->id))
             @include('frontend.exams.create_edit_exams.section_and_questions', ['data' => $data])
         @endif
 
@@ -233,10 +213,6 @@
 
 @endsection
 @push('js')
-    <script src="https://unpkg.com/multiple-select@1.7.0/dist/multiple-select.min.js"></script>
-    <script defer>
-        $('.multiselect').multipleSelect();
-    </script>
     @if (isset($data) && !empty($data) && isset($data->id))
         {{-- Section Functions --}}
         <script defer>
@@ -260,14 +236,12 @@
 
                             if (n.data != null && n.data.length > 0) {
                                 var sectionElementsDiv = document.getElementById('section_elements');
+                                section_elements.innerHTML='';
+                                toggleModalnow('create_sections','hide');
                                 n.data.forEach(function(item) {
-                                    var divElement = document.createElement('div');
-                                    divElement.classList.add('section_element');
-                                    divElement.setAttribute('onclick', 'get_section(' + item.id + ')');
-                                    divElement.setAttribute('id', 'section_element_' + item.id);
-                                    divElement.textContent = item.name;
-
-                                    sectionElementsDiv.appendChild(divElement);
+                                    var divElement = `<div class='section_element' onclick=get_section(${item.id})
+                                    id='section_element_${item.id}'>${item.name}</div>`;
+                                    document.body.innerHTML+=divElement;
                                 });
                             }
                         }
@@ -369,7 +343,7 @@
             var question_content_audio = document.getElementById("question_content_audio");
             var answers_area = document.getElementById('answers_area');
             var question_type = document.getElementById('question_type');
-            var submit_answer= document.getElementById('submit_answer');
+            var submit_answer = document.getElementById('submit_answer');
             if (type == 5) {
                 question_content_audio.classList.remove('d-none');
                 question_content_textbox.classList.add("d-none");
@@ -401,22 +375,13 @@
             var element = docuemnt.getElementById('input_radios_' + id);
             element.prop('checked', true);
         }
-@if(isset($data) && !empty($data) && isset($data->id))
-        function post_question() {
-            var question_type = document.getElementById('question_type');
-            var question = document.getElementById('question');
+        @if (isset($data) && !empty($data) && isset($data->id))
+            function post_question() {
+                var question_type = document.getElementById('question_type');
+                var question = document.getElementById('question');
 
-        }
+            }
         @endif
-
     </script>
     {{-- Section Functions --}}
-@endpush
-@push('css')
-    <link rel="stylesheet" href="https://unpkg.com/multiple-select@1.7.0/dist/multiple-select.min.css">
-    <style>
-        select.multipleSelect-dropdown {
-            background-color: white !important;
-        }
-    </style>
 @endpush

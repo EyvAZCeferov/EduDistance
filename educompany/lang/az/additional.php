@@ -150,7 +150,7 @@ return [
         'exam_startpages'=>'Başlanğıc səhifələr',
         'exam_layout'=>"İmtahan tipi",
         "field_name"=>"Ad",
-        "field_duration"=>"Gözləmə müddəti",
+        "field_duration"=>"Gözləmə müddəti (san)",
         "question_name"=>"Sual adı",
         "answer"=>"Cavab"
     ],

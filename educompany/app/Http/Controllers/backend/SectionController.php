@@ -36,7 +36,7 @@ class SectionController extends Controller
         $model->save();
 
         if (isset($request->responseType) && $request->responseType == "json") {
-            $sections = Section::where("exam_id", $exam_id)->orderBy("id", 'DESC')->get();
+            $sections = Section::where("exam_id", $exam_id)->orderBy("id", 'ASC')->get();
             return response()->json(['status' => 'success', 'message' => 'Yaradıldı!', 'data' => $sections]);
         } else {
             return redirect()->route('exams.questions', $exam_id)->with(['success' => 'Uğurla!']);
