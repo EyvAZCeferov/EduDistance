@@ -13,6 +13,9 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         '*/exam/finish',
-        '*/sections/*/store'
+        '*/sections/*/store',
+        '/upload_image_editor',
+        '/qyestions_store',
+        '/get_question_data'
     ];
 }

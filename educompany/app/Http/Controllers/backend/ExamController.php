@@ -194,7 +194,6 @@ class ExamController extends Controller
         dbdeactive();
         return redirect()->route('exams.index')->with(['success' => 'Uğurla!']);
     }
-
     public function questions($exam_id, $section_id = null)
     {
         $this->authorizeForUser(auth('admins')->user(), 'exam-question-list');
@@ -212,14 +211,12 @@ class ExamController extends Controller
             return view('backend.pages.exams.questions.index', compact('questions', 'exam_id', 'sections', 'section'));
         }
     }
-
     public function createQuestion($exam_id, $section_id)
     {
         $this->authorizeForUser(auth('admins')->user(), 'exam-question-create');
 
         return view('backend.pages.exams.questions.create', compact('exam_id', 'section_id'));
     }
-
     public function storeQuestion(Request $request, $exam_id, $section_id)
     {
         $this->authorizeForUser(auth('admins')->user(), 'exam-question-create');

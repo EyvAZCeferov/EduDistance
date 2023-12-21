@@ -301,9 +301,9 @@ class CommonController extends Controller
                     'en_name' => trim(GoogleTranslate::trans($request->exam_name, 'en')),
                 ];
                 $description = [
-                    'az_description' => trim(GoogleTranslate::trans($request->description, 'az')),
-                    'ru_description' => trim(GoogleTranslate::trans($request->description, 'ru')),
-                    'en_description' => trim(GoogleTranslate::trans($request->description, 'en')),
+                    'az_description' => trim(GoogleTranslate::trans($request->description??$request->mce_0, 'az')),
+                    'ru_description' => trim(GoogleTranslate::trans($request->description??$request->mce_0, 'ru')),
+                    'en_description' => trim(GoogleTranslate::trans($request->description??$request->mce_0, 'en')),
                 ];
                 $start_time = null;
                 if ($request->input('start_time') != null)
@@ -357,10 +357,12 @@ class CommonController extends Controller
                         $page->save();
                     }
                 }
-                dbdeactive();
+                
             // });
+            dbdeactive();
             return redirect(route('exams_front.createoredit',['slug'=>$data->slug]))->with('success', "Əlavə edildi");
         } catch (\Exception $e) {
+            dd([$e->getMessage(),$e->getLine()]);
             return redirect()->back()->with('error', $e->getMessage());
         }
     }

@@ -152,7 +152,9 @@ return [
         "field_name"=>"Ad",
         "field_duration"=>"Gözləmə müddəti (san)",
         "question_name"=>"Sual adı",
-        "answer"=>"Cavab"
+        "answer"=>"Cavab",
+        'upload_audio'=>"Audio fayl əlavə et",
+        "your_question"=>"Sualınız"
     ],
     "messages"=>[
         "passwords_incorrect"=>"Şifrəniz yanlışdır",
@@ -164,6 +166,7 @@ return [
         "yenidenbaxisdancixarildi"=>'Yenidən baxış siyahısından çıxarıldı',
         "answersnotfound"=>"Heç bir suala cavab vermədiniz",
         'exam_finished'=>"İmtahan yekunlaşdı. Nəticələr səhifəsinə yönləndirilirsiniz...",
-        "required_fill"=>"Məcburi xanaları doldurun"
+        "required_fill"=>"Məcburi xanaları doldurun",
+        "success"=>"Uğurlu!"
     ],
 ];

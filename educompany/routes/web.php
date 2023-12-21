@@ -1,10 +1,10 @@
 <?php
 
+use App\Http\Controllers\frontend\ApisController;
 use App\Http\Controllers\frontend\HomeController;
 use App\Http\Controllers\frontend\AuthController;
 use \App\Http\Controllers\frontend\CommonController;
 use App\Http\Controllers\frontend\RoutesController;
-use App\Http\Controllers\FunctionsController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -58,4 +58,8 @@ Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalizati
 
     });
 });
+
+Route::post("upload_image_editor",[ApisController::class,'upload_image_editor'])->name("api.upload_image_editor");
+Route::post("qyestions_store",[ApisController::class,'questions_store'])->name("front.questions.store");
+Route::post("get_question_data",[ApisController::class,'get_question_data'])->name("front.questions.get");
 

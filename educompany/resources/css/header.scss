@@ -196,6 +196,16 @@ body {
     vertical-align: baseline;
 }
 
+.classjustifend {
+    display: flex;
+    align-content: flex-end;
+    align-items: center;
+    justify-content: flex-end;
+    text-align: left;
+    vertical-align: baseline;
+}
+
+
 .classjustifyaround {
     display: flex;
     align-content: center;

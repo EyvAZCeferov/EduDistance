@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Helpers\Epoint;
 use App\Models\Category;
 use App\Models\Payments;
+use App\Models\ExamQuestion;
+use App\Models\ExamAnswer;
 use App\Models\CouponCodes;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -63,7 +65,6 @@ class ApisController extends Controller
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
-
     public function filterelements(Request $request)
     {
         try {
@@ -97,7 +98,6 @@ class ApisController extends Controller
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
-
     public function callback(Request $request)
     {
         try {
@@ -121,40 +121,39 @@ class ApisController extends Controller
             \Log::info(['------------------CallBack Error------------------', $e->getMessage(), $e->getLine()]);
         }
     }
-
     public function create_payment($req)
     {
         try {
-            $user=[
-                'name'=>$req['user_name'],
-                'email'=>$req['user_email'],
-                'phone'=>$req['user_phone'],
-                'id'=>$req['user_id']
+            $user = [
+                'name' => $req['user_name'],
+                'email' => $req['user_email'],
+                'phone' => $req['user_phone'],
+                'id' => $req['user_id']
             ];
-            $exam=[
-                'name'=>$req['exam_name'],
-                'image'=>$req['exam_image'],
-                'id'=>$req['exam_id']
+            $exam = [
+                'name' => $req['exam_name'],
+                'image' => $req['exam_image'],
+                'id' => $req['exam_id']
             ];
-            $coupon=[
-                'name'=>$req['coupon_name']??null,
-                'discount'=>$req['coupon_discount']??null,
-                'code'=>$req['coupon_code']??null,
-                'type'=>$req['coupon_type']??null,
-                'id'=>$req['coupon_id']??null
+            $coupon = [
+                'name' => $req['coupon_name'] ?? null,
+                'discount' => $req['coupon_discount'] ?? null,
+                'code' => $req['coupon_code'] ?? null,
+                'type' => $req['coupon_type'] ?? null,
+                'id' => $req['coupon_id'] ?? null
             ];
             $payment = new Payments();
             $payment->token = $req['token'];
             $payment->amount = $req['amount'];
             $payment->payment_status = 0;
             $payment->data = $req;
-            $payment->user_id=$req['user_id'];
-            $payment->exam_id=$req['exam_id'];
-            $payment->coupon_id=$req['coupon_id']??null;
-            $payment->exam_result_id=$req['exam_result_id'];
-            $payment->exam_data=$exam;
-            $payment->user_data=$user;
-            $payment->coupon_data=$coupon;
+            $payment->user_id = $req['user_id'];
+            $payment->exam_id = $req['exam_id'];
+            $payment->coupon_id = $req['coupon_id'] ?? null;
+            $payment->exam_result_id = $req['exam_result_id'];
+            $payment->exam_data = $exam;
+            $payment->user_data = $user;
+            $payment->coupon_data = $coupon;
             $payment->save();
 
             // 'transaction_id',
@@ -166,7 +165,6 @@ class ApisController extends Controller
             } else {
                 return $payment;
             }
-
         } catch (\Exception $e) {
             return [$e->getMessage(), $e->getLine()];
             Log::info(['------------------Payment Create Callback------------------', $e->getMessage(), $e->getLine()]);
@@ -206,6 +204,68 @@ class ApisController extends Controller
                 return response()->json(['status' => 'error', 'message' => trans("additional.messages.nocodefound", [], $request->language ?? 'az')]);
             }
         } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+    public function upload_image_editor(Request $request)
+    {
+        try {
+            if ($request->hasFile('image')) {
+                $image = image_upload($request->file("image"), 'editor_images');
+                return response()->json(['location' => getImageUrl($image, 'editor_images')]);
+            } else {
+                return response()->json(['error' => 'Resim yüklenirken bir hata oluştu.']);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+    public function questions_store(Request $request)
+    {
+        try {
+            if (isset($request->question_id) && !empty($request->input("question_id")))
+                $model = ExamQuestion::where('id', $request->input("question_id"))->first();
+            else
+                $model = new ExamQuestion();
+            if ($request->input('question_type') != 5 || $request->input('question_type') != '5') {
+                $model->question = $request->input('question');
+            } else {
+                if ($request->hasFile('question_audio')) {
+                    $audio_file = file_upload($request->file("question_audio"), 'exam_questions');
+                    $model->question = $audio_file;
+                }
+            }
+            $model->type = $request->input('question_type');
+            $model->section_id = $request->input('section_id');
+            $model->layout = $request->input("question_layout");
+            $model->save();
+
+            foreach ($request->except(['_token', 'answers']) as $key => $value) {
+                
+                if (substr($key, 0, 7) === 'answerres_') {
+                    
+                    $modelAnswer = new ExamAnswer();
+                    $modelAnswer->answer = $value;
+                    $answerNumber = substr($key, 7);
+                    $correctKey = 'answers[' . $answerNumber . ']';
+                    return [$key,$value,$answerNumber,$correctKey];
+                    $modelAnswer->correct = $request->has($correctKey) ? 1 : 0;
+                    $modelAnswer->question_id = $model->id;
+                    $modelAnswer->save();
+                }
+            }
+            dbdeactive();
+
+            return response()->json(['status' => 'success', 'message' => trans("additional.messages.success",[],$request->input('language')??'az')]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+    public function get_question_data(Request $request){
+        try{
+            $data=ExamQuestion::with('answers')->where('id', $request->input("question_id"))->first();
+            return response()->json(['status' => 'success', 'data'=>$data]);
+        }catch(\Exception $e){
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }

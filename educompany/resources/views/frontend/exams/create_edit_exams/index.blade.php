@@ -1,4 +1,4 @@
-@extends('frontend.layouts.create_exam_layout')
+@extends('frontend.layouts.app')
 @section('title', trans('additional.pages.exams.exams') . isset($data) && !empty($data) && isset($data->id) ?
     trans('additional.buttons.edit') : trans('additional.buttons.add'))
 @section('content')
@@ -135,8 +135,9 @@
                 </div>
 
                 <div class="col-sm-12 col-md-12 col-lg-12 my-2">
-                    <textarea name="description" class="form-control summernote {{ $errors->first('description') ? 'is-invalid' : '' }}"
-                        placeholder="@lang('additional.forms.exam_description')" rows="4">{!! old(
+                    <div name="description"
+                        class="form-control summernote_element {{ $errors->first('description') ? 'is-invalid' : '' }}"
+                        contenteditable="true" placeholder="@lang('additional.forms.exam_description')">{!! old(
                             'description',
                             isset($data) &&
                             !empty($data) &&
@@ -145,7 +146,7 @@
                             !empty($data->content[app()->getLocale() . '_description'])
                                 ? $data->content[app()->getLocale() . '_description']
                                 : null,
-                        ) !!}</textarea>
+                        ) !!}</div>
                 </div>
             </div>
             {{-- Suallar, Section lar --}}
@@ -212,7 +213,12 @@
     {{-- Add Section Calculator --}}
 
 @endsection
+@push('css')
+@endpush
 @push('js')
+    <script src="https://cdn.tiny.cloud/1/0j6r4v4wrpghb7ht8z0yf85cuzcv8iadyrza5gp8f4lxi1ib/tinymce/6/tinymce.min.js"
+        referrerpolicy="origin"></script>
+
     @if (isset($data) && !empty($data) && isset($data->id))
         {{-- Section Functions --}}
         <script defer>
@@ -221,7 +227,7 @@
                 var section_name = document.getElementById('section_name').value.trim();
                 var section_duration = document.getElementById('section_duration').value.trim();
                 if (section_name && section_duration) {
-                    sendAjaxRequest("{{ route('sections.store', $data->id) }}", "post", {
+                    sendAjaxRequestOLD("{{ route('sections.store', $data->id) }}", "post", {
                         exam_id: {{ $data->id }},
                         language: document.getElementById("language").value,
                         user_id: document.getElementById("auth_id").value,
@@ -236,12 +242,12 @@
 
                             if (n.data != null && n.data.length > 0) {
                                 var sectionElementsDiv = document.getElementById('section_elements');
-                                section_elements.innerHTML='';
-                                toggleModalnow('create_sections','hide');
+                                section_elements.innerHTML = '';
+                                toggleModalnow('create_sections', 'hide');
                                 n.data.forEach(function(item) {
-                                    var divElement = `<div class='section_element' onclick=get_section(${item.id})
-                                    id='section_element_${item.id}'>${item.name}</div>`;
-                                    document.body.innerHTML+=divElement;
+                                    var divElement =
+                                        `<div class='section_element' onclick='get_section(${item.id})' id='section_element_${item.id}'>${item.name}</div>`;
+                                    section_elements.innerHTML += divElement;
                                 });
                             }
                         }
@@ -255,6 +261,8 @@
                 var section_id = document.getElementById(`section_element_${id}`);
                 var section_elements = document.getElementsByClassName('section_element');
                 var section_and_questions = document.getElementById('section_and_questions');
+                var current_section_id = document.getElementById('current_section_id');
+                var questions_list=document.querySelector('#section_and_questions_left .questions_list');
                 section_and_questions.classList.add("hide");
                 for (let i = 0; i < section_elements.length; i++) {
                     const element = section_elements[i];
@@ -262,17 +270,23 @@
                 }
                 section_id.classList.add("active");
                 section_and_questions.classList.remove("hide");
-
-                var questions = [];
-                sendAjaxRequest(`/admin/exams/questions/{{ $data->id }}/${id}?responseType=json`, "get", function(e, t) {
+                current_section_id.value = id;
+                sendAjaxRequestOLD(`/admin/exams/questions/{{ $data->id }}/${id}?responseType=json`, "get", {}, function(e,
+                    t) {
                     if (e) toast(e, "error");
                     else {
                         let n = JSON.parse(t);
-                        toast(n.message, n.status);
+                        if (n.message != null)
+                            toast(n.message, n.status);
 
                         if (n.data != null && n.data.length > 0) {
-                            questions = n.data;
-                            console.log(n.data);
+                            if(n.data!=null && n.data.length>0)
+                                for(var i=0; i<n.data.length;i++){
+                                    var element=`<div class="question_list_element" onclick="getquestion(${n.data[i].id})" id="question_list_element_${n.data[i].id}">
+                                        <div class="question_name">${n.data[i].question}</div>
+                                        </div>`;
+                                    questions_list.innerHTML+=element;
+                                }
                         }
                     }
                 });
@@ -280,40 +294,56 @@
 
             function create_question() {
                 var section_and_questions_right = document.getElementById('section_and_questions_right');
+                var current_section_id = document.getElementById('current_section_id').value;
                 var element = `<div class="form_question">
-                    <form class='d-block' method="post">
+                    <form class='d-block' method="post" onsubmit="store_edit_question(event)" id="store_edit_question">
                         @csrf
-                        <input type="hidden" name="section_id" id="section_id">
-                    <div class="col-sm-12 col-md-12 col-lg-12 my-1 d-none" id="question_content_textbox">
-                        <div class="form-group" style="height:150px">
-                            <textarea name="question" rows="5" id="question" class="form-control summernote" plceholder="Sualınız" ></textarea>
-                        </div>
-                    </div>
-                    <div class="col-sm-12 col-md-12 col-lg-12 my-1 d-none" id="question_content_audio">
-                        <div class="form-group">
-                            <input type="file" name="question_audio" class="file" accept="audio/*">
-                        </div>
-                    </div>
-                    <input type='hidden' name='question_type' id='question_type' />
-                    <div id="answers_area"></div>
-                    <div class="col-sm-12 col-md-12 col-lg-12 my-1 left_area">
-
-                        <div class="dropdown">
-                            <button class="btn btn-primary dropdown-toggle" type="button" id="customDropdownButton" aria-haspopup="true" aria-expanded="false">
-                                @lang('additional.buttons.answer_type')
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="customDropdownButton">
-                                @foreach (App\Models\ExamQuestion::TYPES as $k => $type)
-                                    <a class="dropdown-item" onclick="set_type({{ $type }})" href="javascript:void(0)">{{ $k }}</a>
-                                @endforeach
+                        <input type="hidden" name="section_id" id="section_id" value="${current_section_id}">
+                        <input type='hidden' name='question_type' id='question_type' />
+                        <input type='hidden' name='exam_id' id='{{ $data->id }}' />
+                    
+                        <div class="col-sm-12 col-md-12 col-lg-12 my-1 d-none" id="question_content_textbox">
+                            <div class="form-group" style="height:150px">
+                                <div name="question"
+                                    id="question"
+                                    class="form-control summernote_element"
+                                    contenteditable="true" placeholder="@lang('additional.forms.your_question')"></div>
                             </div>
                         </div>
-                    </div>
+                        <div class="col-sm-12 col-md-12 col-lg-12 my-1 d-none" id="question_content_audio">
+                            <div class="form-group">
+                                <input type="file" name="question_audio" id="question_audio" onchange="audiofileselect(event)" class="question_audio" class="file" accept="audio/*">
+                                <label for="question_audio" class="custom-audio-input">
+                                    <i class="fa fa-music"></i> @lang('additional.forms.upload_audio')
+                                </label>
+                            </div>
+                            <div id="selectedAudioFile"></div>
+                        </div>
+                    
+                        <div id="answers_area"></div>
+                        <div class="col-sm-12 col-md-12 col-lg-12 my-1 left_area">
+                            <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" id="customDropdownButton" aria-haspopup="true" aria-expanded="false">
+                                    @lang('additional.buttons.answer_type')
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="customDropdownButton">
+                                    @foreach (App\Models\ExamQuestion::TYPES as $k => $type)
+                                        <a class="dropdown-item" onclick="set_type({{ $type }})" href="javascript:void(0)">{{ $k }}</a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="col-sm-12 col-md-12 col-lg-12 my-1 classjustifybetween">
-                        <div></div>
-                        <button class='btn btn-primary btn-sm submit_answer hide' id="submit_answer" type="submit">Təsdiq et</button>
-                    </div>
+                        <div class="col-sm-12 col-md-12 col-lg-12 my-1 classjustifybetween hide question_footer_buttons" id="question_footer_buttons">
+                            <div>
+                                <select name='question_layout' class="form-control form-control-sm" id="question_layout">
+                                    @foreach (\App\Models\ExamQuestion::LAYOUTS as $key => $type)
+                                        <option {{ old('question_layout') == $type ? 'selected' : '' }} value="{{ $key }}">{{ $type }}</option>
+                                    @endforeach    
+                                </select>    
+                            </div>
+                            <button class='btn btn-primary btn-sm submit_answer' type="submit">Təsdiq et</button>
+                        </div>
                 </form>
                 </div>`;
 
@@ -333,6 +363,70 @@
                         dropdownMenu.classList.remove('show');
                     }
                 });
+
+                createeditor('question');
+            }
+
+            function store_edit_question(event) {
+                event.preventDefault();
+                try {
+                    var form = $('form#store_edit_question');
+                    var formData = new FormData(form[0]);
+                    var question_content = tinyMCE.get('question').getContent();
+                    formData.append("question", question_content);
+                    var answers = document.getElementsByClassName('text-input');
+                    var current_section_id = document.getElementById('current_section_id').value;
+                    for (var i = 0; i < answers.length; i++) {
+                        var answer_content = tinyMCE.get(answers[i].id).getContent();
+                        formData.append("answerres_" + i, answer_content);
+                    }
+
+                    formData.append("exam_id", '{{ $data->id }}');
+                    formData.append("language", '{{ app()->getLocale() }}');
+
+                    sendAjaxRequest("{{ route('front.questions.store') }}", "post", formData, function(e, t) {
+                        if (e) toast(e, "error");
+                        else {
+                            let n = JSON.parse(t);
+                            toast(n.message, n.status);
+                            get_section(current_section_id);
+                        }
+                    });
+                } catch (e) {
+                    console.error("STORE_EDIT_QUESTION-----------------" + e);
+                    toast(e, 'error');
+                }
+            }
+            
+            function getquestion(id){
+                var question_list_elements=document.getElementsByClassName('question_list_element');
+                for (let index = 0; index < question_list_elements.length; index++) {
+                    const element = question_list_elements[index];
+                    element.classList.remove('active');
+                }
+                var question_list_element=document.getElementById(`question_list_element_${id}`);
+                question_list_element.classList.add('active');
+                sendAjaxRequestOLD(`{{ route('front.questions.get') }}`, "post", {
+                    question_id:id,
+                }, function(e,
+                    t) {
+                    if (e) toast(e, "error");
+                    else {
+                        let n = JSON.parse(t);
+                        if (n.message != null)
+                            toast(n.message, n.status);
+
+                        if (n.data != null && n.data.length > 0) {
+                            if(n.data!=null && n.data.length>0)
+                                for(var i=0; i<n.data.length;i++){
+                                    var element=`<div class="question_list_element" onclick="getquestion(${n.data[i].id})" id="question_list_element_${n.data[i].id}">
+                                        <div class="question_name">${n.data[i].question}</div>
+                                        </div>`;
+                                    questions_list.innerHTML+=element;
+                                }
+                        }
+                    }
+                });
             }
         </script>
     @endif
@@ -343,7 +437,7 @@
             var question_content_audio = document.getElementById("question_content_audio");
             var answers_area = document.getElementById('answers_area');
             var question_type = document.getElementById('question_type');
-            var submit_answer = document.getElementById('submit_answer');
+            var question_footer_buttons = document.getElementById('question_footer_buttons');
             if (type == 5) {
                 question_content_audio.classList.remove('d-none');
                 question_content_textbox.classList.add("d-none");
@@ -352,29 +446,104 @@
                 question_content_textbox.classList.remove("d-none");
             }
 
-            submit_answer.classList.remove("hide");
+            question_footer_buttons.classList.remove("hide");
             question_type.value = type;
             var answers = ``;
             if (type == 3) {
                 answers = `@include('frontend.exams.create_edit_exams.question_textbox')`;
+            } else if (type == 2) {
+                answers = `@include('frontend.exams.create_edit_exams.question_checkbox')`;
             } else {
                 answers = `@include('frontend.exams.create_edit_exams.question_radio')`;
             }
 
             answers_area.innerHTML = answers;
 
+            var textinputid = $(".answer .text-input").attr("id");
+            createeditor(textinputid);
+
         }
 
         function change_radio(type, id) {
             var input_radios = document.getElementsByClassName('input_radios');
-            for (var i = 0; i < input_radios.length; i++) {
-                var element = input_radios[i];
-                element.prop('checked', false);
+            if (type == 'single') {
+                for (var i = 0; i < input_radios.length; i++) {
+                    var element = input_radios[i];
+                    element.checked = false;
+                }
             }
 
-            var element = docuemnt.getElementById('input_radios_' + id);
-            element.prop('checked', true);
+            var element = document.getElementById('input_radios_' + id);
+            element.checked = true;
         }
+
+        function addoreditanswer(type, operation, itemid) {
+            var element = document.getElementById(itemid);
+            var answers = document.querySelector('.answers');
+            var answer_elements = document.querySelectorAll('.answer');
+            if (operation == "remove") {
+                element.remove();
+            } else {
+                var codeofelement = createRandomCode('string', 11);
+                var element;
+                if (type == "single") {
+                    element = document.createElement('div');
+                    element.className = `answer ${type}`;
+                    element.id = codeofelement;
+                    element.innerHTML = `
+                        <div class="answer_content">
+                            <label class="radio-input" onclick="change_radio('${type}', ${answer_elements.length})">
+                                <input type="radio" name="answers[${answer_elements.length}]" onchange="change_radio('${type}',${answer_elements.length})"
+                                onclick="change_radio('${type}', ${answer_elements.length})"
+                                    value="${answer_elements.length}" class="input_radios" id="input_radios_${answer_elements.length}">
+                                <span class="checkmark"></span>
+                            </label>
+                            <span name="question" id="answer__input_${codeofelement}" name="answer_reply[${answer_elements.length}]" class="text-input summernote_element" placeholder="@lang('additional.forms.answer')"
+                                contenteditable="true" placeholder="@lang('additional.forms.your_question')"></span>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-success add_remove_buttons add_button"
+                        onclick="addoreditanswer('${type}','add','${codeofelement}')"><i class="fa fa-plus"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-danger add_remove_buttons remove_button"
+                        onclick="addoreditanswer('${type}','remove','${codeofelement}')"><i class="fa fa-minus"></i></button>
+                    `;
+                } else if (type == "multi") {
+                    element = document.createElement('div');
+                    element.className = `answer ${type}`;
+                    element.id = codeofelement;
+                    element.innerHTML = `
+                        <div class="answer_content">
+                            <label class="radio-input" onclick="change_radio('${type}', ${answer_elements.length})">
+                                <input type="checkbox" name="answers[${answer_elements.length}]" onchange="change_radio('${type}',${answer_elements.length})"
+                                onclick="change_radio('${type}', ${answer_elements.length})"
+                                    value="${answer_elements.length}" class="input_radios" id="input_radios_${answer_elements.length}">
+                                <span class="checkmark"></span>
+                            </label>
+                            <input type="text" name="answer_reply[${answer_elements.length}]" class="text-input" id="answer__input_${codeofelement}"
+                                placeholder="@lang('additional.forms.answer')">
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-success add_remove_buttons add_button"
+                        onclick="addoreditanswer('${type}','add','${codeofelement}')"><i class="fa fa-plus"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-danger add_remove_buttons remove_button"
+                        onclick="addoreditanswer('${type}','remove','${codeofelement}')"><i class="fa fa-minus"></i></button>
+                    `;
+                }
+                answers.appendChild(element);
+                createeditor(`answer__input_${codeofelement}`);
+            }
+        }
+
+        function audiofileselect(event) {
+            var file = event.target.files[0];
+            if (file != null) {
+                var selectedAudioFile = document.getElementById('selectedAudioFile');
+                var element =
+                    `<audio controls><source src="${URL.createObjectURL(file)}" type="audio/mpeg">Your browser does not support the audio element.</audio>`;
+                selectedAudioFile.innerHTML = element;
+            } else {
+                toast('@lang('additional.pages.exams.notfound')', 'error');
+            }
+        }
+
         @if (isset($data) && !empty($data) && isset($data->id))
             function post_question() {
                 var question_type = document.getElementById('question_type');
@@ -384,4 +553,80 @@
         @endif
     </script>
     {{-- Section Functions --}}
+
+    <script defer>
+        function createeditor(id = null) {
+            try {
+                var selector = id ? `#${id}` : `.summernote_element`;
+                tinymce.init({
+                    selector: selector,
+                    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+                    toolbar: 'fontfamily fontsize forecolor backcolor | bold italic underline strikethrough subscript superscript | link image media table | align lineheight | numlist bullist indent outdent | charmap',
+                    menubar: false,
+                    image_advtab: false,
+                    a11y_advanced_options: true,
+                    image_caption: true,
+                    image_description: false,
+                    image_dimensions: false,
+                    image_title: true,
+                    images_upload_credentials: true,
+                    images_upload_url: "{{ route('api.upload_image_editor') }}",
+                    images_upload_handler: function(blobInfo, success, failure) {
+                        try {
+                            var url = "{{ route('api.upload_image_editor') }}";
+                            var formData = new FormData();
+                            formData.append('image', blobInfo.blob(), blobInfo.filename());
+                            var myHeaders = new Headers();
+                            var myInit = {
+                                method: 'POST',
+                                headers: myHeaders,
+                                body: formData,
+                                mode: 'cors',
+                                cache: 'default'
+                            };
+                            var myRequest = new Request(url, myInit);
+
+                            new Promise(function(resolve, reject) {
+                                    fetch(myRequest)
+                                        .then(function(response) {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(function(data) {
+                                            resolve(data);
+                                        })
+                                        .catch(function(error) {
+                                            reject(error);
+                                        });
+                                })
+                                .then(function(data) {
+                                    console.log(data);
+                                    success(data.location);
+                                })
+                                .catch(function(error) {
+                                    console.error('There has been a problem with your fetch operation:',
+                                        error);
+                                    toast(error.message, 'error');
+                                    failure('Resim yüklenirken bir hata oluştu.');
+                                });
+                        } catch (e) {
+                            toast(e, 'error');
+                        }
+                    },
+                    toolbar_mode: 'floating',
+                    inline: true,
+                    directionality: 'ltr'
+                });
+            } catch (error) {
+                console.error('------------createeditorError----------------', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            createeditor();
+        });
+    </script>
+    {{--  --}}
 @endpush

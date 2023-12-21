@@ -117,7 +117,6 @@ if (!function_exists('file_upload')) {
     }
 }
 
-
 if (!function_exists('delete_image')) {
 
     function delete_image($image, $clasor)
