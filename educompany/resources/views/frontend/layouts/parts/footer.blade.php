@@ -4,8 +4,8 @@
             @if (!empty(settings()) && isset(settings()->logo_white) && !empty(settings()->logo_white))
                 <div class="logo_footer">
                     <a href="{{ route('page.welcome') }}">
-                        <img src="{{ getImageUrl(settings()->logo_white, 'settings') }}"
-                            alt="{{ settings()->name[app()->getLocale() . '_name'] }}" />
+                        <img src="{{ \Illuminate\Support\Facades\Session::has('subdomain') ? getImageUrl(settings(\Illuminate\Support\Facades\Session::get('subdomain'))->picture, 'users') : getImageUrl(settings()->logo_white, 'settings') }}"
+                            alt="{{ \Illuminate\Support\Facades\Session::has('subdomain') ? settings(\Illuminate\Support\Facades\Session::get('subdomain'))->name : settings()->name[app()->getLocale() . '_name'] }}" />
                     </a>
                 </div>
             @endif
@@ -13,7 +13,9 @@
                 <div class="col-sm-6 col-md-5">
                     <h3 class="title">@lang('additional.footer.networking')</h3>
                     <div class="sub_links"><a href="{{ route('exams_front.index') }}">@lang('additional.pages.exams.exams')</a>
-                        @if (!empty(standartpages('about', 'type')) && !empty(standartpages('about', 'type')->name))
+                        @if (
+                            (!empty(standartpages('about', 'type')) && !empty(standartpages('about', 'type')->name)) ||
+                                session()->has('subdomain') == false)
                             <a
                                 href="{{ route('pages.show', standartpages('about', 'type')->slugs[app()->getLocale() . '_slug']) }}">{{ standartpages('about', 'type')->name[app()->getLocale() . '_name'] }}</a>
                         @endif
@@ -134,11 +136,11 @@
                                 !empty(settings()) &&
                                     isset(settings()->address) &&
                                     !empty(settings()->address) &&
-                                    isset(settings()->address[app()->getLocale().'_address']) &&
-                                    !empty(trim(settings()->address[app()->getLocale().'_address'])))
-                                <li><a href="tel:{{ settings()->address[app()->getLocale().'_address'] }}" target="_blank"
-                                        class="text-white"><i class="fa fa-map-pin"></i> &nbsp;
-                                        {{ settings()->address[app()->getLocale().'_address'] }} </a></li>
+                                    isset(settings()->address[app()->getLocale() . '_address']) &&
+                                    !empty(trim(settings()->address[app()->getLocale() . '_address'])))
+                                <li><a href="tel:{{ settings()->address[app()->getLocale() . '_address'] }}"
+                                        target="_blank" class="text-white"><i class="fa fa-map-pin"></i> &nbsp;
+                                        {{ settings()->address[app()->getLocale() . '_address'] }} </a></li>
                             @endif
                         </ul>
                     </div>

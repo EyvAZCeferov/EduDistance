@@ -2,13 +2,15 @@
     @if (!empty(settings()) && isset(settings()->logo) && !empty(settings()->logo))
         <div class="logo">
             <a href="{{ route('page.welcome') }}">
-                <img src="{{ getImageUrl(settings()->logo, 'settings') }}"
-                    alt="{{ settings()->name[app()->getLocale() . '_name'] }}" />
+                <img src="{{ \Illuminate\Support\Facades\Session::has('subdomain') ? getImageUrl(settings(\Illuminate\Support\Facades\Session::get('subdomain'))->picture, 'users') : getImageUrl(settings()->logo, 'settings') }}"
+                    alt="{{ \Illuminate\Support\Facades\Session::has('subdomain') ? settings(\Illuminate\Support\Facades\Session::get('subdomain'))->name : settings()->name[app()->getLocale() . '_name'] }}" />
             </a>
         </div>
     @endif
     <div class="right_area">
-        @if (!empty(standartpages('about', 'type')) && !empty(standartpages('about', 'type')->name))
+        @if (
+            (!empty(standartpages('about', 'type')) && !empty(standartpages('about', 'type')->name)) ||
+                session()->has('subdomain') == false)
             <a class="header_link_item"
                 href="{{ route('pages.show', standartpages('about', 'type')->slugs[app()->getLocale() . '_slug']) }}">{{ standartpages('about', 'type')->name[app()->getLocale() . '_name'] }}</a>
         @endif

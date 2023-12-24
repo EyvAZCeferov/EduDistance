@@ -9,10 +9,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="#1365A0">
     <meta name="msapplication-navbutton-color" content="#1365A0">
     <meta name="theme-color" content="#1365A0">
-    <title>@yield('title', settings()->name[app()->getLocale() . '_name'])</title>
+    <title>@yield('title', \Illuminate\Support\Facades\Session::has('subdomain') ? settings(\Illuminate\Support\Facades\Session::get('subdomain'))->name : settings()->name[app()->getLocale() . '_name'])</title>
     <meta name="description" content="{{ settings()->description[app()->getLocale() . '_description'] }}">
-    <meta property="og:site_name" content="{{ settings()->name[app()->getLocale() . '_name'] }}" />
-    <meta property="og:title" content="@yield('title', settings()->name[app()->getLocale() . '_name'])" />
+    <meta property="og:site_name"
+        content="{{ \Illuminate\Support\Facades\Session::has('subdomain') ? settings(\Illuminate\Support\Facades\Session::get('subdomain'))->name : settings()->name[app()->getLocale() . '_name'] }}" />
+    <meta property="og:title" content="@yield('title', \Illuminate\Support\Facades\Session::has('subdomain') ? settings(\Illuminate\Support\Facades\Session::get('subdomain'))->name : settings()->name[app()->getLocale() . '_name'])" />
     <meta property="og:description" content="@yield('description', settings()->description[app()->getLocale() . '_description'])" />
     <meta property="og:locale" content="{{ app()->getLocale() }}_{{ strtoupper(app()->getLocale()) }}" />
     <meta property="og:url" content="{{ url()->current() }}" />
@@ -40,7 +41,7 @@
     @include('frontend.layouts.parts.footer')
 
     <script src="{{ asset('backend/assets/js/jquery-3.1.1.min.js') }}"></script>
-    
+
     <script type="text/javascript" src="{{ asset('front/assets/js/eyvaz/base.js') }}"></script>
 
     <script defer>
@@ -65,6 +66,15 @@
             @endif
         });
     </script>
+
+    <div id="loader">
+        <div class="icon">
+            <div class="bar" style="background-color: #3498db; margin-left: -60px;"></div>
+            <div class="bar" style="background-color: #e74c3c; margin-left: -20px;"></div>
+            <div class="bar" style="background-color: #f1c40f; margin-left: 20px;"></div>
+            <div class="bar" style="background-color: #2eB869; margin-left: 60px;"></div>
+        </div>
+    </div>
     @stack('js')
 </body>
 

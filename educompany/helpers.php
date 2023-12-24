@@ -155,9 +155,12 @@ if (!function_exists('count_endirim_faiz')) {
 }
 
 if (!function_exists('settings')) {
-    function settings()
+    function settings($key=null)
     {
-        $model = Settings::latest()->first();
+        if(isset($key) && !empty($key))
+            $model=User::where("subdomain",$key)->where("user_type",2)->first();
+        else
+            $model = Settings::latest()->first();
         return Cache::rememberForever("settings", fn() => $model);
     }
 }
@@ -185,6 +188,8 @@ if (!function_exists('categories')) {
             $model = Category::whereNull('parent_id')->orderBy('order_number', 'DESC')->get();
         } else if ($type == "exammedcats") {
             $model = Category::whereHas('exams')->orderBy('order_number', 'DESC')->get();
+        } else if ($type == "id") {
+            $model = Category::where('id',$key)->first();
         } else {
             $model = Category::orderBy('order_number', 'DESC')->get();
         }
@@ -236,6 +241,8 @@ if (!function_exists('exams')) {
             $model = Exam::where('id', $key)->first();
         } else if (isset($key) && $type == "slug") {
             $model = Exam::where("slug", $key)->first();
+        }else if (isset($key)&& $type=="subdomain"){
+            $model=Exam::where("user_id",$key)->orderBy("id",'DESC')->get();
         } else if (isset($key) && $type == "search") {
             $model = Exam::whereRaw('LOWER(JSON_EXTRACT(`name`, "$.az_name")) like ?', ['%' . $key . '%'])
                 ->orWhereRaw('LOWER(JSON_EXTRACT(`name`, "$.ru_name")) like ?', ['%' . $key . '%'])

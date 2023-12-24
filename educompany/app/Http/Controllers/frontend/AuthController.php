@@ -12,32 +12,33 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Laravel\Socialite\Facades\Socialite;
-use GeneaLabs\LaravelSocialiter\Facades\Socialiter;
+use Illuminate\Support\Facades\Session;
+
 
 class AuthController extends Controller
 {
     public function login(Request $request)
     {
         try {
-            if(isset($request->savethisurl) && !empty($request->savethisurl)){
-                session()->put("savethisurl",$request->savethisurl);
+            if (isset($request->savethisurl) && !empty($request->savethisurl)) {
+                Session::put("savethisurl", $request->savethisurl);
             }
             return view('frontend.auth.login');
         } catch (\Exception $e) {
-            return redirect()->back()->with("error",$e->getMessage());
+            dd($e->getMessage());
+            return redirect()->back()->with("error", $e->getMessage());
         }
     }
 
     public function register(Request $request)
     {
         try {
-            if(isset($request->savethisurl) && !empty($request->savethisurl)){
-                session()->put("savethisurl",$request->savethisurl);
-            }
+            if (isset($request->savethisurl) && !empty($request->savethisurl))
+                Session::put("savethisurl", $request->savethisurl);
+
             return view('frontend.auth.register');
         } catch (\Exception $e) {
-            return redirect()->back()->with("error",$e->getMessage());
+            return redirect()->back()->with("error", $e->getMessage());
         }
     }
 
@@ -58,15 +59,24 @@ class AuthController extends Controller
             ];
 
             if (Auth::guard('users')->attempt($credentials)) {
-                if(!empty(session()->get("savethisurl"))){
-                    return redirect(session()->get("savethisurl"));
-                }else{
-                    return redirect()->route('user.profile');
+                $userwith_subdomain = User::where('id', Auth::guard('users')->id())->whereNotNull("subdomain")->first();
+
+                if (!empty($userwith_subdomain) && isset($userwith_subdomain->subdomain) && !empty($userwith_subdomain->subdomain))
+                    Session::put('subdomain', $userwith_subdomain->subdomain ?? null);
+
+                if (Session::has("savethisurl") && !empty(Session::get("savethisurl"))) {
+                    return redirect(Session::get("savethisurl"));
+                } else {
+                    if (!empty($userwith_subdomain) && isset($userwith_subdomain->subdomain) && !empty($userwith_subdomain->subdomain))
+                        return redirect(route('user.profile.subdomain', ['subdomain' => $userwith_subdomain->subdomain]));
+                    else
+                        return redirect(route('user.profile'));
                 }
             } else {
                 return redirect()->back()->with(['error' => trans('additional.messages.passwords_incorrect')]);
             }
         } catch (\Exception $e) {
+            dd($e->getMessage(), $e->getLine());
             return redirect()->back()->with(['error' => $e->getMessage()]);
         }
     }
@@ -103,25 +113,38 @@ class AuthController extends Controller
                 if (isset($image) && !empty($image)) {
                     $user->picture = $image;
                 }
+                $subdomain = Session::get('subdomain') ?? $request->route('subdomain');
+                if ($user->user_type == 2)
+                    $subdomain = Str::slug($request->name);
+
+                $user->subdomain = $subdomain;
                 $user->save();
 
                 $credentials = [
                     'email' => $request->email,
                     'password' => $request->password,
                 ];
-
             });
 
             if (Auth::guard('users')->attempt($credentials)) {
-                if(!empty(session()->get("savethisurl"))){
-                    return redirect(session()->get("savethisurl"));
-                }else{
-                    return redirect()->route('user.profile');
+                $userwith_subdomain = User::where('id', Auth::guard('users')->id())->whereNotNull("subdomain")->first();
+
+                if (!empty($userwith_subdomain) && isset($userwith_subdomain->subdomain) && !empty($userwith_subdomain->subdomain))
+                    Session::put("subdomain", $userwith_subdomain->subdomain);
+
+                if (!empty(Session::get("savethisurl"))) {
+                    return redirect(Session::get("savethisurl"));
+                } else {
+                    if (!empty($userwith_subdomain))
+                        return redirect()->route('user.profile.subdomain', ['subdomain' => $userwith_subdomain->subdomain]);
+                    else
+                        return redirect()->route('user.profile');
                 }
             } else {
                 return redirect()->back()->with(['error' => trans('additional.messages.passwords_incorrect')]);
             }
         } catch (\Exception $e) {
+            dd($e->getMessage(), $e->getLine());
             return redirect()->back()->with(['error' => $e->getMessage()]);
         }
     }

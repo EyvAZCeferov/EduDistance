@@ -228,7 +228,7 @@ class ApisController extends Controller
             else
                 $model = new ExamQuestion();
             if ($request->input('question_type') != 5 || $request->input('question_type') != '5') {
-                $model->question = $request->input('question');
+                $model->question = $request->input('question_input');
             } else {
                 if ($request->hasFile('question_audio')) {
                     $audio_file = file_upload($request->file("question_audio"), 'exam_questions');
@@ -240,32 +240,46 @@ class ApisController extends Controller
             $model->layout = $request->input("question_layout");
             $model->save();
 
-            foreach ($request->except(['_token', 'answers']) as $key => $value) {
-                
-                if (substr($key, 0, 7) === 'answerres_') {
-                    
-                    $modelAnswer = new ExamAnswer();
-                    $modelAnswer->answer = $value;
-                    $answerNumber = substr($key, 7);
-                    $correctKey = 'answers[' . $answerNumber . ']';
-                    return [$key,$value,$answerNumber,$correctKey];
-                    $modelAnswer->correct = $request->has($correctKey) ? 1 : 0;
-                    $modelAnswer->question_id = $model->id;
-                    $modelAnswer->save();
+            $examanswers = ExamAnswer::where("question_id", $model->id)->get();
+            if (count($examanswers) > 0) {
+                foreach ($examanswers as $value) {
+                    $value->delete();
                 }
             }
+            if ($request->input("question_type") != 3) {
+                $answers = array();
+                foreach ($request->except(['_token', 'question_id', 'answers_count', 'section_id', 'question_type', 'exam_id', 'question', 'question_audio', 'language']) as $key => $value) {
+                    if (strpos($key, 'answerres_') === 0) {
+                        $modelAnswer = new ExamAnswer();
+                        $modelAnswer->answer = $value;
+                        $answerNumber = explode('answerres_', $key)[1];
+                        $modelAnswer->correct = isset($request->answers[$answerNumber]) ? true : false;
+                        $modelAnswer->question_id = $model->id;
+                        $modelAnswer->save();
+                    }
+                }
+            } else {
+                $modelAnswer = new ExamAnswer();
+                $modelAnswer->answer = $request->input("textbox_0");
+                $modelAnswer->correct = true;
+                $modelAnswer->question_id = $model->id;
+                $modelAnswer->save();
+            }
+
+            
             dbdeactive();
 
-            return response()->json(['status' => 'success', 'message' => trans("additional.messages.success",[],$request->input('language')??'az')]);
+            return response()->json(['status' => 'success', 'message' => trans("additional.messages.success", [], $request->input('language') ?? 'az')]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
-    public function get_question_data(Request $request){
-        try{
-            $data=ExamQuestion::with('answers')->where('id', $request->input("question_id"))->first();
-            return response()->json(['status' => 'success', 'data'=>$data]);
-        }catch(\Exception $e){
+    public function get_question_data(Request $request)
+    {
+        try {
+            $data = ExamQuestion::with('answers')->where('id', $request->input("question_id"))->first();
+            return response()->json(['status' => 'success', 'data' => $data]);
+        } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }

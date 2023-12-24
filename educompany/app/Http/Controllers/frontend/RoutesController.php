@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Exam;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class RoutesController extends Controller
 {
@@ -18,16 +19,29 @@ class RoutesController extends Controller
             return view("frontend.pages.contactus");
         }
     }
-    public function welcome()
+    public function welcome(Request $request)
     {
-        return view('frontend.welcome');
+        try {
+            // Session::put("subdomain",'globalmart');
+
+            if (Session::has("subdomain") || $request->route('subdomain') != null)
+                return redirect(route("page.welcome.subdomain", ['subdomain' => Session::get("subdomain") ?? $request->route('subdomain')]));
+            return view('frontend.welcome');
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
     public function exams(Request $request)
     {
         try {
             $data = collect();
-            $categories=collect();
-            $category=collect();
+            $categories = collect();
+            $category = collect();
+            $subdomain = null;
+            if (Session::has("subdomain") || $request->route('subdomain') != null)
+                $subdomain = Session::get("subdomain") ?? $request->route('subdomain');
+
             if (isset($request->slug) && !empty($request->slug)) {
                 $category = Category::where('slugs->az_slug', $request->slug)
                     ->orWhere('slugs->ru_slug', $request->slug)
@@ -40,16 +54,23 @@ class RoutesController extends Controller
                     $data = $category->exams;
                 }
 
-                if(!empty($category->sub)){
-                    foreach($category->sub as $sub){
+                if (!empty($subdomain)) {
+                    $data = $data->where('user_id', settings($subdomain)->id)->get();
+                }
+
+                if (!empty($category->sub)) {
+                    foreach ($category->sub as $sub) {
                         $categories->push($sub);
                     }
                 }
             } else {
-                $data = exams();
+                if (!empty($subdomain))
+                    $data = exams(settings($subdomain)->id,'subdomain');
+                else
+                    $data = exams();
             }
 
-            return view('frontend.exams.index', compact('data','categories','category'));
+            return view('frontend.exams.index', compact('data', 'categories', 'category'));
         } catch (\Exception $e) {
             return redirect()->back()->with("error", $e->getMessage());
         }
@@ -91,7 +112,7 @@ class RoutesController extends Controller
     {
         try {
             $key = $request->input("search");
-            $data = Exam::whereRaw('name like ?', ['%' . $key . '%'])->orWhereRaw('content like ?', ['%' . $key . '%'])->orderBy("order_number",'ASC')->get();
+            $data = Exam::whereRaw('name like ?', ['%' . $key . '%'])->orWhereRaw('content like ?', ['%' . $key . '%'])->orderBy("order_number", 'ASC')->get();
 
             return view("frontend.exams.search", compact("data"));
         } catch (\Exception $e) {

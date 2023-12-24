@@ -2,7 +2,7 @@
     @php($answerid = createRandomCode('string', 11))
     <div class="answer textbox" id="{{ $answerid }}">
         <div class="answer_content">
-            <textarea rows="5" name="answer_reply[0]" class="text-input" placeholder="@lang('additional.forms.answer')"></textarea>
+            <textarea rows="5" name="textbox_0" class="text-input textbox_0" id="textbox_0" placeholder="@lang('additional.forms.answer')"></textarea>
         </div>
     </div>
 </div>

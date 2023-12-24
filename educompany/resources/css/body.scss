@@ -585,7 +585,7 @@ body {
                     margin: 0;
 
                     &.still_waiting {
-                        font-size: $small_size/1.2;
+                        font-size: 9px;
                     }
                 }
 
@@ -663,6 +663,27 @@ body {
                             position: relative;
                             top: -6px;
                         }
+                    }
+                }
+
+                &.add_product {
+                    background-color: $gray-color;
+                    @extend .classcenter;
+                    height: 150px;
+                    cursor: pointer;
+
+                    .content {
+                        background-color: $primary-color;
+                        color: #fff;
+                        font-size: $small_size;
+                        width: max-content;
+                        padding: 7px 10px;
+                        border-radius: 10px;
+                        -webkit-border-radius: 10px;
+                        -moz-border-radius: 10px;
+                        -ms-border-radius: 10px;
+                        -o-border-radius: 10px;
+                        box-shadow:2px 7px 7px rgba(0,0,0,.3);
                     }
                 }
             }
@@ -2216,52 +2237,57 @@ body {
                             color: #fff;
                         }
                     }
-                    
-                    .questions_list{
+
+                    .questions_list {
                         @extend .classjustifstart;
                         flex-direction: column;
-                        margin-top:15px;
-                        width:100%;
-                        .question_list_element{
-                            width:100%;
-                            margin-bottom:5px;
-                            transition:all ease 0.7s;                            
-                            -webkit-transition:all ease 0.7s;
-                            -moz-transition:all ease 0.7s;
-                            -ms-transition:all ease 0.7s;
-                            -o-transition:all ease 0.7s;
-                            .question_name{
+                        margin-top: 15px;
+                        width: 100%;
+
+                        .question_list_element {
+                            width: 100%;
+                            margin-bottom: 5px;
+                            transition: all ease 0.7s;
+                            -webkit-transition: all ease 0.7s;
+                            -moz-transition: all ease 0.7s;
+                            -ms-transition: all ease 0.7s;
+                            -o-transition: all ease 0.7s;
+
+                            .question_name {
                                 font-size: $page_size;
-                                color:#000;
+                                color: #000;
                                 font-weight: 600;
                                 font-family: $secondary-font;
                                 @extend .classjustifstart;
-                                width:100%;
-                                transition:all ease 0.7s;                            
-                                -webkit-transition:all ease 0.7s;
-                                -moz-transition:all ease 0.7s;
-                                -ms-transition:all ease 0.7s;
-                                -o-transition:all ease 0.7s;
-                                &:before{
+                                width: 100%;
+                                transition: all ease 0.7s;
+                                -webkit-transition: all ease 0.7s;
+                                -moz-transition: all ease 0.7s;
+                                -ms-transition: all ease 0.7s;
+                                -o-transition: all ease 0.7s;
+
+                                &:before {
                                     content: '*';
-                                    font-size:$normal_size;
+                                    font-size: $normal_size;
                                     vertical-align: baseline;
                                     line-height: 0;
                                     padding-bottom: 10px;
                                 }
                             }
+
                             &:hover,
                             &:focus,
                             &:active,
-                            &.active{
-                                color:$secondary-color;
-                                cursor:pointer;
-                                .question_name{
-                                    color:$secondary-color;
+                            &.active {
+                                color: $secondary-color;
+                                cursor: pointer;
+
+                                .question_name {
+                                    color: $secondary-color;
                                 }
                             }
                         }
-                        
+
                     }
                 }
 
@@ -2354,7 +2380,7 @@ body {
                             color: #000;
                             font-size: $page_size;
                             border-radius: 10px;
-                            margin-bottom: 10px;
+                            margin-bottom: 0;
                             @extend .classjustifybetween;
                             -webkit-border-radius: 10px;
                             -moz-border-radius: 10px;
@@ -2459,10 +2485,71 @@ body {
                             display: none;
                         }
                     }
+
+                    .dropdown {
+                        .types_element {
+                            &.active {
+                                background-color: $secondary-color;
+                                color: #fff;
+                            }
+                        }
+                    }
                 }
 
                 .summernote_element {
                     text-align: left;
+                }
+            }
+        }
+
+        &.category_exams {
+            .categories_list {
+                @extend .classjustifstart;
+                width: 90%;
+                margin: 5px auto;
+                overflow-x: scroll;
+                overflow-y: hidden;
+
+                .category_item {
+                    border-bottom: 3px solid $gray-color;
+                    color: #000;
+                    font-size: $page_size;
+                    display: inline-block;
+                    width: fit-content;
+                    padding: 4px 10px;
+                    padding-left: 0;
+                    height: 100%;
+                    transition: all ease 0.7s;
+
+                    &.active,
+                    &:hover,
+                    &:active,
+                    &:focus {
+                        border-bottom-color: $primary-color;
+                        color: $primary-color;
+                        cursor: pointer;
+                        user-select: none;
+                    }
+                }
+            }
+
+            .category_body {
+                width: 90%;
+                margin: 5px auto;
+                overflow-x: hidden;
+                overflow-y: auto;
+
+                .category_body_item {
+                    @extend .classjustifstart;
+                    width: 100%;
+                    height: 100%;
+                    padding: 5px 0;
+                    display: none;
+                    padding-top: 10px;
+
+                    &.active {
+                        display: flex;
+                    }
                 }
             }
         }
@@ -2641,7 +2728,7 @@ body {
                 &:active::placeholder {
                     border-color: $primary-color;
                     color: $primary-color;
-                    outline:none;
+                    outline: none;
                     box-shadow: none;
                 }
             }

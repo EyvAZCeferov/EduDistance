@@ -16,7 +16,6 @@ class HomeController extends Controller
         $categories = Category::whereNull('parent_id')->with('sub')->get();
         return view('frontend.pages.index', compact('categories'));
     }
-
     public function exams(Request $request)
     {
         try {
@@ -57,6 +56,16 @@ class HomeController extends Controller
                     ->get();
             });
             return view('frontend.exams.index', compact('exams', 'sub_categories', 'category', 'filters', 'search'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+    public function category_exam(Request $request,$category=null)
+    {
+        try {
+            $categories=categories(null,null);
+            $search=$request->search??null;
+            return view('frontend.exams.category_exam', compact('categories', 'category','search'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
