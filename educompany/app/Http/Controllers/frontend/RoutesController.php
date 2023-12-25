@@ -22,8 +22,6 @@ class RoutesController extends Controller
     public function welcome(Request $request)
     {
         try {
-            // Session::put("subdomain",'globalmart');
-
             if (Session::has("subdomain") || $request->route('subdomain') != null)
                 return redirect(route("page.welcome.subdomain", ['subdomain' => Session::get("subdomain") ?? $request->route('subdomain')]));
             return view('frontend.welcome');

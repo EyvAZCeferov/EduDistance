@@ -9,7 +9,7 @@
         @include('frontend.light_parts.exam_profile_column', [
             'title' => 'yourexams',
             'nav_id' => 'pills',
-            'tab_datas' => [collect(), collect()],
+            'tab_datas' => [exam_for_profile('active',auth('users')->id()), exam_for_profile('passive',auth('users')->id())],
         ])
 
         @include('frontend.light_parts.categories')

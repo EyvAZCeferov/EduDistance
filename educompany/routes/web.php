@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\SetSubdomain;
 
 
-Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalization::setLocale(), 'middleware' => ['localeSessionRedirect', 'localizationRedirect', 'localeViewPath', 'web', 'ifsubdomain']], function () {
+Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalization::setLocale(), 'middleware' => ['localeSessionRedirect', 'localizationRedirect', 'localeViewPath']], function () {
 
     Route::group([
         'namespace' => 'App\\Http\\Controllers\\frontend',

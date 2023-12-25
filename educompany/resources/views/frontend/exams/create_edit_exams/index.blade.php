@@ -36,10 +36,14 @@
                         @foreach (\App\Models\Category::whereNull('parent_id')->with('sub')->get() as $category)
                             <optgroup label="{{ $category->name['az_name'] }}">
                                 @foreach ($category->sub as $sub)
-                                    <option
-                                        {{ old('category_id', isset($data) && !empty($data) && isset($data->category_id) && !empty($data->category_id) ? $data->category_id : null) == $sub->id ? 'selected' : '' }}
-                                        value="{{ $sub->id }}">{{ $sub->name['az_name'] }}
-                                    </option>
+                                    @php
+                                        $categoryIdFromOldData = isset($data) && !empty($data) && isset($data->category_id) && !empty($data->category_id) ? $data->category_id : null;
+                                        $categoryIdFromRequest = request()->has('category') && !empty(request()->get('category')) ? request()->get('category') : null;
+                                        $isSelected = $categoryIdFromOldData == $sub->id || $categoryIdFromRequest == $sub->id;
+                                    @endphp
+
+                                    <option {{ $isSelected ? 'selected' : '' }} value="{{ $sub->id }}">
+                                        {{ $sub->name['az_name'] }}</option>
                                 @endforeach
                             </optgroup>
                         @endforeach
@@ -395,14 +399,14 @@
                     formData.append("question_input", question_input);
                     var answers = document.getElementsByClassName('text-input');
                     var current_section_id = document.getElementById('current_section_id').value;
-                    var question_type=document.getElementById('question_type').value;
+                    var question_type = document.getElementById('question_type').value;
                     for (var i = 0; i < answers.length; i++) {
                         var answer_content = getcontenteditor(answers[i].id);
                         formData.append("answerres_" + i, answer_content);
                     }
 
-                    if(question_type==3)
-                        formData.append('textbox_0',getcontenteditor('textbox_0'));
+                    if (question_type == 3)
+                        formData.append('textbox_0', getcontenteditor('textbox_0'));
 
                     formData.append("exam_id", '{{ $data->id }}');
                     formData.append("language", '{{ app()->getLocale() }}');
@@ -594,7 +598,7 @@
     @endif
 
     <script defer>
-        function set_type(type,old=false) {
+        function set_type(type, old = false) {
             try {
                 var question_content_textbox = document.getElementById("question_content_textbox");
                 var question_content_audio = document.getElementById("question_content_audio");
@@ -605,8 +609,8 @@
                 var types_getted_element = document.getElementById(`types_${type}`);
                 var question_id = document.getElementById('question_id');
                 var answers_count = document.getElementById('answers_count');
-                if(old==true)
-                    answers_area.innerHTML ='';
+                if (old == true)
+                    answers_area.innerHTML = '';
                 for (let index = 0; index < types_element.length; index++) {
                     const element = types_element[index];
                     element.classList.remove('active');
@@ -629,7 +633,7 @@
                 if (
                     (question_id == null && (answers_count == null || answers_count == 0)) ||
                     ((question_id != null && question_id.value != null) && (answers_count == null || answers_count.value ==
-                        0)) || old==true
+                        0)) || old == true
                 ) {
                     var answers = ``;
                     if (type == 3) {
@@ -643,7 +647,7 @@
                     var textinputid = $(".answer .text-input").attr("id");
                     createeditor(textinputid);
 
-                    if(type==3){
+                    if (type == 3) {
                         var textbox_0 = createeditor('textbox_0');
                         console.log(textbox_0);
                     }

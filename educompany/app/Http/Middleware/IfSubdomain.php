@@ -19,7 +19,6 @@ class IfSubdomain
     {
         if (Session::has("subdomain") || $request->route('subdomain') != null) {
             $url = $request->url();
-            dd($url,Session::get("subdomain"),$request->route('subdomain'));
             if (Session::has('subdomain') == false)
                 Session::put('subdomain', $request->route('subdomain'));
 
@@ -33,7 +32,8 @@ class IfSubdomain
                 return redirect(env('HTTP_OR_HTTPS') . Session::get('subdomain') . '.' . $urlWithoutProtocol);
             else
                 return redirect(env('HTTP_OR_HTTPS') .  $urlWithoutProtocol);
+        }else{
+            return $next($request);
         }
-        return $next($request);
     }
 }

@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Cache;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 if (!function_exists('answerChoice')) {
     function answerChoice($key): string
@@ -150,18 +151,18 @@ if (!function_exists('count_endirim_faiz')) {
         if ($price != 0) {
             $model = ($endirim_price / $price) * 100;
         }
-        return Cache::rememberForever("count_endirim_faiz" . $price . $endirim_price, fn() => $model);
+        return Cache::rememberForever("count_endirim_faiz" . $price . $endirim_price, fn () => $model);
     }
 }
 
 if (!function_exists('settings')) {
-    function settings($key=null)
+    function settings($key = null)
     {
-        if(isset($key) && !empty($key))
-            $model=User::where("subdomain",$key)->where("user_type",2)->first();
+        if (isset($key) && !empty($key))
+            $model = User::where("subdomain", $key)->where("user_type", 2)->first();
         else
             $model = Settings::latest()->first();
-        return Cache::rememberForever("settings", fn() => $model);
+        return Cache::rememberForever("settings", fn () => $model);
     }
 }
 
@@ -175,7 +176,7 @@ if (!function_exists('standartpages')) {
         } else {
             $model = StandartPages::orderBy('id', 'DESC')->get();
         }
-        return Cache::rememberForever("standartpages" . $key . $type, fn() => $model);
+        return Cache::rememberForever("standartpages" . $key . $type, fn () => $model);
     }
 }
 
@@ -189,11 +190,11 @@ if (!function_exists('categories')) {
         } else if ($type == "exammedcats") {
             $model = Category::whereHas('exams')->orderBy('order_number', 'DESC')->get();
         } else if ($type == "id") {
-            $model = Category::where('id',$key)->first();
+            $model = Category::where('id', $key)->first();
         } else {
             $model = Category::orderBy('order_number', 'DESC')->get();
         }
-        return Cache::rememberForever("categories" . $key . $type, fn() => $model);
+        return Cache::rememberForever("categories" . $key . $type, fn () => $model);
     }
 }
 
@@ -208,7 +209,7 @@ if (!function_exists('sections')) {
                 ->groupBy('name')
                 ->orderBy('id', 'DESC')->get();
         }
-        return Cache::rememberForever("sections" . $key . $type, fn() => $model);
+        return Cache::rememberForever("sections" . $key . $type, fn () => $model);
     }
 }
 
@@ -219,10 +220,12 @@ if (!function_exists('users')) {
             $model = User::where('user_type', 2)->orderBy("id", "DESC")->whereHas('exams')->get();
         } else if ($type == "company") {
             $model = User::where('user_type', 2)->orderBy("id", "DESC")->get();
+        } else if ($type == "id") {
+            $model = User::where('id', $key)->first();
         } else {
             $model = User::orderBy("id", "DESC")->whereHas('exams')->get();
         }
-        return Cache::rememberForever("users" . $key . $type, fn() => $model);
+        return Cache::rememberForever("users" . $key . $type, fn () => $model);
     }
 }
 
@@ -230,7 +233,7 @@ if (!function_exists('counters')) {
     function counters()
     {
         $model = Counters::orderBy('order_number', 'ASC')->where('status', true)->get();
-        return Cache::rememberForever("counters", fn() => $model);
+        return Cache::rememberForever("counters", fn () => $model);
     }
 }
 
@@ -241,8 +244,8 @@ if (!function_exists('exams')) {
             $model = Exam::where('id', $key)->first();
         } else if (isset($key) && $type == "slug") {
             $model = Exam::where("slug", $key)->first();
-        }else if (isset($key)&& $type=="subdomain"){
-            $model=Exam::where("user_id",$key)->orderBy("id",'DESC')->get();
+        } else if (isset($key) && $type == "subdomain") {
+            $model = Exam::where("user_id", $key)->orderBy("id", 'DESC')->get();
         } else if (isset($key) && $type == "search") {
             $model = Exam::whereRaw('LOWER(JSON_EXTRACT(`name`, "$.az_name")) like ?', ['%' . $key . '%'])
                 ->orWhereRaw('LOWER(JSON_EXTRACT(`name`, "$.ru_name")) like ?', ['%' . $key . '%'])
@@ -263,7 +266,7 @@ if (!function_exists('exams')) {
         } else {
             $model = Exam::where('status', true)->orderBy("order_number", 'ASC')->get();
         }
-        return Cache::rememberForever("exams" . $key . $type, fn() => $model);
+        return Cache::rememberForever("exams" . $key . $type, fn () => $model);
     }
 }
 
@@ -271,7 +274,7 @@ if (!function_exists('sliders')) {
     function sliders()
     {
         $model = Sliders::where('status', true)->orderBy('id', 'DESC')->get();
-        return Cache::rememberForever("sliders", fn() => $model);
+        return Cache::rememberForever("sliders", fn () => $model);
     }
 }
 
@@ -279,7 +282,7 @@ if (!function_exists('student_ratings')) {
     function student_ratings()
     {
         $model = StudentRatings::where('status', true)->orderBy('order_number', 'ASC')->get();
-        return Cache::rememberForever("student_ratings", fn() => $model);
+        return Cache::rememberForever("student_ratings", fn () => $model);
     }
 }
 
@@ -293,7 +296,7 @@ if (!function_exists('blogs')) {
         } else {
             $model = Blogs::where('status', true)->orderBy('id', 'DESC')->get();
         }
-        return Cache::rememberForever("blogs" . $key, fn() => $model);
+        return Cache::rememberForever("blogs" . $key, fn () => $model);
     }
 }
 
@@ -306,7 +309,7 @@ if (!function_exists('teams')) {
         } else {
             $model = Teams::orderBy('order_number', 'ASC')->get();
         }
-        return Cache::rememberForever("teams" . $key, fn() => $model);
+        return Cache::rememberForever("teams" . $key, fn () => $model);
     }
 }
 
@@ -314,7 +317,7 @@ if (!function_exists('exam_answered')) {
     function exam_answered($auth_id, $exam_id)
     {
         $model = ExamResult::where('user_id', $auth_id)->where('exam_id', $exam_id)->first();
-        return Cache::rememberForever("exam_answered" . $auth_id . $exam_id, fn() => $model);
+        return Cache::rememberForever("exam_answered" . $auth_id . $exam_id, fn () => $model);
     }
 }
 
@@ -328,7 +331,7 @@ if (!function_exists('exam_start_page')) {
         } else {
             $model = ExamStartPage::orderBy("order_number", 'ASC')->get();
         }
-        return Cache::rememberForever("exam_start_page" . $key . $type, fn() => $model);
+        return Cache::rememberForever("exam_start_page" . $key . $type, fn () => $model);
     }
 }
 
@@ -340,7 +343,7 @@ if (!function_exists('coupon_codes')) {
         } else {
             $model = CouponCodes::orderBy('id', 'DESC')->get();
         }
-        return Cache::rememberForever("coupon_codes" . $key . $type, fn() => $model);
+        return Cache::rememberForever("coupon_codes" . $key . $type, fn () => $model);
     }
 }
 
@@ -352,7 +355,7 @@ if (!function_exists('references')) {
         } else {
             $model = References::orderBy('id', 'DESC')->get();
         }
-        return Cache::rememberForever("references" . $key . $type, fn() => $model);
+        return Cache::rememberForever("references" . $key . $type, fn () => $model);
     }
 }
 
@@ -362,10 +365,9 @@ if (!function_exists('exist_on_model')) {
         if ($type == "references") {
             $model = ExamReferences::where("exam_id", $data_id)->where("reference_id", $key)->first();
         } elseif ($type == "start_page") {
-            $model = ExamStartPageIds::where("exam_id", $data_id)->where("start_page_id", $key)->first();
-            ;
+            $model = ExamStartPageIds::where("exam_id", $data_id)->where("start_page_id", $key)->first();;
         }
-        return Cache::rememberForever("exist_on_model" . $key . $data_id . $type, fn() => $model);
+        return Cache::rememberForever("exist_on_model" . $key . $data_id . $type, fn () => $model);
     }
 }
 
@@ -376,7 +378,7 @@ if (!function_exists('question_is_marked')) {
             ->where("exam_result_id", $exam_result_id)
             ->where("question_id", $question_id)
             ->where("user_id", $user_id)->first();
-        return Cache::rememberForever("question_is_marked" . $question_id . $exam_id . $exam_result_id . $user_id, fn() => $model);
+        return Cache::rememberForever("question_is_marked" . $question_id . $exam_id . $exam_result_id . $user_id, fn () => $model);
     }
 }
 
@@ -401,7 +403,7 @@ if (!function_exists('int_to_abcd_value')) {
         } else if ($key == 7) {
             $model = "H";
         }
-        return Cache::rememberForever("int_to_abcd_value" . $key, fn() => $model);
+        return Cache::rememberForever("int_to_abcd_value" . $key, fn () => $model);
     }
 }
 
@@ -419,14 +421,11 @@ if (!function_exists('answer_result_true_or_false')) {
                     $model = false;
                 }
             } else if ($question->type == 2) {
-
             } else if ($question->type == 3) {
-
             } else if ($question->type == 4) {
-
             }
         }
-        return Cache::rememberForever("answer_result_true_or_false" . $question_id . $value, fn() => $model);
+        return Cache::rememberForever("answer_result_true_or_false" . $question_id . $value, fn () => $model);
     }
 }
 
@@ -444,23 +443,47 @@ if (!function_exists('your_answer_result_true_or_false')) {
                 $model = false;
             }
         }
-        return Cache::rememberForever("your_answer_result_true_or_false" . $question_id . $result_id . $value, fn() => $model);
+        return Cache::rememberForever("your_answer_result_true_or_false" . $question_id . $result_id . $value, fn () => $model);
     }
 }
 
-
 if (!function_exists('exam_result_answer_true_or_false')) {
-    function exam_result_answer_true_or_false($question_id,$result_id)
+    function exam_result_answer_true_or_false($question_id, $result_id)
     {
-        $result='null';
-        $model = ExamResultAnswer::where('question_id',$question_id)->where('result_id',$result_id)->first();
-        if(!empty($model) && isset($model->id)){
-            if($model->result==true){
-                $result='true';
-            }else{
-                $result='false';
+        $result = 'null';
+        $model = ExamResultAnswer::where('question_id', $question_id)->where('result_id', $result_id)->first();
+        if (!empty($model) && isset($model->id)) {
+            if ($model->result == true) {
+                $result = 'true';
+            } else {
+                $result = 'false';
             }
         }
-        return Cache::rememberForever("exam_result_answer_true_or_false"  .$question_id.$result_id, fn() => $result);
+        return Cache::rememberForever("exam_result_answer_true_or_false"  . $question_id . $result_id, fn () => $result);
+    }
+}
+
+if (!function_exists('exam_for_profile')) {
+    function exam_for_profile($type, $auth_id)
+    {
+        $model = Exam::orderBy('id', 'DESC');
+        $user = users($auth_id, 'id');
+        if ($user->user_type == 2)
+            $model = $model->where("user_id", $auth_id);
+
+        if ($type == "active") {
+            $model = $model->whereHas('results', function ($query) {
+                $query->orderBy("id", 'DESC');
+                $query->whereBetween('created_at', [Carbon::now()->subDays(10), Carbon::now()]);
+            });
+        } else {
+            $model = $model->whereHas('results', function ($query) {
+                $query->orderBy("id", 'DESC');
+                $query->whereBetween('created_at', [Carbon::now()->subDays(50), Carbon::now()->subDays(10)]);
+            });
+        }
+
+        $model=$model->get();
+        return Cache::rememberForever("exam_for_profile"  . $type . $auth_id, fn () => $model);
     }
 }

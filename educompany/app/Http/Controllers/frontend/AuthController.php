@@ -29,7 +29,6 @@ class AuthController extends Controller
             return redirect()->back()->with("error", $e->getMessage());
         }
     }
-
     public function register(Request $request)
     {
         try {
@@ -41,7 +40,6 @@ class AuthController extends Controller
             return redirect()->back()->with("error", $e->getMessage());
         }
     }
-
     public function authenticate(Request $request)
     {
         try {
@@ -68,19 +66,17 @@ class AuthController extends Controller
                     return redirect(Session::get("savethisurl"));
                 } else {
                     if (!empty($userwith_subdomain) && isset($userwith_subdomain->subdomain) && !empty($userwith_subdomain->subdomain))
-                        return redirect(route('user.profile.subdomain', ['subdomain' => $userwith_subdomain->subdomain]));
+                        return redirect()->route('user.profile.subdomain', ['subdomain' => $userwith_subdomain->subdomain]);
                     else
-                        return redirect(route('user.profile'));
+                        return redirect()->route('user.profile');
                 }
             } else {
                 return redirect()->back()->with(['error' => trans('additional.messages.passwords_incorrect')]);
             }
         } catch (\Exception $e) {
-            dd($e->getMessage(), $e->getLine());
             return redirect()->back()->with(['error' => $e->getMessage()]);
         }
     }
-
     public function registerSave(Request $request)
     {
         try {
@@ -148,12 +144,10 @@ class AuthController extends Controller
             return redirect()->back()->with(['error' => $e->getMessage()]);
         }
     }
-
     public function email()
     {
         return view('frontend.auth.email');
     }
-
     public function sendToken(Request $request)
     {
         if ($request->input("user_type") == 1) {
@@ -188,7 +182,6 @@ class AuthController extends Controller
         }
         return redirect()->route('login')->with(['success' => 'İsmarıc göndərildi.']);
     }
-
     public function reset($token)
     {
         $reset = DB::table('password_resets')->where('token', $token)->where('created_at', '>=', Carbon::now()->addHours(-1)->format('Y-m-d H:i:s'))->first();
@@ -199,7 +192,6 @@ class AuthController extends Controller
 
         return view('frontend.auth.reset', compact('token', 'reset'));
     }
-
     public function changePassword(Request $request)
     {
         $request->validate([
@@ -215,7 +207,6 @@ class AuthController extends Controller
         DB::table('password_resets')->where('token', request('token'))->delete();
         return redirect()->route('login')->with(['success' => 'Şifrəniz yeniləndi']);
     }
-
     public function logout()
     {
         Auth::guard('users')->logout();
@@ -227,7 +218,7 @@ class AuthController extends Controller
         try {
             return view('frontend.auth.profile');
         } catch (\Exception $e) {
-            dd($e->getMessage());
+            return redirect()->back()->with('error',$e->getMessage());
         }
     }
 }

@@ -91,7 +91,6 @@ class HomeController extends Controller
             $slug = strip_tags_with_whitespace($request->get("slug"));
             if (isset($slug) && !empty($slug)) {
                 $data = Exam::where('slug', $slug)->first();
-                // $data = Exam::where('slug',"yeni-imtahan-1")->first();
             }
             return view('frontend.exams.create_edit_exams.index', compact('data'));
         } catch (\Exception $e) {
