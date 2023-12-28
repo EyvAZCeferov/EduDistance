@@ -70,3 +70,4 @@ Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalizati
 Route::post("upload_image_editor", [ApisController::class, 'upload_image_editor'])->name("api.upload_image_editor");
 Route::post("qyestions_store", [ApisController::class, 'questions_store'])->name("front.questions.store");
 Route::post("get_question_data", [ApisController::class, 'get_question_data'])->name("front.questions.get");
+Route::post("remove_questionorsection_data", [ApisController::class, 'remove_questionorsection_data'])->name("front.questionsorsection.remove");

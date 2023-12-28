@@ -549,7 +549,7 @@ body {
                 padding: 0;
                 transition: all ease 0.6s;
                 position: relative;
-                z-index:99;
+                z-index: 99;
 
                 &:hover,
                 &:focus,
@@ -571,14 +571,14 @@ body {
                 }
 
                 .product_section_element_edit {
-                    @extend.classcenter; 
+                    @extend.classcenter;
                     display: inline-block;
                     position: absolute;
                     top: 0;
                     left: 0;
                     border-top-left-radius: 8px;
                     border-top-right-radius: 8px;
-                    width:45px;
+                    width: 45px;
                     color: #fff;
                     font-size: $page_size;
                     font-weight: 500;
@@ -590,8 +590,8 @@ body {
                     -moz-transition: all ease 0.6s;
                     -ms-transition: all ease 0.6s;
                     -o-transition: all ease 0.6s;
-                    cursor:pointer;
-                    z-index:10001;
+                    cursor: pointer;
+                    z-index: 10001;
 
                     &:hover,
                     &:focus,
@@ -2192,33 +2192,41 @@ body {
                     width: max-content;
                 }
 
-                .section_element {
-                    width: max-content;
-                    padding: 5px 10px;
-                    display: inline-block;
-                    margin: 5px 0;
-                    margin-right: 7px;
-                    color: #000;
-                    background-color: #fff;
-                    border: 1px solid #000;
-                    transition: all ease 0.6s;
-                    -webkit-transition: all ease 0.6s;
-                    -moz-transition: all ease 0.6s;
-                    -ms-transition: all ease 0.6s;
-                    -o-transition: all ease 0.6s;
-                    border-radius: 10px;
-
-                    &:hover,
-                    &:focus,
-                    &:active,
-                    &.active {
-                        background-color: #000;
-                        color: #fff;
-                        border-color: #000;
-                        cursor: pointer;
+                #section_elements{
+                    @extend .classjustifstart;
+                    .section_el{
+                        margin: 5px 0;
+                        margin-right: 7px;
+                        @extend .classcenter;
+                        flex-direction:column;
+                        width: max-content;
+                        .section_element {
+                            width: max-content;
+                            padding: 5px 10px;
+                            display: inline-block;
+                            color: #000;
+                            background-color: #fff;
+                            border: 1px solid #000;
+                            transition: all ease 0.6s;
+                            -webkit-transition: all ease 0.6s;
+                            -moz-transition: all ease 0.6s;
+                            -ms-transition: all ease 0.6s;
+                            -o-transition: all ease 0.6s;
+                            border-radius: 10px;
+        
+                            &:hover,
+                            &:focus,
+                            &:active,
+                            &.active {
+                                background-color: #000;
+                                color: #fff;
+                                border-color: #000;
+                                cursor: pointer;
+                            }
+                        }
                     }
                 }
-
+                
                 .create_section_button {
                     width: max-content;
                     padding: 5px 10px;
@@ -2284,6 +2292,7 @@ body {
                             -moz-transition: all ease 0.7s;
                             -ms-transition: all ease 0.7s;
                             -o-transition: all ease 0.7s;
+                            @extend .classjustifybetween;
 
                             .question_name {
                                 font-size: $page_size;
@@ -2291,7 +2300,7 @@ body {
                                 font-weight: 600;
                                 font-family: $secondary-font;
                                 @extend .classjustifstart;
-                                width: 100%;
+                                // width: 100%;
                                 transition: all ease 0.7s;
                                 -webkit-transition: all ease 0.7s;
                                 -moz-transition: all ease 0.7s;
@@ -2407,6 +2416,10 @@ body {
                         @extend .classcenter;
                         flex-direction: column;
 
+                        &.sortable {
+                            cursor: ns-resize;
+                        }
+
                         .answer {
                             width: 100%;
                             color: #000;
@@ -2442,16 +2455,33 @@ body {
                                     -o-border-radius: 50% !important;
                                     width: 25px;
                                     height: 25px;
-                                }
+                                    position:relative;
 
-                                input[type="radio"],
-                                input[type="checkbox"] {
-                                    width: 25px;
-                                    height: 25px;
-                                    border: 1px solid #000;
-                                    border-radius: 50%;
-                                    outline: none;
-                                    clip-path: circle(46% at 50% 50%);
+                                    .checkmark {
+                                        position: absolute;
+                                        top: 0;
+                                        left: 0;
+                                        width: 25px;
+                                        height: 25px;
+                                        border: 1px solid #000;
+                                        border-radius: 50%;
+                                        clip-path: circle(46% at 50% 50%);
+                                        background-color:transparent;
+                                        &.active{
+                                            background-color: $secondary-color;
+                                            border-color: $secondary-color;
+                                        }
+                                    }
+
+                                    input[type="radio"],
+                                    input[type="checkbox"] {
+                                        width: 25px;
+                                        height: 25px;
+                                        border: 1px solid #000;
+                                        border-radius: 50%;
+                                        outline: none;
+                                        clip-path: circle(46% at 50% 50%);
+                                    }
                                 }
 
                                 span.text-input,
@@ -2475,6 +2505,142 @@ body {
                             .add_remove_buttons {
                                 width: max-content;
                                 @extend .classcenter;
+                            }
+
+                            &.textbox {
+                                outline: none;
+
+                                .answer_content {
+                                    width: 93%;
+                                    outline: none;
+
+                                    .textbox_0 {
+                                        min-height: 100px;
+                                        max-height: 500px;
+                                        outline: none;
+
+                                        &:focus,
+                                        &:active,
+                                        &:hover {
+                                            outline: none;
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.match {
+                                border: none;
+
+                                .answer_content {
+                                    @extend .classjustifybetween;
+                                    border: none;
+                                    user-select: none;
+                                    padding: 0;
+
+                                    .sides {
+                                        width: 100%;
+                                        @extend .classcenter;
+                                        flex-direction: column;
+                                        position: relative;
+
+                                        .content_element {
+                                            @extend .classjustifstart;
+                                            border: 1px solid #000;
+                                            width: max-content;
+                                            padding: 3px;
+                                            border-radius: 9px;
+                                            -webkit-border-radius: 9px;
+                                            -moz-border-radius: 9px;
+                                            -ms-border-radius: 9px;
+                                            -o-border-radius: 9px;
+                                            box-shadow: 5px 5px 10px 1px rgba(0, 0, 0, .3);
+                                            cursor: pointer;
+                                            transition: all ease 0.6s;
+                                            -webkit-transition: all ease 0.6s;
+                                            -moz-transition: all ease 0.6s;
+                                            -ms-transition: all ease 0.6s;
+                                            -o-transition: all ease 0.6s;
+                                            min-width: 270px;
+                                            max-width: 300px;
+                                            vertical-align: baseline;
+                                            color: #fff;
+
+                                            &::-webkit-input-placeholder {
+                                                color: #fff;
+                                            }
+
+                                            &:-moz-placeholder {
+                                                color: #fff;
+                                                opacity: 1;
+                                            }
+
+                                            &::-moz-placeholder {
+                                                color: #fff;
+                                                opacity: 1;
+                                            }
+
+                                            &:-ms-input-placeholder {
+                                                color: #fff;
+                                            }
+
+                                            &::-ms-input-placeholder {
+                                                color: #fff;
+                                            }
+
+                                            &::placeholder {
+                                                color: #fff;
+                                            }
+
+                                            &.mce-container[aria-label] .mce-panel[aria-hidden="false"] .mce-edit-area::before,
+                                            .mce-container[aria-label] .mce-panel[aria-hidden="false"] .mce-edit-area::before,
+                                            .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before,
+                                            &.mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
+                                                color: #fff;
+                                            }
+                                        }
+
+                                        &.left_side {
+                                            .content_element {
+                                                background-color: $primary-color;
+                                                border-color: $primary-color;
+                                                color: #fff;
+
+                                                &:hover {
+                                                    background-color: $secondary-color;
+                                                    border-color: $secondary-color;
+                                                }
+                                            }
+
+                                            &:before {
+                                                content: '';
+                                                width: 70%;
+                                                height: 2px;
+                                                background-color: $gray-color;
+                                                position: absolute;
+                                                top: 50%;
+                                                left: 100%;
+                                                transform: translate(-50%, -50%);
+                                                -webkit-transform: translate(-50%, -50%);
+                                                -moz-transform: translate(-50%, -50%);
+                                                -ms-transform: translate(-50%, -50%);
+                                                -o-transform: translate(-50%, -50%);
+                                            }
+                                        }
+
+                                        &.right_side {
+                                            .content_element {
+                                                background-color: $secondary-color;
+                                                border-color: $secondary-color;
+                                                color: #fff;
+
+                                                &:hover {
+                                                    background-color: $primary-color;
+                                                    border-color: $primary-color;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
 
                         }

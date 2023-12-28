@@ -10,10 +10,13 @@ use App\Models\Payments;
 use App\Models\ExamQuestion;
 use App\Models\ExamAnswer;
 use App\Models\CouponCodes;
+use App\Models\Section;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
+
 
 class ApisController extends Controller
 {
@@ -227,12 +230,12 @@ class ApisController extends Controller
                 $model = ExamQuestion::where('id', $request->input("question_id"))->first();
             else
                 $model = new ExamQuestion();
-            if ($request->input('question_type') != 5 || $request->input('question_type') != '5') {
-                $model->question = $request->input('question_input');
-            } else {
+
+            $model->question = $request->input('question_input');
+            if ($request->input('question_type') == 5 || $request->input('question_type') == '5') {
                 if ($request->hasFile('question_audio')) {
                     $audio_file = file_upload($request->file("question_audio"), 'exam_questions');
-                    $model->question = $audio_file;
+                    $model->file = $audio_file;
                 }
             }
             $model->type = $request->input('question_type');
@@ -246,7 +249,8 @@ class ApisController extends Controller
                     $value->delete();
                 }
             }
-            if ($request->input("question_type") != 3) {
+
+            if ($request->input("question_type") != 3 && $request->input("question_type") != 4) {
                 $answers = array();
                 foreach ($request->except(['_token', 'question_id', 'answers_count', 'section_id', 'question_type', 'exam_id', 'question', 'question_audio', 'language']) as $key => $value) {
                     if (strpos($key, 'answerres_') === 0) {
@@ -258,15 +262,27 @@ class ApisController extends Controller
                         $modelAnswer->save();
                     }
                 }
-            } else {
+            } else if ($request->input("question_type") == 3) {
                 $modelAnswer = new ExamAnswer();
                 $modelAnswer->answer = $request->input("textbox_0");
                 $modelAnswer->correct = true;
                 $modelAnswer->question_id = $model->id;
                 $modelAnswer->save();
+            } else if ($request->input('question_type') == 4) {
+                $matchData = $request->input("match_data");
+                $decodedMatchData = json_decode($matchData, true);
+                if (!empty($decodedMatchData) && count($decodedMatchData) > 0) {
+                    foreach ($decodedMatchData as $match) {
+                        $modelAnswer = new ExamAnswer();
+                        $modelAnswer->answer = json_encode($match);
+                        $modelAnswer->correct = true;
+                        $modelAnswer->question_id = $model->id;
+                        $modelAnswer->save();
+                    }
+                }
             }
 
-            
+
             dbdeactive();
 
             return response()->json(['status' => 'success', 'message' => trans("additional.messages.success", [], $request->input('language') ?? 'az')]);
@@ -279,6 +295,69 @@ class ApisController extends Controller
         try {
             $data = ExamQuestion::with('answers')->where('id', $request->input("question_id"))->first();
             return response()->json(['status' => 'success', 'data' => $data]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+    public function getsectiondata(Request $request)
+    {
+        try {
+            $sections = Section::where('exam_id', $request->input("exam_id"))->orderBy('created_at')->get();
+            $section = $sections->first();
+            if (!empty($request->input('section_id'))) {
+                $section = Section::where('exam_id', $request->input("exam_id"))->orderBy('created_at')->findOrFail($request->input('section_id'));
+            }
+            $questions = $section ? ExamQuestion::where('section_id', $section?->id)->orderBy('created_at')->get() : [];
+
+            return response()->json(['status' => 'success', 'data' => $questions]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+    public function remove_questionorsection_data(Request $request)
+    {
+        try {
+            if ($request->input("element_type") == 'question') {
+                $data = ExamQuestion::where('id', $request->input("element_id"))->first();
+                if (!empty($data) && isset($data->id)) {
+                    $data->delete();
+                    return response()->json(['status' => 'success', 'message' => trans('additional.messages.success', [], $request->input('language') ?? 'az')]);
+                } else {
+                    return response()->json(['status' => 'warning', 'message' => trans('additional.pages.exams.notfound', [], $request->input('language') ?? 'az')]);
+                }
+            } else if ($request->input("element_type") == 'section') {
+                $data = Section::where('id', $request->input("element_id"))->first();
+                if (!empty($data) && isset($data->id)) {
+                    $data->delete();
+                    return response()->json(['status' => 'success', 'message' => trans('additional.messages.success', [], $request->input('language') ?? 'az')]);
+                } else {
+                    return response()->json(['status' => 'warning', 'message' => trans('additional.pages.exams.notfound', [], $request->input('language') ?? 'az')]);
+                }
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+    public function setsectiondata(Request $request)
+    {
+        try {
+            DB::transaction(function () use ($request) {
+                $model = new Section();
+                $model->exam_id = $request->input('exam_id');
+                $model->name = $request->input('name');
+                $model->time_range_sections = $request->input('time_range_sections') ?? 0;
+                $model->save();
+            });
+            return response()->json(['status' => 'success', 'message' => 'Yaradıldı!']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+    public function getexamsections(Request $request)
+    {
+        try {
+            $sections = Section::where("exam_id", $request->input('exam_id'))->orderBy("id", 'ASC')->get();
+            return response()->json(['status' => 'success', 'data' => $sections]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }

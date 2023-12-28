@@ -17,6 +17,7 @@ class VerifyCsrfToken extends Middleware
         '/upload_image_editor',
         '/qyestions_store',
         '/get_question_data',
-        '*/authenticate'
+        '*/authenticate',
+        '/remove_questionorsection_data',
     ];
 }

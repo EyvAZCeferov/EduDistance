@@ -242,30 +242,38 @@ function setnewparametrandsearch (element, type, id) {
   window.location.href = newUrl;
 }
 
-function sendAjaxRequestOLD(e, t = "post", n = null, a) {
-    var i = new XMLHttpRequest;
-    i.onreadystatechange = function() { 4 === i.readyState && (200 === i.status ? a(null, i.responseText) : a(i.statusText)) }, "post" == t ? (i.open("POST", e), i.setRequestHeader("Content-Type", "application/json"), i.send(JSON.stringify(n))) : (i.open("GET", e), i.send())
+function sendAjaxRequestOLD (e, t = 'post', n = null, a) {
+  var i = new XMLHttpRequest ();
+  (i.onreadystatechange = function () {
+    4 === i.readyState &&
+      (200 === i.status ? a (null, i.responseText) : a (i.statusText));
+  }), 'post' == t
+    ? (i.open ('POST', e), i.setRequestHeader (
+        'Content-Type',
+        'application/json'
+      ), i.send (JSON.stringify (n)))
+    : (i.open ('GET', e), i.send ());
 }
 
-function sendAjaxRequest(url, method = "post", formData = null, callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-                callback(null, xhr.responseText);
-            } else {
-                callback(xhr.statusText);
-            }
-        }
-    };
-
-    if (method.toLowerCase() === "post") {
-        xhr.open("POST", url);
-        xhr.send(formData);
-    } else {
-        xhr.open("GET", url);
-        xhr.send();
+function sendAjaxRequest (url, method = 'post', formData = null, callback) {
+  var xhr = new XMLHttpRequest ();
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        callback (null, xhr.responseText);
+      } else {
+        callback (xhr.statusText);
+      }
     }
+  };
+
+  if (method.toLowerCase () === 'post') {
+    xhr.open ('POST', url);
+    xhr.send (formData);
+  } else {
+    xhr.open ('GET', url);
+    xhr.send ();
+  }
 }
 
 function getserializedlang (data, type, lang) {
@@ -332,19 +340,36 @@ function toggleModalnow (idelement, status = 'open') {
   }
 }
 
-function createRandomCode(type = "int", length = 4) {
-    if (type === "int") {
-        if (length === 4) {
-            return Math.floor(Math.random() * 9000) + 1000;
-        }
-    } else if (type === "string") {
-        const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const charactersLength = characters.length;
-        let randomString = '';
-        for (let i = 0; i < length; i++) {
-            randomString += characters.charAt(Math.floor(Math.random() * charactersLength));
-        }
-        return randomString;
+function createRandomCode (type = 'int', length = 4) {
+  if (type === 'int') {
+    if (length === 4) {
+      return Math.floor (Math.random () * 9000) + 1000;
     }
+  } else if (type === 'string') {
+    const characters =
+      '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const charactersLength = characters.length;
+    let randomString = '';
+    for (let i = 0; i < length; i++) {
+      randomString += characters.charAt (
+        Math.floor (Math.random () * charactersLength)
+      );
+    }
+    return randomString;
+  }
 }
 
+function getFileUrl (file, clasore) {
+  let url = '/uploads/' + clasore + '/' + file;
+  return url;
+}
+
+showLoader ();
+
+document.addEventListener ('DOMContentLoaded', function () {
+  hideLoader ();
+});
+
+// window.addEventListener ('load', function () {
+//   hideLoader ();
+// });

@@ -40,10 +40,43 @@
     </div>
     @include('frontend.layouts.parts.footer')
 
-    <script src="{{ asset('backend/assets/js/jquery-3.1.1.min.js') }}"></script>
 
+    <div id="loader">
+        <div class="icon">
+            <div class="bar" style="background-color: #3498db; margin-left: -60px;"></div>
+            <div class="bar" style="background-color: #e74c3c; margin-left: -20px;"></div>
+            <div class="bar" style="background-color: #f1c40f; margin-left: 20px;"></div>
+            <div class="bar" style="background-color: #2eB869; margin-left: 60px;"></div>
+        </div>
+    </div>
+
+    {{-- Delete Modal --}}
+    <div id="deleteModal" class="deleteModal custom-modal modal show" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-confirm">
+            <div class="modal-content">
+                <div class="modal-header flex-column">
+                    <div class="icon-box">
+                        <i class="fa fa-trash"></i>
+                    </div>
+                    <h4 class="modal-title w-100">@lang('additional.messages.suredelete')</h4>
+                    <button type="button" class="close" data-dismiss="modal"
+                        onclick="toggleModalnow('deleteModal','hide')" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>@lang('additional.messages.dontrestore')</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                        onclick="toggleModalnow('deleteModal','hide')">@lang('additional.buttons.back')</button>
+                    <button type="button" onclick="deletequestion()" class="btn btn-danger">@lang('additional.buttons.remove')</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- Delete Modal --}}
+    <script type="text/javascript" src="{{ asset('front/assets/js/eyvaz/vendor/jquery-ui/external/jquery/jquery.js') }}"></script>
     <script type="text/javascript" src="{{ asset('front/assets/js/eyvaz/base.js') }}"></script>
-
+    
     <script defer>
         $(function() {
             @if (Session::has('message'))
@@ -67,14 +100,7 @@
         });
     </script>
 
-    <div id="loader">
-        <div class="icon">
-            <div class="bar" style="background-color: #3498db; margin-left: -60px;"></div>
-            <div class="bar" style="background-color: #e74c3c; margin-left: -20px;"></div>
-            <div class="bar" style="background-color: #f1c40f; margin-left: 20px;"></div>
-            <div class="bar" style="background-color: #2eB869; margin-left: 60px;"></div>
-        </div>
-    </div>
+
     @stack('js')
 </body>
 

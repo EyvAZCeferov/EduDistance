@@ -108,6 +108,7 @@ return [
         "sendrequest"=>"Sorğu göndər",
         "free"=>"Ödənişsiz",
         "back"=>"Geri",
+        "remove"=>"Sil",
         "imtahanver"=>"İmtahan ver",
         'filter'=>"Filter",
         "gotohome"=>"Əsas səhifəyə keçin",
@@ -154,6 +155,7 @@ return [
         "question_name"=>"Sual adı",
         "answer"=>"Cavab",
         'upload_audio'=>"Audio fayl əlavə et",
+        'change_audio'=>"Audio faylı dəyişdir",
         "your_question"=>"Sualınız"
     ],
     "messages"=>[
@@ -167,6 +169,8 @@ return [
         "answersnotfound"=>"Heç bir suala cavab vermədiniz",
         'exam_finished'=>"İmtahan yekunlaşdı. Nəticələr səhifəsinə yönləndirilirsiniz...",
         "required_fill"=>"Məcburi xanaları doldurun",
-        "success"=>"Uğurlu!"
+        "success"=>"Uğurlu!",
+        "suredelete"=>"Silmək istədiyinizdən əminsiniz?",
+        "dontrestore"=>"Siləcəyiniz məlumat geri qaytarılmır!!!"
     ],
 ];

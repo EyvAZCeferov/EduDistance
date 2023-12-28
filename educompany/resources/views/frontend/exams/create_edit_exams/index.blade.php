@@ -8,6 +8,8 @@
             <input type="hidden" name="language" id="language" value="{{ app()->getLocale() }}">
             <input type="hidden" name="auth_id" id="auth_id" value="{{ auth('users')->id() }}">
             <input type="hidden" name="current_section" id="current_section">
+            <input type="hidden" name="deleting_question_id" id="deleting_question_id">
+            <input type="hidden" name="deleting_question_type" id="deleting_question_type">
             @if (isset($data) && !empty($data) && isset($data->id)) <input type="hidden" name="top_id"
                     value="{{ $data->id }}"> @endif
             <div class="row my-2">
@@ -60,8 +62,9 @@
                 <div class="col-sm-12 col-md-6 col-lg-3 my-1">
                     @if (isset($data) && !empty($data) && !empty($data->image))
 
-                        <img src="{{ getImageUrl($data->image, 'exams') }}" class="img-fluid img-responsive"
-                            style="height: 150px">
+                        <img data-fancybox data-caption="{{ $data->name[app()->getLocale() . '_name'] }}"
+                            href="{{ getImageUrl($data->image, 'exams') }}" src="{{ getImageUrl($data->image, 'exams') }}"
+                            class="img-fluid img-responsive" style="height: 150px;margin-bottom:10px;">
                     @endif
                     <input type="file" @if (!(isset($data) && !empty($data) && !empty($data->image))) required @endif name="image"
                         class="form-control {{ $errors->first('image') ? 'is-invalid' : '' }}">
@@ -217,12 +220,51 @@
     {{-- Add Section Calculator --}}
 
 @endsection
+
 @push('css')
+    @if (isset($data) && !empty($data) && isset($data->id) && !empty($data->image))
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css"
+            integrity="sha512-H9jrZiiopUdsLpg94A333EfumgUBpO9MdbxStdeITo+KEIMaNfHNvwyjjDJb+ERPaRS6DpyRlKbvPUasNItRyw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer" />
+    @endif
 @endpush
+
 @push('js')
     <script src="https://cdn.tiny.cloud/1/0j6r4v4wrpghb7ht8z0yf85cuzcv8iadyrza5gp8f4lxi1ib/tinymce/6/tinymce.min.js"
         referrerpolicy="origin"></script>
-
+    <script type="text/javascript" src="{{ asset('front/assets/js/eyvaz/customsortable.js') }}"></script>
+    @if (isset($data) && !empty($data) && isset($data->id) && !empty($data->image))
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"
+            integrity="sha512-uURl+ZXMBrF4AwGaWmEetzrd+J5/8NRkWAvJx5sbPSSuOb0bZLqf+tOzniObO00BjHa/dD7gub9oCGMLPQHtQA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script type="text/javascript" charset="utf-8">
+            $(document).ready(function() {
+                $('[data-fancybox]').fancybox({
+                    // Options will go here
+                    buttons: [
+                        'close'
+                    ],
+                    wheel: false,
+                    transitionEffect: "slide",
+                    // thumbs          : false,
+                    // hash            : false,
+                    loop: true,
+                    // keyboard        : true,
+                    toolbar: false,
+                    animationEffect: false,
+                    // arrows          : true,
+                    clickContent: false,
+                    toolbar: {
+                        items: {
+                            close: {
+                                tpl: '<button data-fancybox-close class="fancybox-button fancybox-button--close" title="Close"></button>'
+                            }
+                        }
+                    },
+                });
+            });
+        </script>
+    @endif
     @if (isset($data) && !empty($data) && isset($data->id))
         {{-- Section Functions --}}
         <script defer>
@@ -232,7 +274,7 @@
                     var section_name = document.getElementById('section_name').value.trim();
                     var section_duration = document.getElementById('section_duration').value.trim();
                     if (section_name && section_duration) {
-                        sendAjaxRequestOLD("{{ route('sections.store', $data->id) }}", "post", {
+                        sendAjaxRequestOLD("{{ route('api.setsectiondata') }}", "post", {
                             exam_id: {{ $data->id }},
                             language: document.getElementById("language").value,
                             user_id: document.getElementById("auth_id").value,
@@ -242,21 +284,7 @@
                         }, function(e, t) {
                             if (e) toast(e, "error");
                             else {
-                                let n = JSON.parse(t);
-                                toast(n.message, n.status);
-
-                                if (n.data != null && n.data.length > 0) {
-                                    var sectionElementsDiv = document.getElementById('section_elements');
-                                    section_elements.innerHTML = '';
-                                    toggleModalnow('create_sections', 'hide');
-                                    n.data.forEach(function(item) {
-                                        var divElement =
-                                            `<div class='section_element' onclick='get_section(${item.id})' id='section_element_${item.id}'>${item.name}</div>`;
-                                        section_elements.innerHTML += divElement;
-                                    });
-
-                                    get_section(n.data[n.data.length - 1].id);
-                                }
+                                getsectiondatas();
                             }
                         });
                     } else {
@@ -266,6 +294,39 @@
                     toast(error, 'error');
                     console.log("---------------SETTYPE------------" + error);
                 }
+            }
+
+            function getsectiondatas() {
+                sendAjaxRequestOLD("{{ route('api.getexamsections') }}", "post", {
+                    exam_id: {{ $data->id }},
+                    language: document.getElementById("language").value,
+                }, function(e, t) {
+                    if (e) toast(e, "error");
+                    else {
+                        let n = JSON.parse(t);
+                        if (n.message != null && n.message != '' && n.message != ' ')
+                            toast(n.message, n.status);
+
+                        if (n.data != null && n.data.length > 0) {
+                            var sectionElementsDiv = document.getElementById('section_elements');
+                            section_elements.innerHTML = '';
+                            toggleModalnow('create_sections', 'hide');
+                            n.data.forEach(function(item) {
+                                var divElement = `<div class="section_el">
+                                            <div class="section_element" onclick="get_section(${item.id})"
+                                                id="section_element_${item.id}">
+                                                ${item.name}
+                                            </div>
+                                            <button class="btn btn-danger btn-sm mt-1" type="button"
+                                                onclick="deletequestion(${item.id},'section')"><i class="fa fa-minus"></i></button>
+                                        </div>`;
+                                section_elements.innerHTML += divElement;
+                            });
+                            
+                            get_section(n.data[n.data.length - 1].id);
+                        }
+                    }
+                });
             }
 
             function get_section(id) {
@@ -284,7 +345,10 @@
                     section_and_questions.classList.remove("hide");
                     current_section_id.value = id;
                     questions_list.innerHTML = '';
-                    sendAjaxRequestOLD(`/admin/exams/questions/{{ $data->id }}/${id}?responseType=json`, "get", {},
+                    sendAjaxRequestOLD(`{{ route('api.getsectiondata') }}`, "post", {
+                            exam_id: {{ $data->id }},
+                            section_id: id,
+                        },
                         function(e,
                             t) {
                             if (e) toast(e, "error");
@@ -296,8 +360,9 @@
                                 if (n.data != null && n.data.length > 0) {
                                     if (n.data != null && n.data.length > 0)
                                         for (var i = 0; i < n.data.length; i++) {
-                                            var element = `<div class="question_list_element" onclick="getquestion(${n.data[i].id})" id="question_list_element_${n.data[i].id}">
-                                        <div class="question_name">${n.data[i].question}</div>
+                                            var element = `<div class="question_list_element" id="question_list_element_${n.data[i].id}">
+                                        <div onclick="getquestion(${n.data[i].id})" class="question_name">${n.data[i].question}</div>
+                                        <button class='btn btn-outline-danger btn-sm' type='submit' onclick='deletequestion(${n.data[i].id},"question")'><i class='fa fa-trash'></i></i></button>
                                         </div>`;
                                             questions_list.innerHTML += element;
                                         }
@@ -330,7 +395,7 @@
                                     contenteditable="true" placeholder="@lang('additional.forms.your_question')"></div>
                             </div>
                         </div>
-                        <div class="col-sm-12 col-md-12 col-lg-12 my-1 d-none" id="question_content_audio">
+                        <div class="col-sm-12 col-md-12 col-lg-12 my-3 d-none" id="question_content_audio">
                             <div class="form-group">
                                 <input type="file" name="question_audio" id="question_audio" onchange="audiofileselect(event)" class="question_audio" class="file" accept="audio/*">
                                 <label for="question_audio" class="custom-audio-input">
@@ -400,6 +465,7 @@
                     var answers = document.getElementsByClassName('text-input');
                     var current_section_id = document.getElementById('current_section_id').value;
                     var question_type = document.getElementById('question_type').value;
+                    var matching_datas = [];
                     for (var i = 0; i < answers.length; i++) {
                         var answer_content = getcontenteditor(answers[i].id);
                         formData.append("answerres_" + i, answer_content);
@@ -410,6 +476,29 @@
 
                     formData.append("exam_id", '{{ $data->id }}');
                     formData.append("language", '{{ app()->getLocale() }}');
+
+                    if (question_type == 4) {
+                        $(".matching_element").each(function(index, element) {
+                            if (index % 2 != 0) {
+                                var questionID = $(element).data('key');
+                                var question_element = $(`#mathing_questions_${questionID}`);
+                                var questionContent = getcontenteditor(question_element.attr("id"));
+                                var answerID = $(`#mathing_answers_${questionID}`);
+                                var answerContent = getcontenteditor(answerID.attr("id"));
+
+                                if (questionContent != null && answerContent != null) {
+                                    var matchingData = {
+                                        question_content: questionContent,
+                                        answer_content: answerContent,
+                                    };
+                                    matching_datas.push(matchingData);
+                                }
+                            }
+                        });
+                        formData.append("match_data", JSON.stringify(matching_datas));
+                    }
+
+                    console.log(matching_datas);
 
                     sendAjaxRequest("{{ route('front.questions.store') }}", "post", formData, function(e, t) {
                         if (e) toast(e, "error");
@@ -455,9 +544,31 @@
                                     var elementContent = '';
                                     var codeofelement = createRandomCode('string', 11);
                                     idscontenteditable.push(codeofelement);
-                                    var type = n.data.type == 1 ? 'single' : 'multi';
+                                    var type;
+
+                                    switch (n.data.type) {
+                                        case 1:
+                                            type = 'single';
+                                            break;
+                                        case 2:
+                                            type = 'multi';
+                                            break;
+                                        case 3:
+                                            type = 'textbox';
+                                            break;
+                                        case 5:
+                                            type = 'audio';
+                                            break;
+                                        case 4:
+                                            type = 'match';
+                                            break;
+                                        default:
+                                            type = 'single';
+                                            break;
+                                    }
+
                                     elementContent.id = codeofelement;
-                                    if (n.data.type == 1) {
+                                    if (n.data.type == 1 || n.data.type == 5) {
                                         elementContent = `
                                     <div class='answer ${type}' id="${codeofelement}">
                                         <div class="answer_content">
@@ -467,7 +578,7 @@
                                                     value="${index}" class="input_radios" id="input_radios_${index}"
                                                     ${answer.correct == 1 ? 'checked' : ''}
                                                     >
-                                                <span class="checkmark"></span>
+                                                <span class="checkmark ${answer.correct == 1 ? 'active' : ''}" id="label_checkmark_${index}"></span>
                                             </label>
                                             <span name="answer_reply[${index}]" id="answer__input_${codeofelement}" name="answer_reply[${index}]" class="text-input summernote_element" placeholder="@lang('additional.forms.answer')"
                                                 contenteditable="true" placeholder="@lang('additional.forms.your_question')">${answer.answer}</span>
@@ -479,84 +590,117 @@
                                         </div>
 
                                     `;
-                                    } else if (type == 2) {
+                                    } else if (n.data.type == 2) {
+                                        elementContent = `
+                                        <div class='answer ${type}' id="${codeofelement}">
+                                            <div class="answer_content">
+                                                <label class="radio-input" onclick="change_radio('${type}', ${answer_elements.length})">
+                                                    <input type="checkbox" name="answers[${answer_elements.length}]"
+                                                        value="${answer_elements.length}" class="input_radios" id="input_radios_${answer_elements.length}">
+                                                    <span class="checkmark ${answer.correct == 1 ? 'active' : ''}" id="label_checkmark_${index}"></span>
+                                                </label>
+                                                <span name="answer_reply[${index}]" id="answer__input_${codeofelement}" name="answer_reply[${index}]"
+                                                class="text-input summernote_element" placeholder="@lang('additional.forms.answer')" contenteditable="true"
+                                                placeholder="@lang('additional.forms.your_question')">${answer.answer}</span>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-success add_remove_buttons add_button"
+                                            onclick="addoreditanswer('${type}','add','${codeofelement}')"><i class="fa fa-plus"></i></button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger add_remove_buttons remove_button"
+                                            onclick="addoreditanswer('${type}','remove','${codeofelement}')"><i class="fa fa-minus"></i></button>
+                                        </div>
+                                    `;
+                                    } else if (n.data.type == 3) {
                                         elementContent = `
                                     <div class='answer ${type}' id="${codeofelement}">
                                         <div class="answer_content">
-                                            <label class="radio-input" onclick="change_radio('${type}', ${answer_elements.length})">
-                                                <input type="checkbox" name="answers[${answer_elements.length}]" onchange="change_radio('${type}',${answer_elements.length})"
-                                                onclick="change_radio('${type}', ${answer_elements.length})"
-                                                    value="${answer_elements.length}" class="input_radios" id="input_radios_${answer_elements.length}">
-                                                <span class="checkmark"></span>
-                                            </label>
-                                            <input type="text" name="answer_reply[${answer_elements.length}]" class="text-input" id="answer__input_${codeofelement}"
-                                                placeholder="@lang('additional.forms.answer')">
+                                            <div rows="5" name="textbox_0" class="text-input textbox_0" id="textbox_0" placeholder="@lang('additional.forms.answer')">${answer.answer}</div>
                                         </div>
-                                        <button type="button" class="btn btn-sm btn-outline-success add_remove_buttons add_button"
-                                        onclick="addoreditanswer('${type}','add','${codeofelement}')"><i class="fa fa-plus"></i></button>
-                                        <button type="button" class="btn btn-sm btn-outline-danger add_remove_buttons remove_button"
-                                        onclick="addoreditanswer('${type}','remove','${codeofelement}')"><i class="fa fa-minus"></i></button>
                                         </div>
                                     `;
+                                    }else if(n.data.type==4){
+                                        var answer=JSON.parse(answer.answer);
+                                        elementContent=`
+                                        <div class="answer ${type}" id="${codeofelement}">
+                                            <div class="answer_content">
+                                                <div class="sides left_side">
+                                                    <div class="content_element matching_element" data-key="${index}" id="mathing_questions_${index}" name="mathing_questions[${index}]" placeholder="@lang('additional.forms.answer')" contenteditable="true">${answer.question_content}</div>
+                                                </div>
+                                                <div class="sides right_side">
+                                                    <div class="content_element matching_element" data-key="${index}" id="mathing_answers_${index}" name="mathing_answers[${index}]" placeholder="@lang('additional.forms.answer')" contenteditable="true">${answer.answer_content}</div>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-success add_remove_buttons add_button"
+                                                onclick="addoreditanswer('${type}','add','${codeofelement}')"><i class="fa fa-plus"></i></button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger add_remove_buttons remove_button"
+                                                onclick="addoreditanswer('${type}','remove','${codeofelement}')"><i class="fa fa-minus"></i></button>
+                                        </div>`;
                                     }
                                     return elementContent;
                                 }).join('') : '';
+
+                                var audiotag = '';
+
+                                if (n.data.type == 5) {
+                                    audiotag =
+                                        `<audio controls><source src="${getFileUrl(n.data.file,'exam_questions')}" type="audio/mpeg">Your browser does not support the audio element.</audio>`;
+                                }
+
                                 var question_input_code = createRandomCode('string', 11);
                                 var element = `<div class="form_question">
-                                <form class='d-block' method="post" onsubmit="store_edit_question(event)" id="store_edit_question">
-                                    @csrf
-                                    <input type="hidden" name="question_id" id="question_id" value="${n.data.id}" />
-                                    <input type="hidden" name="answers_count" id="answers_count" value="${n.data.answers.length}" />
-                                    <input type="hidden" name="section_id" id="section_id" value="${current_section_id}" />
-                                    <input type='hidden' name='question_type' id='question_type' />
-                                    <input type='hidden' name='exam_id' id='{{ $data->id }}' />
-                                    <div class="col-sm-12 col-md-12 col-lg-12 my-1 d-none" id="question_content_textbox">
-                                        <div>
-                                            <div name="question_input_${question_input_code}"
-                                                id="question_input_${question_input_code}"
-                                                class="form-control question_input"
-                                                contenteditable="true" placeholder="@lang('additional.forms.your_question')">${n.data.question}</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-12 col-lg-12 my-1 d-none" id="question_content_audio">
-                                        <div class="form-group">
-                                            <input type="file" name="question_audio" id="question_audio" onchange="audiofileselect(event)" class="question_audio" class="file" accept="audio/*">
-                                            <label for="question_audio" class="custom-audio-input">
-                                                <i class="fa fa-music"></i> @lang('additional.forms.upload_audio')
-                                            </label>
-                                        </div>
-                                        <div id="selectedAudioFile"></div>
-                                    </div>
-                                    <div id="answers_area">
-                                        <div class="answers">
-                                            ${answersAreaContent}
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-12 col-lg-12 my-1 left_area">
-                                        <div class="dropdown">
-                                            <button class="btn btn-primary dropdown-toggle" type="button" id="customDropdownButton" aria-haspopup="true" aria-expanded="false">
-                                                @lang('additional.buttons.answer_type')
-                                            </button>
-                                            <div class="dropdown-menu" aria-labelledby="customDropdownButton">
-                                                @foreach (App\Models\ExamQuestion::TYPES as $k => $type)
-                                                    <a class="dropdown-item types_element" id="types_{{ $type }}" onclick="set_type('{{ $type }}',true)" href="javascript:void(0)">{{ $k }}</a>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    </div>
+                                                <form class='d-block' method="post" onsubmit="store_edit_question(event)" id="store_edit_question">
+                                                    @csrf
+                                                    <input type="hidden" name="question_id" id="question_id" value="${n.data.id}" />
+                                                    <input type="hidden" name="answers_count" id="answers_count" value="${n.data.answers.length}" />
+                                                    <input type="hidden" name="section_id" id="section_id" value="${current_section_id}" />
+                                                    <input type='hidden' name='question_type' id='question_type' />
+                                                    <input type='hidden' name='exam_id' id='{{ $data->id }}' />
+                                                    <div class="col-sm-12 col-md-12 col-lg-12 my-1 d-none" id="question_content_textbox">
+                                                        <div>
+                                                            <div name="question_input_${question_input_code}"
+                                                                id="question_input_${question_input_code}"
+                                                                class="form-control question_input"
+                                                                contenteditable="true" placeholder="@lang('additional.forms.your_question')">${n.data.question}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-12 col-lg-12 my-1 d-none" id="question_content_audio">
+                                                        <div class="form-group">
+                                                            <input type="file" name="question_audio" id="question_audio" onchange="audiofileselect(event)" class="question_audio" class="file" accept="audio/*">
+                                                            <label for="question_audio" class="custom-audio-input">
+                                                                <i class="fa fa-music"></i> ${n.data.file!=null && n.data.file!='' && n.data.file!=' ' ? "@lang('additional.forms.change_audio')" : "@lang('additional.forms.upload_audio')"} 
+                                                            </label>
+                                                        </div>
+                                                        <div id="selectedAudioFile">${audiotag}</div>
+                                                    </div>
+                                                    <div id="answers_area">
+                                                        <div class="answers" id="${n.data.type==4?'match':''}">
+                                                            ${answersAreaContent}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-12 col-lg-12 my-1 left_area">
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-primary dropdown-toggle" type="button" id="customDropdownButton" aria-haspopup="true" aria-expanded="false">
+                                                                @lang('additional.buttons.answer_type')
+                                                            </button>
+                                                            <div class="dropdown-menu" aria-labelledby="customDropdownButton">
+                                                                @foreach (App\Models\ExamQuestion::TYPES as $k => $type)
+                                                                    <a class="dropdown-item types_element" id="types_{{ $type }}" onclick="set_type('{{ $type }}',true)" href="javascript:void(0)">{{ $k }}</a>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
-                                    <div class="col-sm-12 col-md-12 col-lg-12 my-1 classjustifybetween hide question_footer_buttons" id="question_footer_buttons">
-                                        <div>
-                                            <select name='question_layout' class="form-control form-control-sm" id="question_layout">
-                                                @foreach (\App\Models\ExamQuestion::LAYOUTS as $key => $type)
-                                                    <option  {{ old('question_layout') == $type ? 'selected' : '' }} value="{{ $key }}">{{ $type }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <button class='btn btn-primary btn-sm submit_answer' type="submit">Təsdiq et</button>
-                                    </div>
-                                </form>
-                            </div>`;
+                                                    <div class="col-sm-12 col-md-12 col-lg-12 my-1 classjustifybetween hide question_footer_buttons" id="question_footer_buttons">
+                                                        <div>
+                                                            <select name='question_layout' class="form-control form-control-sm" id="question_layout">
+                                                                @foreach (\App\Models\ExamQuestion::LAYOUTS as $key => $type)
+                                                                    <option  {{ old('question_layout') == $type ? 'selected' : '' }} value="{{ $key }}">{{ $type }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <button class='btn btn-primary btn-sm submit_answer' type="submit">Təsdiq et</button>
+                                                    </div>
+                                                </form>
+                                            </div>`;
 
                                 section_and_questions_right.innerHTML = element;
                                 const dropdownButton = document.getElementById('customDropdownButton');
@@ -586,12 +730,58 @@
                                 for (var i = 0; i < idscontenteditable.length; i++) {
                                     createeditor('answer__input_' + idscontenteditable[i]);
                                 }
+
+                                var matching_elements=document.getElementsByClassName("matching_element");
+                                for (var i = 0; i < matching_elements.length; i++) {
+                                    createeditor(matching_elements[i].id);
+                                }
+
+                                if (n.data.type == 4) {
+                                    initSortable('match');
+                                }
                             }
                         }
                     });
                 } catch (error) {
                     toast(error, 'error');
                     console.log("---------------SETTYPE------------" + error);
+                }
+            }
+
+            function deletequestion(id = null, type = null) {
+                var deleting_question_id = document.getElementById('deleting_question_id');
+                var deleting_question_type = document.getElementById('deleting_question_type');
+                var current_section = document.getElementById('current_section');
+                if (type != null)
+                    deleting_question_type.value = type
+
+                if (id != null) {
+                    var deleting_question_id = document.getElementById('deleting_question_id');
+                    deleting_question_id.value = id;
+                    toggleModalnow('deleteModal', 'open');
+                } else {
+                    sendAjaxRequestOLD(`{{ route('front.questionsorsection.remove') }}`, "post", {
+                        element_id: deleting_question_id.value,
+                        element_type: deleting_question_type.value,
+                        language: '{{ app()->getLocale() }}'
+                    }, function(e,
+                        t) {
+                        if (e) toast(e, "error");
+                        else {
+                            let n = JSON.parse(t);
+                            if (n.message != null)
+                                toast(n.message, n.status);
+
+                            deleting_question_id.value = null;
+                            deleting_question_type.value = null;
+                            toggleModalnow('deleteModal', 'hide');
+
+                            if(deleting_question_type=="question")
+                                get_section(current_section.value);
+                            else
+                                getsectiondatas();
+                        }
+                    });
                 }
             }
         </script>
@@ -617,15 +807,18 @@
                 }
 
                 types_getted_element.classList.add('active');
+                question_content_audio.classList.add('d-none');
+                question_content_textbox.classList.remove("d-none");
 
-                if (type == 5) {
+                if (type == 5)
                     question_content_audio.classList.remove('d-none');
-                    question_content_textbox.classList.add("d-none");
-                } else {
-                    question_content_audio.classList.add('d-none');
-                    question_content_textbox.classList.remove("d-none");
-                    var question_input_id = $("question_input").prop('id');
-                    createeditor(question_input_id);
+
+
+                var question_input_id = $(".question_input").prop('id');
+                createeditor(question_input_id);
+                if (type == 3) {
+                    var textbox_0_id = $(".textbox_0").prop('id');
+                    var textbox_0 = createeditor(textbox_0_id);
                 }
 
                 question_footer_buttons.classList.remove("hide");
@@ -640,6 +833,8 @@
                         answers = `@include('frontend.exams.create_edit_exams.question_textbox')`;
                     } else if (type == 2) {
                         answers = `@include('frontend.exams.create_edit_exams.question_checkbox')`;
+                    } else if (type == 4) {
+                        answers = `@include('frontend.exams.create_edit_exams.question_match')`;
                     } else {
                         answers = `@include('frontend.exams.create_edit_exams.question_radio')`;
                     }
@@ -647,10 +842,18 @@
                     var textinputid = $(".answer .text-input").attr("id");
                     createeditor(textinputid);
 
-                    if (type == 3) {
-                        var textbox_0 = createeditor('textbox_0');
-                        console.log(textbox_0);
+                    var matching_element = $(".matching_element");
+                    if (matching_element != null && matching_element.length > 0) {
+                        for (let index = 0; index < matching_element.length; index++) {
+                            const element = matching_element[index];
+                            createeditor(element.id);
+                        }
                     }
+
+                    if (type == 4) {
+                        initSortable('match');
+                    }
+
                 }
             } catch (error) {
                 toast(error, 'error');
@@ -660,18 +863,20 @@
 
         function change_radio(type, id) {
             try {
-                var element = document.getElementById('input_radios_' + id);
-                if (element) {
-                    console.log(element);
-                    if (type === 'single') {
-                        var input_radios = document.getElementsByClassName('input_radios');
-                        for (var i = 0; i < input_radios.length; i++) {
-                            input_radios[i].checked = false;
-                        }
-                    }
+                var clickedInput = $('#input_radios_' + id);
+                if (type === 'multi' && clickedInput.attr('type') === 'checkbox') {
+                    var labelspancheckmark = document.getElementById('label_checkmark_' + id);
+                    if (labelspancheckmark.classList.contains('active'))
+                        labelspancheckmark.classList.remove("active");
+                    else
+                        labelspancheckmark.classList.add('active');
 
-
-                    element.checked = !element.checked;
+                    clickedInput.prop('checked', !clickedInput.prop('checked'));
+                } else if (type === 'single' && clickedInput.attr('type') === 'radio') {
+                    $('.input_radios[type="radio"]').prop('checked', false);
+                    clickedInput.prop('checked', true);
+                } else {
+                    clickedInput.prop('checked', !clickedInput.prop('checked'));
                 }
             } catch (error) {
                 toast(error, 'error');
@@ -689,51 +894,54 @@
                     element.remove();
                 } else {
                     var codeofelement = createRandomCode('string', 11);
-                    var element;
-                    if (type == "single") {
-                        element = document.createElement('div');
-                        element.className = `answer ${type}`;
-                        element.id = codeofelement;
-                        element.innerHTML = `
-                        <div class="answer single" id="${codeofelement}">
-                            <div class="answer_content">
-                                <label class="radio-input" onclick="change_radio('${type}', ${answer_elements.length})">
-                                    <input type="radio" name="answers[${answer_elements.length}]" value="${answer_elements.length}" class="input_radios" id="input_radios_${answer_elements.length}">
-                                    <span class="checkmark"></span>
-                                </label>
-                                <span name="answer_reply[${answer_elements.length}]" id="answer__input_${codeofelement}" name="answer_reply[${answer_elements.length}]" class="text-input summernote_element" placeholder="@lang('additional.forms.answer')"
-                                    contenteditable="true" placeholder="@lang('additional.forms.your_question')"></span>
-                            </div>
-                            <button type="button" class="btn btn-sm btn-outline-success add_remove_buttons add_button"
-                            onclick="addoreditanswer('${type}','add','${codeofelement}')"><i class="fa fa-plus"></i></button>
-                            <button type="button" class="btn btn-sm btn-outline-danger add_remove_buttons remove_button"
-                            onclick="addoreditanswer('${type}','remove','${codeofelement}')"><i class="fa fa-minus"></i></button>
-                        </div>`;
-                    } else if (type == "multi") {
-                        element = document.createElement('div');
-                        element.className = `answer ${type}`;
-                        element.id = codeofelement;
+                    var element = document.createElement('div');
+                    element.className = `answer ${type}`;
+                    element.id = codeofelement;
 
-                        element.innerHTML = `
-                        <div class="answer multi" id="${codeofelement}">
-                            <div class="answer_content">
-                                <label class="radio-input" onclick="change_radio('${type}', ${answer_elements.length})">
-                                    <input type="checkbox" name="answers[${answer_elements.length}]" value="${answer_elements.length}" class="input_radios" id="input_radios_${answer_elements.length}">
-                                    <span class="checkmark"></span>
-                                </label>
-
-                                <span name="answer_reply[${answer_elements.length}]" id="answer__input_${codeofelement}" name="answer_reply[${answer_elements.length}]"
-                                    class="text-input summernote_element" placeholder="@lang('additional.forms.answer')" contenteditable="true"
-                                    placeholder="@lang('additional.forms.your_question')"></span>
-                            </div>
-                            <button type="button" class="btn btn-sm btn-outline-success add_remove_buttons add_button"
-                                onclick="addoreditanswer('${type}','add','${codeofelement}')"><i class="fa fa-plus"></i></button>
-                                <button type="button" class="btn btn-sm btn-outline-danger add_remove_buttons remove_button"
-                        onclick="addoreditanswer('${type}','remove','${codeofelement}')"><i class="fa fa-minus"></i></button>
+                    var innerContent = '';
+                    if (type === 'single') {
+                        innerContent = `
+                        <label class="radio-input" onclick="change_radio('${type}', ${answer_elements.length})">
+                            <input type="radio" name="answers[${answer_elements.length}]" value="${answer_elements.length}" class="input_radios" id="input_radios_${answer_elements.length}">
+                            <span class="checkmark" id="label_checkmark_${answer_elements.length}"></span>
+                            </label>
+                            <span name="answer_reply[${answer_elements.length}]" id="answer__input_${codeofelement}" name="answer_reply[${answer_elements.length}]"
+                                class="text-input summernote_element" placeholder="@lang('additional.forms.answer')"
+                                contenteditable="true" placeholder="@lang('additional.forms.your_question')"></span>`;
+                    } else if (type === 'multi') {
+                        innerContent = `
+                        <label class="radio-input" onclick="change_radio('${type}', ${answer_elements.length})">
+                            <input type="checkbox" name="answers[${answer_elements.length}]" value="${answer_elements.length}" class="input_radios" id="input_radios_${answer_elements.length}">
+                            <span class="checkmark" id="label_checkmark_${answer_elements.length}"></span>
+                        </label>
+                        <span name="answer_reply[${answer_elements.length}]" id="answer__input_${codeofelement}" name="answer_reply[${answer_elements.length}]"
+                            class="text-input summernote_element" placeholder="@lang('additional.forms.answer')" contenteditable="true"
+                            placeholder="@lang('additional.forms.your_question')"></span>`;
+                    } else if (type === 'match') {
+                        innerContent = `
+                        <div class="sides left_side">
+                            <div class="content_element matching_element" id="mathing_questions_${answer_elements.length}" data-key="${answer_elements.length}" name="mathing_questions[${answer_elements.length}]" placeholder="@lang('additional.forms.answer')" contenteditable="true"></div>
+                        </div>
+                        <div class="sides right_side">
+                            <div class="content_element matching_element" id="mathing_answers_${answer_elements.length}" data-key="${answer_elements.length}" name="mathing_answers[${answer_elements.length}]" placeholder="@lang('additional.forms.answer')" contenteditable="true"></div>
                         </div>`;
                     }
+
+                    element.innerHTML = `
+                        <div class="answer_content">${innerContent}</div>
+                        <button type="button" class="btn btn-sm btn-outline-success add_remove_buttons add_button"
+                            onclick="addoreditanswer('${type}','add','${codeofelement}')"><i class="fa fa-plus"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-danger add_remove_buttons remove_button"
+                            onclick="addoreditanswer('${type}','remove','${codeofelement}')"><i class="fa fa-minus"></i></button>
+                    `;
+
                     answers.appendChild(element);
-                    createeditor(`answer__input_${codeofelement}`);
+                    if (type == "match") {
+                        createeditor(`mathing_questions_${answer_elements.length}`);
+                        createeditor(`mathing_answers_${answer_elements.length}`);
+                    } else {
+                        createeditor(`answer__input_${codeofelement}`);
+                    }
                 }
             } catch (error) {
                 toast(error, 'error');
