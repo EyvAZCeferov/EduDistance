@@ -12,6 +12,7 @@
         }
     @endphp
     <section class="exam_page">
+        <input type="hidden" name="first_question" id="first_question" value="{{ $questions[0]->id }}">
         <input type="hidden" name="current_question" id="current_question" value="{{ $questions[0]->id }}">
         <input type="hidden" name="current_section" id="current_section" value="{{ $questions[0]->section_id }}">
         <input type="hidden" name="current_section_name" id="current_section_name"
@@ -34,97 +35,18 @@
         <input type="hidden" name="exam_result_id" id="exam_result_id" value="{{ $exam_result->id }}">
         <input type="hidden" name="language" id="language" value="{{ app()->getLocale() }}">
         @include('frontend.exams.exam_main_process.parts.header_result', [
-            'exam_result' => $exam_result
+            'exam_result' => $exam_result,
         ])
         @include('frontend.exams.exam_main_process.parts.content', [
             'exam' => $exam,
             'questions' => $questions,
             'exam_result' => $exam_result,
-            "hide_abc"=>"hide"
+            'hide_abc' => 'hide',
         ])
         @include('frontend.exams.exam_main_process.parts.footer', [
             'exam' => $exam,
             'questions' => $questions,
         ])
-
-        {{-- Desmos Calculator --}}
-        <div id="desmoscalculator" class="modal custom-modal show" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" onclick="toggleModalnow('desmoscalculator', 'hide')"
-                            data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-
-                    <div class="modal-body">
-                        {{-- <iframe src="https://www.desmos.com/calculator/ob0gttdkxf?embed"
-                        style="width:100%;height:100%;"frameborder=0></iframe> --}}
-                        <iframe src="https://www.geogebra.org/graphing/bbrq7kwt?embed" allowfullscreen
-                            style="width:100%;height:100%;" frameborder="0"></iframe>
-                    </div>
-
-                </div>
-            </div>
-            <br>
-        </div>
-        {{-- Desmos Calculator --}}
-
-        {{-- References --}}
-        <div id="references" class="modal custom-modal modal-lg show" tabindex="-1" role="dialog"
-            aria-labelledby="myModalLabel">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header bg-secondary">
-                        <h3 class="text-white">@lang('additional.pages.exams.referances')</h3>
-                        <button type="button" class="close text-white" onclick="toggleModalnow('references', 'hide')"
-                            data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-
-                    <div class="modal-body">
-                        <div class="references_top_buttons">
-                            <div></div>
-                            <div>
-                                <a href="javascript:void(0)"
-                                    onclick="toggle_references_modal_content('open')">@lang('additional.pages.exams.references_open')</a>
-                                <a href="javascript:void(0)"
-                                    onclick="toggle_references_modal_content('hide')">@lang('additional.pages.exams.references_hide')</a>
-                            </div>
-                        </div>
-
-                        @foreach ($exam->references as $key => $value)
-                            <div class="reference" id="reference_{{ $key }}">
-                                <div class="referance_title">
-                                    <h4>{{ $value->reference->name[app()->getLocale() . '_name'] }}</h4>
-                                    <a href="javascript:void(0)" id="toggler_button_reference_{{ $key }}"
-                                        class="referance_toggle_button"
-                                        onclick="toggle_references_modal_content_element({{ $key }})"><i
-                                            class="fa fa-plus"></i></a>
-                                </div>
-                                <div class="referance_body hide" id="body_reference_{{ $key }}">
-                                    @if (isset($value->reference->image) && !empty($value->reference->image))
-                                        <div class="col-sm-12 col-md-6 col-lg-8 img_area">
-                                            <img src="{{ getImageUrl($value->reference->image, 'exams') }}"
-                                                class="img-fluid img-responsive" alt="{{ $value->reference->image }}">
-                                        </div>
-                                    @endif
-                                    <div
-                                        class="@if (isset($value->reference->image) && !empty($value->reference->image)) col-sm-12 col-md-6 col-lg-4 @else col-sm-12 col-md-12 col-lg-12 @endif">
-                                        {!! $value->reference->description[app()->getLocale() . '_description'] !!}
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-
-                </div>
-            </div>
-            <br>
-        </div>
-        {{-- References --}}
     </section>
 @endsection
 
@@ -141,7 +63,7 @@
             } else {
                 currentDivQuestion.classList.remove("show");
                 var new_key = parseInt(currentDivQuestion.dataset.key) - 1;
-                var nextDivQuestion = document.querySelectorAll(`[data-key="${new_key}"]`);
+                var nextDivQuestion = document.querySelectorAll(`.content_exam[data-key="${new_key}"]`);
                 nextDivQuestion.forEach(function(element) {
                     element.classList.add("show");
                     document.getElementById("current_question").value = element.dataset.id;
@@ -160,7 +82,7 @@
             }
         }
 
-        function tonext() {
+        function tonext(tolast=false) {
             var current_question = document.getElementById("current_question").value;
             var all_questions = document.getElementById("all_questions").value;
             var currentDivQuestion = document.getElementById(`content_exam_${current_question}`);
@@ -169,21 +91,47 @@
             var section_start_time = document.getElementById("section_start_time");
             var loader_for_sections = document.getElementById("loader_for_sections");
             var form = document.getElementById("exam");
-            if (all_questions == currentDivQuestion.dataset.key) {
-                window.location.href="{{ route('user.profile') }}"
+            if (all_questions == currentDivQuestion.dataset.key || tolast==true) {
+                if (finishmodalshowed == false && tolast==false) {
+                    showfinishmodal('open');
+                } else {
+                    clearInterval(intervalTimerID);
+                    var forum = document.getElementById("exam");
+                    var formData = new FormData(forum);
+                    fetch("{{ route('finish_exam') }}", {
+                            method: "POST",
+                            body: formData
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("Network response was not ok.");
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            toast(data.message, data.status);
+                            if (data.url != null && data.url != '' && data.url != ' ') {
+                                window.location.href = data.url;
+                            }
+                            console.log(data.status);
+                        })
+                        .catch(error => {
+                            toast(error.message, "error");
+                        });
 
-                if (time_range_sections > 0) {
-                    if (next_section == 1) {
-                        section_start_time.value = document.getElementById("time_exam").value;
-                        form.classList.remove('d-block');
-                        form.style.display = "none";
-                        loader_for_sections.classList.add("active");
+                    if (time_range_sections > 0) {
+                        if (next_section == 1) {
+                            section_start_time.value = document.getElementById("time_exam").value;
+                            form.classList.remove('d-block');
+                            form.style.display = "none";
+                            loader_for_sections.classList.add("active");
+                        }
                     }
                 }
             } else {
                 currentDivQuestion.classList.remove("show");
                 var new_key = parseInt(currentDivQuestion.dataset.key) + 1;
-                var nextDivQuestion = document.querySelectorAll(`[data-key="${new_key}"]`);
+                var nextDivQuestion = document.querySelectorAll(`.content_exam[data-key="${new_key}"]`);
                 nextDivQuestion.forEach(function(element) {
                     element.classList.add("show");
                     document.getElementById("current_question").value = element.dataset.id;
@@ -191,11 +139,39 @@
                     document.getElementById("current_section").value = element.dataset.section_id;
                 });
             }
-
         }
 
         function updatepad() {
             var current_question = document.getElementById("current_question").value;
+            var first_question = document.getElementById("first_question").value;
+
+            var footer_question_buttons = document.getElementsByClassName('footer_question_buttons');
+            var marked_questions = document.getElementById('marked_questions').value;
+
+            for (var i = 0; i < footer_question_buttons.length; i++) {
+                footer_question_buttons[i].classList.remove("current");
+                if (marked_questions!=null && marked_questions.length > 0) {
+                    marked_questions_jsoned = JSON.parse(marked_questions);
+                    var buttonDataKey = footer_question_buttons[i].getAttribute('data-key');
+                    var found = false;
+                    for (var j = 0; j < marked_questions_jsoned.length; j++) {
+                        if (marked_questions_jsoned[j] === buttonDataKey.toString()) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        footer_question_buttons[i].classList.add("saved");
+                    }
+                }
+            }
+
+            if (current_question == first_question) {
+                document.getElementById("to_back").classList.add('hide');
+            } else {
+                if (document.getElementById("to_back").classList.contains('hide'))
+                    document.getElementById("to_back").classList.remove('hide');
+            }
             var all_questions = document.getElementById("all_questions").value;
             var footer_active_button = document.getElementById(`question_row_button_${current_question}`);
             var buttons = document.getElementsByClassName("btn-question");
@@ -209,36 +185,30 @@
 
                 if (time_range_sections > 0) {
                     if (next_section == 1) {
-                        next_button.innerHTML = `@lang('additional.buttons.nextsection') <i class="fa fa-angle-right"></i>`;
+                        next_button.innerHTML =
+                            `@lang('additional.buttons.nextsection') @if ($exam->layout_type == 'standart')<i class="fa fa-angle-right"></i>@endif`;
                     } else {
-                        next_button.innerHTML = `@lang('additional.buttons.finish') <i class="fa fa-check"></i>`;
+                        next_button.innerHTML =
+                            `@lang('additional.buttons.finish') @if ($exam->layout_type == 'standart')<i class="fa fa-check"></i>@endif`;
                     }
                 } else {
-                    next_button.innerHTML = `@lang('additional.buttons.finish') <i class="fa fa-check"></i>`;
+                    next_button.innerHTML =
+                        `@lang('additional.buttons.finish') @if ($exam->layout_type == 'standart')<i class="fa fa-check"></i>@endif`;
                 }
             } else {
                 next_button.classList.add("btn-secondary");
                 next_button.classList.remove("active");
-                next_button.innerHTML = `@lang('additional.buttons.next') <i class="fa fa-angle-right"></i>`;
+                next_button.innerHTML =
+                    `@lang('additional.buttons.next')@if ($exam->layout_type == 'standart') <i class="fa fa-angle-right"></i> @endif`;
             }
 
             var current_question_text = document.getElementById("current_question_text");
             current_question_text.innerText = currentDivQuestion.dataset.key;
 
             for (var i = 0; i < buttons.length; i++) {
-                buttons[i].classList.remove("current");
-                buttons[i].classList.remove("saved");
-                if (buttons[i].id == `question_row_button_${current_question}`) {
+                if (buttons[i].id == `question_row_button_${current_question}`)
                     buttons[i].classList.add("current");
-                }
-            }
-            var marked_questions = document.getElementById('marked_questions').value;
-            if (marked_questions.length > 0) {
-                marked_questions = JSON.parse(marked_questions);
-                for (var i = 0; i < marked_questions.length; i++) {
-                    var markingbutton = document.getElementById(`question_row_button_${marked_questions[i]}`);
-                    markingbutton.classList.add("saved");
-                }
+
             }
 
             var section_name_area = document.getElementById("section_name");
@@ -260,6 +230,43 @@
         }
 
         setInterval(updatepad, 500);
+    </script>
+
+    <script defer>
+        const leftCol = document.getElementsByClassName('left_col');
+        const resizer = document.getElementsByClassName('resizer');
+
+        function draggingleftandrightcolumns() {
+            for (let index = 0; index < resizer.length; index++) {
+                const element = resizer[index];
+                element.addEventListener("mousedown", (e) => {
+                    e.preventDefault();
+                    document.addEventListener("mousemove", resize);
+                    document.addEventListener("mouseup", () => {
+                        document.removeEventListener("mousemove", resize);
+                    });
+                });
+                element.addEventListener("mouseover", (e) => {
+                    element.style.opacity = 1;
+                });
+                element.addEventListener("mouseleave", (e) => {
+                    element.style.opacity = 0.5;
+                });
+            }
+
+        }
+
+        function resize(e) {
+            const size = `${e.clientX}px`;
+            for (let index = 0; index < leftCol.length; index++) {
+                const element = leftCol[index];
+                element.style.width = size;
+            }
+        }
+
+        window.addEventListener('load', function() {
+            draggingleftandrightcolumns();
+        });
     </script>
     {{-- Footer Buttons --}}
     <script defer>

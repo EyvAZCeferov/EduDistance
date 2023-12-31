@@ -31,6 +31,15 @@
     @stack('css')
 
     @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    <script language='javascript' type='text/javascript'>
+        function DisableBackButton() {
+            window.history.forward()
+        }
+        DisableBackButton();
+            window.onload = DisableBackButton;
+            window.onpageshow = function(evt) { if (evt.persisted) DisableBackButton() }
+            window.onunload = function() { void (0) }
+    </script>
 </head>
 
 <body>

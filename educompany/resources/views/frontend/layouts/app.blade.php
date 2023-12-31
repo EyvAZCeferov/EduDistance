@@ -31,6 +31,15 @@
     <link rel="stylesheet" href="{{ asset('front/assets/css/fontawesome-all.min.css') }}">
     @stack('css')
     @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    <script language='javascript' type='text/javascript'>
+        function DisableBackButton() {
+            window.history.forward()
+        }
+        DisableBackButton();
+            window.onload = DisableBackButton;
+            window.onpageshow = function(evt) { if (evt.persisted) DisableBackButton() }
+            window.onunload = function() { void (0) }
+    </script>
 </head>
 
 <body>
@@ -76,7 +85,7 @@
     {{-- Delete Modal --}}
     <script type="text/javascript" src="{{ asset('front/assets/js/eyvaz/vendor/jquery-ui/external/jquery/jquery.js') }}"></script>
     <script type="text/javascript" src="{{ asset('front/assets/js/eyvaz/base.js') }}"></script>
-    
+
     <script defer>
         $(function() {
             @if (Session::has('message'))

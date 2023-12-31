@@ -5,7 +5,7 @@
         <a class="btn btn-primary goback" href="{{ url()->previous() }}"><i class="fa fa-arrow-left"></i>&nbsp;
             @lang('additional.buttons.back')</a>
         <div class="content row my-4">
-            <div class="col-sm-12 col-md-6 col-lg-7">
+            <div class="col-sm-12 col-md-8 col-lg-7">
                 @include('frontend.light_parts.section_title', [
                     'title' => $data->name[app()->getLocale() . '_name'],
                     'url' => null,
@@ -59,7 +59,7 @@
                     @endif
                 </div>
             </div>
-            <div class="col-sm-12 col-md-6 col-lg-5 right_column_image">
+            <div class="col-sm-12 col-md-4 col-lg-5 right_column_image">
                 <img src="{{ getImageUrl($data->image, 'exams') }}" alt="{{ $data->name[app()->getLocale() . '_name'] }}">
             </div>
         </div>

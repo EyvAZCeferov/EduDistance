@@ -16,18 +16,18 @@ class ExamQuestion extends Model implements HasMedia
 
     protected $table = 'exam_questions';
 
-     CONST TYPES = [
-         'Tək Seçimli' => 1,
-         'Çox Seçimli' => 2,
-         'Açıq' => 3,
-         'Uzlaşma' => 4,
-         'Səs' => 5,
-     ];
+    const TYPES = [
+        'Tək Seçimli' => 1,
+        'Çox Seçimli' => 2,
+        'Açıq' => 3,
+        'Uzlaşma' => 4,
+        'Səs' => 5,
+    ];
 
-     CONST LAYOUTS=[
-        'standart'=>'Sol tərəfdə sual, sağ tərəfdə cavablar',
-        'onepage'=>'Yuxarıda sual, aşağıda cavab',
-     ];
+    const LAYOUTS = [
+        'standart' => 'Sol tərəfdə sual, sağ tərəfdə cavablar',
+        'onepage' => 'Yuxarıda sual, aşağıda cavab',
+    ];
 
     public const ALLOWED_FILE_SIZE_KB = 20 * 1024;
 
@@ -61,16 +61,19 @@ class ExamQuestion extends Model implements HasMedia
     {
         if ($this->type == 1) {
             return $this->answers?->where('correct', true)?->first();
-        } elseif ($this->type == 2) {
+        } else if ($this->type == 2) {
             return $this->answers?->where('correct', true);
-        }elseif ($this->type == 3) {
+        } else if ($this->type == 3) {
             return $this->answers?->where('correct', true)->first();
-        }else{
+        } else if ($this->type == 4) {
+            return $this->answers?->where('correct', true);
+        } else {
             return $this->answers?->where('correct', true)?->first();
         }
     }
 
-    public function section(){
-        return $this->hasOne(Section::class,'id','section_id');
+    public function section()
+    {
+        return $this->hasOne(Section::class, 'id', 'section_id');
     }
 }

@@ -8,7 +8,7 @@
         <input type="radio" name="answers[{{ $value->question->section_id }}][{{ $question->id }}]"
             value="{{ $value->id }}">
         <div class="rowNumber">{{ int_to_abcd_value($key) }}</div>
-        <div class="question">{{ $question->id }} {{ $value->id }} {{ $exam_result->id }}
+        <div class="question">
             {{ your_answer_result_true_or_false($question->id, $value->id, $exam_result->id) }} {!! $value->answer !!}
         </div>
     </div>

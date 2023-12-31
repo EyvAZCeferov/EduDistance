@@ -206,4 +206,4 @@ function initSortable (list) {
     sortable = new Sortable (listObj);
 }
 
-initSortable ('list-1');
+// initSortable ('list-1');

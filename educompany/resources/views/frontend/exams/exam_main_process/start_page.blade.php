@@ -1,20 +1,19 @@
 @extends('frontend.layouts.app')
 @section('title')
-    {{ $exam_start_pages[0]->name[app()->getLocale() . '_name'] }}
+    {{ @$exam_start_pages[0]->name[app()->getLocale() . '_name'] }}
 @endsection
 @section('content')
-    @foreach ($exam_start_pages as $key => $exam_start_page)
+    @foreach ($exam_start_pages as $key => $page)
         <section class="exam_start_page @if ($key == 0) show @else hide @endif "
             id="{{ $key }}_start_page">
-            <h1 class="exam_start_page_title">{{ $exam_start_page->name[app()->getLocale() . '_name'] }}</h1>
+            <h1 class="exam_start_page_title">{{ $page->name[app()->getLocale() . '_name'] }}</h1>
             <div class="exam_start_page_section">
                 <div class="row">
                     <div
-                        class="col-sm-12 @if (isset($exam_start_page->image) && !empty($exam_start_page->image)) col-md-6 col-lg-6 @else col-md-12 col-lg-12 @endif">
-                        {!! $exam_start_page->description[app()->getLocale() . '_description'] !!}
+                        class="col-sm-12 @if (isset($page->image) && !empty($page->image)) col-md-6 col-lg-6 @else col-md-12 col-lg-12 @endif">
+                        {!! $page->description[app()->getLocale() . '_description'] !!}
 
-
-                        @if ($exam_start_page->type == 'coupon')
+                        @if ($page->type == 'coupon')
                             <div class="row my-4">
                                 <input class="form-control coupon_code_input" onkeyup="searchcoupon_code(event)"
                                     name="coupon_code" id="coupon_code" placeholder="@lang('additional.pages.payments.coupon_code')" />
@@ -30,11 +29,11 @@
                             <label for="agree_with_you">&nbsp; @lang('additional.pages.exams.iamagreewithyou')</label>
                         </div>
                     </div>
-                    @if (isset($exam_start_page->image) && !empty($exam_start_page->image))
+                    @if (isset($page->image) && !empty($page->image))
                         <div
-                            class="col-sm-12 @if (isset($exam_start_page->image) && !empty($exam_start_page->image)) col-md-6 col-lg-6 @else col-md-12 col-lg-12 @endif image_area ">
-                            <img src="{{ getImageUrl($exam_start_page->image, 'exam_start_page') }}"
-                                alt="{{ $exam_start_page->name[app()->getLocale() . '_name'] }}">
+                            class="col-sm-12 @if (isset($page->image) && !empty($page->image)) col-md-6 col-lg-6 @else col-md-12 col-lg-12 @endif image_area ">
+                            <img src="{{ getImageUrl($page->image, 'exam_start_page') }}"
+                                alt="{{ $page->name[app()->getLocale() . '_name'] }}">
                         </div>
                     @endif
                 </div>

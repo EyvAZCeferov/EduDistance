@@ -39,7 +39,8 @@
             value="{{ $questions[0]->section->name }}">
         <input type="hidden" name="selected_section" id="selected_section"
             value="{{ session()->get('selected_section') }}">
-        <input type="hidden" name="time_range_sections" id="time_range_sections" value="{{ $questions[0]->section->time_range_sections }}">
+        <input type="hidden" name="time_range_sections" id="time_range_sections"
+            value="{{ $questions[0]->section->time_range_sections }}">
         <input type="hidden" name="next_section" id="next_section"
             value="{{ !empty($exam->sections[session()->get('selected_section')]) ? true : false }}">
         <input type="hidden" name="all_questions" id="all_questions" value="{{ count($questions) }}">
@@ -220,7 +221,7 @@
             } else {
                 currentDivQuestion.classList.remove("show");
                 var new_key = parseInt(currentDivQuestion.dataset.key) - 1;
-                var nextDivQuestion = document.querySelectorAll(`[data-key="${new_key}"]`);
+                var nextDivQuestion = document.querySelectorAll(`.content_exam[data-key="${new_key}"]`);
                 nextDivQuestion.forEach(function(element) {
                     element.classList.add("show");
                     document.getElementById("current_question").value = element.dataset.id;
@@ -240,7 +241,7 @@
             }
         }
 
-        function tonext() {
+        function tonext(tolast=false) {
             var current_question = document.getElementById("current_question").value;
             var all_questions = document.getElementById("all_questions").value;
             var currentDivQuestion = document.getElementById(`content_exam_${current_question}`);
@@ -249,9 +250,8 @@
             var section_start_time = document.getElementById("section_start_time");
             var loader_for_sections = document.getElementById("loader_for_sections");
             var form = document.getElementById("exam");
-            console.log(finishmodalshowed);
-            if (all_questions == currentDivQuestion.dataset.key) {
-                if (finishmodalshowed == false) {
+            if (all_questions == currentDivQuestion.dataset.key || tolast==true) {
+                if (finishmodalshowed == false && tolast==false) {
                     showfinishmodal('open');
                 } else {
                     clearInterval(intervalTimerID);
@@ -272,6 +272,7 @@
                             if (data.url != null && data.url != '' && data.url != ' ') {
                                 window.location.href = data.url;
                             }
+                            console.log(data.status);
                         })
                         .catch(error => {
                             toast(error.message, "error");
@@ -289,7 +290,7 @@
             } else {
                 currentDivQuestion.classList.remove("show");
                 var new_key = parseInt(currentDivQuestion.dataset.key) + 1;
-                var nextDivQuestion = document.querySelectorAll(`[data-key="${new_key}"]`);
+                var nextDivQuestion = document.querySelectorAll(`.content_exam[data-key="${new_key}"]`);
                 nextDivQuestion.forEach(function(element) {
                     element.classList.add("show");
                     document.getElementById("current_question").value = element.dataset.id;
@@ -299,16 +300,20 @@
             }
         }
 
-        function showfinishmodal(action){
-            var showfinishmodal=document.getElementById('showfinishmodal');
-            var content_area_exam=document.getElementById('content_area_exam');
-            if(action=="open"){
+        function showfinishmodal(action) {
+            var showfinishmodal = document.getElementById('showfinishmodal');
+            var content_area_exam = document.getElementById('content_area_exam');
+            var footer_questions = document.getElementById("footer_questions");
+            var footer_questions_top = document.getElementById('footer_questions_top');
+            if (action == "open") {
                 finishmodalshowed = true;
                 showfinishmodal.classList.remove('hide');
+                footer_questions_top.innerHTML = footer_questions.innerHTML;
                 content_area_exam.classList.add('hide');
-            }else{
+            } else {
                 finishmodalshowed = false;
                 showfinishmodal.classList.add('hide');
+                footer_questions_top.innerHTML = '';
                 content_area_exam.classList.remove('hide');
             }
         }
@@ -316,6 +321,28 @@
         function updatepad() {
             var current_question = document.getElementById("current_question").value;
             var first_question = document.getElementById("first_question").value;
+
+            var footer_question_buttons = document.getElementsByClassName('footer_question_buttons');
+            var marked_questions = document.getElementById('marked_questions').value;
+
+            for (var i = 0; i < footer_question_buttons.length; i++) {
+                footer_question_buttons[i].classList.remove("current");
+                if (marked_questions!=null && marked_questions.length > 0) {
+                    marked_questions_jsoned = JSON.parse(marked_questions);
+                    var buttonDataKey = footer_question_buttons[i].getAttribute('data-key');
+                    var found = false;
+                    for (var j = 0; j < marked_questions_jsoned.length; j++) {
+                        if (marked_questions_jsoned[j] === buttonDataKey.toString()) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        footer_question_buttons[i].classList.add("saved");
+                    }
+                }
+            }
+
             if (current_question == first_question) {
                 document.getElementById("to_back").classList.add('hide');
             } else {
@@ -335,36 +362,30 @@
 
                 if (time_range_sections > 0) {
                     if (next_section == 1) {
-                        next_button.innerHTML = `@lang('additional.buttons.nextsection') @if($exam->layout_type=="standart")<i class="fa fa-angle-right"></i>@endif`;
+                        next_button.innerHTML =
+                            `@lang('additional.buttons.nextsection') @if ($exam->layout_type == 'standart')<i class="fa fa-angle-right"></i>@endif`;
                     } else {
-                        next_button.innerHTML = `@lang('additional.buttons.finish') @if($exam->layout_type=="standart")<i class="fa fa-check"></i>@endif`;
+                        next_button.innerHTML =
+                            `@lang('additional.buttons.finish') @if ($exam->layout_type == 'standart')<i class="fa fa-check"></i>@endif`;
                     }
                 } else {
-                    next_button.innerHTML = `@lang('additional.buttons.finish') @if($exam->layout_type=="standart")<i class="fa fa-check"></i>@endif`;
+                    next_button.innerHTML =
+                        `@lang('additional.buttons.finish') @if ($exam->layout_type == 'standart')<i class="fa fa-check"></i>@endif`;
                 }
             } else {
                 next_button.classList.add("btn-secondary");
                 next_button.classList.remove("active");
-                next_button.innerHTML = `@lang('additional.buttons.next')@if($exam->layout_type=="standart") <i class="fa fa-angle-right"></i> @endif`;
+                next_button.innerHTML =
+                    `@lang('additional.buttons.next')@if ($exam->layout_type == 'standart') <i class="fa fa-angle-right"></i> @endif`;
             }
 
             var current_question_text = document.getElementById("current_question_text");
             current_question_text.innerText = currentDivQuestion.dataset.key;
 
             for (var i = 0; i < buttons.length; i++) {
-                buttons[i].classList.remove("current");
-                buttons[i].classList.remove("saved");
-                if (buttons[i].id == `question_row_button_${current_question}`) {
+                if (buttons[i].id == `question_row_button_${current_question}`)
                     buttons[i].classList.add("current");
-                }
-            }
-            var marked_questions = document.getElementById('marked_questions').value;
-            if (marked_questions.length > 0) {
-                marked_questions = JSON.parse(marked_questions);
-                for (var i = 0; i < marked_questions.length; i++) {
-                    var markingbutton = document.getElementById(`question_row_button_${marked_questions[i]}`);
-                    markingbutton.classList.add("saved");
-                }
+
             }
 
             var section_name_area = document.getElementById("section_name");
@@ -387,7 +408,6 @@
         }
 
         setInterval(updatepad, 500);
-
     </script>
     {{-- Footer Buttons --}}
 
@@ -399,30 +419,30 @@
             return val.toString().padStart(2, '0');
         }
 
+        var countDownDate = new Date(Date.now() + (20 * 60 * 1000)).getTime();
+
         function pad_new(val) {
-            return val < 10 ? "0" + val : val;
+            return val > 9 ? val : "0" + val;
         }
 
-        let difference = 0;
-        let endTime;
+        intervalTimerID = setInterval(updateClock, 1000);
 
         function updateClock() {
             sec++;
-            var nowTimeStamp;
+
             var inputtimeinput = document.getElementById("time_exam");
             var section_start_time = document.getElementById("section_start_time");
             var time_range_sections = document.getElementById("time_range_sections");
             var loader_for_sections = document.getElementById("loader_for_sections");
             var form = document.getElementById("exam");
-            var time_end_exam = document.getElementById("time_end_exam").value;
-
-            var splitTimeEndTime = time_end_exam.split(":");
-            var hoursEndTime = parseInt(splitTimeEndTime[0], 10);
-            var minutesEndTime = parseInt(splitTimeEndTime[1], 10);
-            var secondsEndTime = parseInt(splitTimeEndTime[2], 10);
-            nowTimeStamp = new Date().getTime();
-            difference = tracktime(nowTimeStamp, hoursEndTime, minutesEndTime, secondsEndTime);
+            // var time_end_exam = document.getElementById("time_end_exam").value;
+            const now= new Date();
+            // const endTimeInMilliseconds = now.getTime() + (parseInt(time_end_exam) * 60000);
+            const difference = countDownDate - now.getTime();
+            const minutesDifference = Math.floor(difference / (1000 * 60));
+            const secondsDifference = Math.floor((difference % (1000 * 60)) / 1000);
             inputtimeinput.value = sec;
+
             if (loader_for_sections.classList.contains('active') && section_start_time.value > 0) {
                 var qalan_vaxt = time_range_sections.value - section_start_time.value;
                 section_start_time.value = parseInt(section_start_time.value) + 1;
@@ -445,8 +465,13 @@
                 form.classList.add('d-block');
             }
 
-            var minutesDifference = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-            var secondsDifference = Math.floor((difference % (1000 * 60)) / 1000);
+            if (difference <= 0) {
+                clearInterval(intervalTimerID);
+                document.getElementById('minutes').innerHTML = "00";
+                document.getElementById('seconds').innerHTML = "00";
+                tonext(true);
+                return;
+            }
 
             if (document.getElementById('seconds')) {
                 document.getElementById('seconds').innerHTML = pad_new(secondsDifference);
@@ -457,15 +482,6 @@
             }
         }
 
-        function tracktime(nowT, hoursEndTime, minutesEndTime, secondsEndTime) {
-            var nowTTT = moment();
-            var endTTT = moment().add(hoursEndTime, 'hours').add(minutesEndTime, 'minutes').add(secondsEndTime,
-            'seconds'); // Belirtilen süreyi ekler
-            let difference = endTTT.diff(nowTTT);
-            return difference;
-        }
-
-        intervalTimerID = setInterval(updateClock, 1000);
     </script>
     {{-- Create Timer --}}
 
@@ -560,6 +576,7 @@
 
             var answer_footer_buttons = document.getElementById(`question_row_button_${question_id}`);
             answer_footer_buttons.classList.add('answered');
+            updatepad();
         }
 
         function changeTextBox(question_id, type) {
@@ -574,12 +591,16 @@
         }
 
         function mark_unmark_question(id) {
-            sendAjaxRequest("{{ route('api.mark_unmark_question') }}", "post", {
+            var exam_id = document.getElementById('exam_id').value;
+            var exam_result_id = document.getElementById('exam_result_id').value;
+            var user_id = document.getElementById("user_id").value;
+            var language = document.getElementById('language').value;
+            sendAjaxRequestOLD("{{ route('api.mark_unmark_question') }}", "post", {
                 question_id: id,
-                exam_id: {{ $exam->id }},
-                exam_result_id: {{ $exam_result->id }},
-                language: '{{ app()->getLocale() }}',
-                user_id: document.getElementById("user_id").value,
+                exam_id: exam_id,
+                exam_result_id: exam_result_id,
+                language: language,
+                user_id: user_id,
             }, function(e, t) {
                 if (e) toast(e, "error");
                 else {
@@ -602,48 +623,73 @@
 
         document.addEventListener("DOMContentLoaded", function() {
             var oneTimeAudios = document.querySelectorAll('.only1time');
+
             oneTimeAudios.forEach(function(audio) {
-                audio.addEventListener('play', function() {
-                    oneTimeAudios.forEach(function(otherAudio) {
-                        if (otherAudio !== audio) {
-                            otherAudio.pause(); // Diğer audio dosyalarını durdur
-                            otherAudio.disabled =
-                                true; // Diğer audio dosyalarını devre dışı bırak
-                        }
-                    });
+                audio.addEventListener('play', function(event) {
+                    audio.controls = false;
+                    var audio_tag_text = document.querySelector(".audio_tag_text");
+                    audio_tag_text.innerHTML += `<span class="text-info">@lang('additional.pages.exams.audiofile_played')</span>`;
+                    audio.removeEventListener('play', arguments.callee);
+
                 }, {
                     once: true
-                }); // 'once' parametresi sayesinde bu eventListener yalnızca bir kez çalışır
+                });
             });
         });
 
-        const leftCol = document.getElementById('left_col');
-        const resizer = document.getElementById('resizer');
+        const leftCol = document.getElementsByClassName('left_col');
+        const resizer = document.getElementsByClassName('resizer');
 
         function draggingleftandrightcolumns() {
-            resizer.addEventListener("mousedown", (e) => {
-                e.preventDefault();
-                document.addEventListener("mousemove", resize);
-                document.addEventListener("mouseup", () => {
-                    document.removeEventListener("mousemove", resize);
+            for (let index = 0; index < resizer.length; index++) {
+                const element = resizer[index];
+                element.addEventListener("mousedown", (e) => {
+                    e.preventDefault();
+                    document.addEventListener("mousemove", resize);
+                    document.addEventListener("mouseup", () => {
+                        document.removeEventListener("mousemove", resize);
+                    });
                 });
-            });
-            resizer.addEventListener("mouseover", (e) => {
-                resizer.style.opacity = 1;
-            });
-            resizer.addEventListener("mouseleave", (e) => {
-                resizer.style.opacity = 0.5;
-            });
+                element.addEventListener("mouseover", (e) => {
+                    element.style.opacity = 1;
+                });
+                element.addEventListener("mouseleave", (e) => {
+                    element.style.opacity = 0.5;
+                });
+            }
+
         }
 
         function resize(e) {
             const size = `${e.clientX}px`;
-            leftCol.style.width = size;
+            for (let index = 0; index < leftCol.length; index++) {
+                const element = leftCol[index];
+                element.style.width = size;
+            }
         }
 
         window.addEventListener('load', function() {
             draggingleftandrightcolumns();
+            sortanswerarea();
         });
+
+        function sortanswerarea() {
+            let answerareas = document.getElementsByClassName('answers_match_area');
+            if (answerareas != null && answerareas.length > 0) {
+                for (let index = 0; index < answerareas.length; index++) {
+                    const element = answerareas[index];
+                    $(`#${element.id}`).sortable({
+                        start: function(event, ui) {
+                            var questionelem = ui.item[0];
+                            var questionId=questionelem.dataset.question_id;
+                            var answer_footer_buttons = document.getElementById(`question_row_button_${questionId}`);
+                            answer_footer_buttons.classList.add('answered');
+                        }
+                    });
+                    $(`#${element.id}`).disableSelection();
+                }
+            }
+        }
     </script>
     {{-- Exam Functions --}}
     {{-- Content Functions --}}
@@ -683,7 +729,6 @@
             document.body.appendChild(aux);
             aux.select();
             document.execCommand("copy");
-            // Remove it from the body
             document.body.removeChild(aux);
             toast("@lang('additional.messages.noprint')", 'error')
         }

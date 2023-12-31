@@ -24,6 +24,9 @@
 @import "bootstrap/scss/list-group";
 @import 'multiple-select/src/multiple-select';
 @import 'header';
+@import 'mobile/header';
 @import 'body';
+@import 'mobile/body';
 @import 'footer';
+@import 'mobile/footer';
 @import '../vendor/slick/slick-theme.scss';

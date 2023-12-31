@@ -24,6 +24,9 @@
                 id="{{ $nav_id }}-{{ $key }}_tab" role="tabpanel"
                 aria-labelledby="{{ $nav_id }}-{{ $key }}">
                 @if (!empty($value) && count($value) > 0)
+                    @include('frontend.light_parts.products.products_grid', [
+                        'products' => $value,
+                    ])
                 @else
                     <p class="not_found_text text-center">@lang('additional.pages.exams.notfound') </p>
                 @endif

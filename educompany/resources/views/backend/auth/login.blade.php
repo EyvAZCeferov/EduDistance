@@ -68,29 +68,29 @@
 
     $(document).ready(function(){
         @if(session()->has('modal'))
-        $('#{{session()->get('modal')}}').modal('show')
+            $('#{{session()->get('modal')}}').modal('show')
         @endif
 
         @if(session()->has('error'))
-        toastr.error("{{session()->get('error')}}", "Error");
+            toastr.error("{{session()->get('error')}}", "Error");
         @endif
 
         @if(session()->has('success'))
-        toastr.success("{{session()->get('success')}}", "Success");
+            toastr.success("{{session()->get('success')}}", "Success");
         @endif
 
         @if(session()->has('warning'))
-        toastr.warning("{{session()->get('warning')}}", "Warning");
+            toastr.warning("{{session()->get('warning')}}", "Warning");
         @endif
 
         @if(session()->has('info'))
-        toastr.info("{{session()->get('info')}}", "Info");
+            toastr.info("{{session()->get('info')}}", "Info");
         @endif
 
         @if (isset($errors) && count($errors) > 0)
-        @foreach ($errors->all() as $error)
-        toastr.error("{{ $error }}", "Error");
-        @endforeach
+            @foreach ($errors->all() as $error)
+                toastr.error("{{ $error }}", "Error");
+            @endforeach
         @endif
 
     });

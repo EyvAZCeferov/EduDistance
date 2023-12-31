@@ -1,6 +1,6 @@
 <footer id="site_footer">
     <div class="bg_footer row">
-        <div class="col-md-6 col-sm-12 left_column">
+        <div class="col-md-7 col-sm-12 col-lg-6 left_column">
             @if (!empty(settings()) && isset(settings()->logo_white) && !empty(settings()->logo_white))
                 <div class="logo_footer">
                     <a href="{{ route('page.welcome') }}">
@@ -107,8 +107,8 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-md-2 col-sm-0"></div>
-                <div class="col-sm-6 col-md-5">
+                <div class="col-md-1 col-sm-0"></div>
+                <div class="col-sm-6 col-md-6">
                     <h3 class="title">@lang('additional.footer.contactus')</h3>
                     <div class="contact_us_links">
                         <ul>
@@ -151,7 +151,7 @@
             !empty(settings()) &&
                 isset(settings()->social_media['maps_google']) &&
                 !empty(settings()->social_media['maps_google']))
-            <div class="col-md-6 col-sm-12">
+            <div class="col-md-5 col-sm-12 col-lg-6">
                 <iframe src="{{ settings()->social_media['maps_google'] }}" frameborder="0"></iframe>
             </div>
         @endif

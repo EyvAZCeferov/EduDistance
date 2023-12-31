@@ -34,11 +34,29 @@
     @stack('css')
 
     @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    <script language='javascript' type='text/javascript'>
+        function DisableBackButton() {
+            window.history.forward()
+        }
+        DisableBackButton();
+            window.onload = DisableBackButton;
+            window.onpageshow = function(evt) { if (evt.persisted) DisableBackButton() }
+            window.onunload = function() { void (0) }
+    </script>
 </head>
 
 <body>
     <div class="container-xxl">
         @yield('content')
+    </div>
+
+    <div id="loader">
+        <div class="icon">
+            <div class="bar" style="background-color: #3498db; margin-left: -60px;"></div>
+            <div class="bar" style="background-color: #e74c3c; margin-left: -20px;"></div>
+            <div class="bar" style="background-color: #f1c40f; margin-left: 20px;"></div>
+            <div class="bar" style="background-color: #2eB869; margin-left: 60px;"></div>
+        </div>
     </div>
 
     <script type="text/javascript" src="{{ asset('front/assets/js/jquery.min.js') }}"></script>

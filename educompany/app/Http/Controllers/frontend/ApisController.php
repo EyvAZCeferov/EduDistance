@@ -127,49 +127,72 @@ class ApisController extends Controller
     public function create_payment($req)
     {
         try {
-            $user = [
-                'name' => $req['user_name'],
-                'email' => $req['user_email'],
-                'phone' => $req['user_phone'],
-                'id' => $req['user_id']
-            ];
-            $exam = [
-                'name' => $req['exam_name'],
-                'image' => $req['exam_image'],
-                'id' => $req['exam_id']
-            ];
-            $coupon = [
-                'name' => $req['coupon_name'] ?? null,
-                'discount' => $req['coupon_discount'] ?? null,
-                'code' => $req['coupon_code'] ?? null,
-                'type' => $req['coupon_type'] ?? null,
-                'id' => $req['coupon_id'] ?? null
-            ];
-            $payment = new Payments();
-            $payment->token = $req['token'];
-            $payment->amount = $req['amount'];
-            $payment->payment_status = 0;
-            $payment->data = $req;
-            $payment->user_id = $req['user_id'];
-            $payment->exam_id = $req['exam_id'];
-            $payment->coupon_id = $req['coupon_id'] ?? null;
-            $payment->exam_result_id = $req['exam_result_id'];
-            $payment->exam_data = $exam;
-            $payment->user_data = $user;
-            $payment->coupon_data = $coupon;
-            $payment->save();
+            $exam_price = 0;
+            $payment = payments($req['user_id'], $req['exam_id'], $req['exam_result_id'], null, $req['coupon_id'] ?? null, null);
+            if ($req['amount'] == 0) {
+                $exam = exams($req['exam_id'], 'id');
+                $coupon_code = coupon_codes($req['coupon_id'], 'id');
+                if ($exam->endirim_price != null && $exam->endirim_price != $exam->price) {
+                    $exam_price = $exam->endirim_price;
+                } else {
+                    $exam_price = $exam->price;
+                }
 
-            // 'transaction_id',
-            // 'frompayment'
-            if ($req['amount'] > 0) {
-                $epoint = new Epoint();
-                $epoint = $epoint->typeCard($payment->id, $payment->amount, $req['exam_name']);
+                if (!empty($coupon_code) && isset($coupon_code->discount) && $coupon_code->discount > 0 && $exam_price > 0) {
+                    if ($coupon_code->type == "percent") {
+                        $exam_price -= $exam_price * $coupon_code->discount / 100;
+                    } else {
+                        if ($coupon_code->discount > $exam_price) {
+                            $exam_price = 0;
+                        } else {
+                            $exam_price -= $coupon_code->discount;
+                        }
+                    }
+                }
+            }
+            if ((empty($payment) || !isset($payment->id) && empty($payment->id)) || (!empty($payment) && isset($payment->id) && $payment->payment_status == 0)) {
+                $user = [
+                    'name' => $req['user_name'],
+                    'email' => $req['user_email'],
+                    'phone' => $req['user_phone'],
+                    'id' => $req['user_id']
+                ];
+                $exam = [
+                    'name' => $req['exam_name'],
+                    'image' => $req['exam_image'],
+                    'id' => $req['exam_id']
+                ];
+                $coupon = [
+                    'name' => $req['coupon_name'] ?? null,
+                    'discount' => $req['coupon_discount'] ?? null,
+                    'code' => $req['coupon_code'] ?? null,
+                    'type' => $req['coupon_type'] ?? null,
+                    'id' => $req['coupon_id'] ?? null
+                ];
+                $payment = new Payments();
+                $payment->token = $req['token'];
+                $payment->amount = $req['amount']==0?$exam_price:$req['amount'];
+                $payment->payment_status = 0;
+                $payment->data = $req;
+                $payment->user_id = $req['user_id'];
+                $payment->exam_id = $req['exam_id'];
+                $payment->coupon_id = $req['coupon_id'] ?? null;
+                $payment->exam_result_id = $req['exam_result_id'];
+                $payment->exam_data = $exam;
+                $payment->user_data = $user;
+                $payment->coupon_data = $coupon;
+                $payment->save();
+            }
+            if ($payment->amount > 0) {
+                $epoint = Epoint::typeCard($payment->id, $payment->amount, "Hu");
+                if (!empty($epoint) && isset($epoint->transaction) && !empty($epoint->transaction))
+                    $payment->update(['transaction_id' => $epoint->transaction]);
                 return $epoint;
             } else {
                 return $payment;
             }
         } catch (\Exception $e) {
-            return [$e->getMessage(), $e->getLine()];
+            return ['status' => 'error', 'message' => $e->getMessage(), 'line' => $e->getLine()];
             Log::info(['------------------Payment Create Callback------------------', $e->getMessage(), $e->getLine()]);
         }
     }
@@ -327,6 +350,14 @@ class ApisController extends Controller
                 }
             } else if ($request->input("element_type") == 'section') {
                 $data = Section::where('id', $request->input("element_id"))->first();
+                if (!empty($data) && isset($data->id)) {
+                    $data->delete();
+                    return response()->json(['status' => 'success', 'message' => trans('additional.messages.success', [], $request->input('language') ?? 'az')]);
+                } else {
+                    return response()->json(['status' => 'warning', 'message' => trans('additional.pages.exams.notfound', [], $request->input('language') ?? 'az')]);
+                }
+            } else if ($request->input('element_type') == "product") {
+                $data = Exam::where('id', $request->input("element_id"))->first();
                 if (!empty($data) && isset($data->id)) {
                     $data->delete();
                     return response()->json(['status' => 'success', 'message' => trans('additional.messages.success', [], $request->input('language') ?? 'az')]);

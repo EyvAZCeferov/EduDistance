@@ -71,6 +71,8 @@ return [
             "notanswered_answers"=>"Cavabsız",
             'true_false_counts'=>'Düzgün cavablar: :true, Yanlış cavablar: :false',
             'your_result'=>'İmtahan nəticəsi: :point',
+            "audiofile_played"=>"Səs faylı sadəcə 1 dəfə səsləndiriləcək.",
+            "sort_right_tab_elements"=>"Sağ tərəfdəki cavabları uyğun olaraq yerləşdirin."
         ],
         'blogs'=>[
             'blogs'=>"Bloqlar"

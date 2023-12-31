@@ -26,7 +26,7 @@ class Payments extends Model
         'coupon_data',
     ];
     protected $casts=[
-        'amount'=>"decimal",
+        'amount'=>"double:10,2",
         'payment_status'=>'boolean',
         'data'=>"json",
         'frompayment'=>'json',
@@ -43,6 +43,9 @@ class Payments extends Model
     }
     public function user():HasOne{
         return $this->hasOne(User::class,'id','user_id');
+    }
+    public function coupon():HasOne{
+        return $this->hasOne(CouponCodes::class,'id','coupon_id');
     }
     public function exam_result():HasOne{
         return $this->hasOne(ExamResult::class,'id','exam_result_id');

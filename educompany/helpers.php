@@ -13,6 +13,7 @@ use App\Models\ExamResult;
 use App\Models\References;
 use App\Models\CouponCodes;
 use App\Models\ExamQuestion;
+use App\Models\Payments;
 use App\Models\ExamStartPage;
 use App\Models\MarkQuestions;
 use App\Models\StandartPages;
@@ -63,10 +64,10 @@ if (!function_exists('strip_tags_with_whitespace')) {
     function strip_tags_with_whitespace($string, $allowable_tags = null)
     {
         $string = str_replace('<', ' <', $string);
-        $string = str_replace('&nbsp; ', ' ', $string);
-        $string = str_replace('&nbsp;', ' ', $string);
+        $string = preg_replace('/\p{Z}/u', ' ', $string);
+        $string = str_replace(['&nbsp;', '\u{A0}'], ' ', $string);
         $string = strip_tags($string, $allowable_tags);
-        $string = str_replace('  ', ' ', $string);
+        $string = preg_replace('/\s+/', ' ', $string);
         $string = trim($string);
 
         return $string;
@@ -339,11 +340,52 @@ if (!function_exists('coupon_codes')) {
     function coupon_codes($key = null, $type = "default")
     {
         if ($type == "default") {
-            $model = ExamStartPage::where("status", 'ASC')->orderBy('id', 'DESC')->first();
+            $model = CouponCodes::where("status", 'ASC')->orderBy('id', 'DESC')->first();
+        } else if ($type == "code") {
+            $model = CouponCodes::where("code", $key)->first();
+        } else if ($type == "id") {
+            $model = CouponCodes::where("id", $key)->first();
         } else {
             $model = CouponCodes::orderBy('id', 'DESC')->get();
         }
         return Cache::rememberForever("coupon_codes" . $key . $type, fn () => $model);
+    }
+}
+
+if (!function_exists('payments')) {
+    function payments($auth_id = null, $exam_id = null, $exam_result_id = null, $transaction_id = null, $coupon_id=null, $id = null)
+    {
+        $model = Payments::orderBy('id', 'DESC');
+        if (isset($auth_id) && !empty($auth_id)){
+            $model = $model->where("user_id", $auth_id);
+        }
+
+        if (isset($exam_id) && !empty($exam_id)){
+            $model = $model->where("exam_id", $exam_id);
+        }
+
+        if (isset($exam_result_id) && !empty($exam_result_id)){
+            $model = $model->where("exam_result_id", $exam_result_id);
+        }
+
+        if (isset($transaction_id) && !empty($transaction_id)){
+            $model = $model->where("transaction_id", $transaction_id);
+        }
+
+        if (isset($coupon_id) && !empty($coupon_id)){
+            $model = $model->where("coupon_id", $coupon_id);
+        }
+
+        if (isset($id) && !empty($id)){
+            $model = $model->where("id", $id);
+        }
+
+        $model = $model->where('payment_status', 0);
+        $model = $model->get();
+        if (count($model) == 1){
+            $model = $model[0];
+        }
+        return Cache::rememberForever("payments" . $auth_id . $exam_id . $exam_result_id . $transaction_id . $coupon_id . $id, fn () => $model);
     }
 }
 
@@ -459,6 +501,7 @@ if (!function_exists('exam_result_answer_true_or_false')) {
                 $result = 'false';
             }
         }
+
         return Cache::rememberForever("exam_result_answer_true_or_false"  . $question_id . $result_id, fn () => $result);
     }
 }
@@ -483,7 +526,7 @@ if (!function_exists('exam_for_profile')) {
             });
         }
 
-        $model=$model->get();
+        $model = $model->get();
         return Cache::rememberForever("exam_for_profile"  . $type . $auth_id, fn () => $model);
     }
 }

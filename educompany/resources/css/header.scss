@@ -9,6 +9,7 @@ $subsubheading_size:21px;
 $normal_size:17px;
 $page_size:15px;
 $small_size:13px;
+$extra_small_size:11px;
 $primary-font:'Poppins',
 sans-serif;
 $secondary-font: 'DM Sans',
@@ -17,6 +18,62 @@ $success-color:#28a745;
 $error-color:#dc3545;
 $warning-color:#ffc107;
 $info-color:#17a2b8;
+
+
+.classcenter {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    vertical-align: baseline;
+}
+
+.classjustifybetween {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+    vertical-align: baseline;
+}
+
+.classjustifstart {
+    display: flex;
+    align-content: flex-start;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    vertical-align: baseline;
+}
+
+.classjustifend {
+    display: flex;
+    align-content: flex-end;
+    align-items: center;
+    justify-content: flex-end;
+    text-align: left;
+    vertical-align: baseline;
+}
+
+.classjustifyaround {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: space-around;
+    text-align: center;
+    vertical-align: baseline;
+}
+
+.classjustifyevenly {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: space-evenly;
+    text-align: center;
+    vertical-align: baseline;
+}
+
 html,
 body {
     font-family: $primary-font;
@@ -169,57 +226,3 @@ body {
     }
 }
 
-.classcenter {
-    display: flex;
-    align-content: center;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    vertical-align: baseline;
-}
-
-.classjustifybetween {
-    display: flex;
-    align-content: center;
-    align-items: center;
-    justify-content: space-between;
-    text-align: center;
-    vertical-align: baseline;
-}
-
-.classjustifstart {
-    display: flex;
-    align-content: flex-start;
-    align-items: center;
-    justify-content: flex-start;
-    text-align: left;
-    vertical-align: baseline;
-}
-
-.classjustifend {
-    display: flex;
-    align-content: flex-end;
-    align-items: center;
-    justify-content: flex-end;
-    text-align: left;
-    vertical-align: baseline;
-}
-
-
-.classjustifyaround {
-    display: flex;
-    align-content: center;
-    align-items: center;
-    justify-content: space-around;
-    text-align: center;
-    vertical-align: baseline;
-}
-
-.classjustifyevenly {
-    display: flex;
-    align-content: center;
-    align-items: center;
-    justify-content: space-evenly;
-    text-align: center;
-    vertical-align: baseline;
-}

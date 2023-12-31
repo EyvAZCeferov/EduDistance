@@ -454,7 +454,7 @@ class ExamController extends Controller
                 $data->user_id = $request->input('user_id');
                 $data->save();
                 $type = "success";
-                $message = trans("additional.messages.yenidenbaxisdancixarildi", [], $request->language ?? 'az');
+                $message = trans("additional.messages.yenidenbaxisucunisaretlendi", [], $request->language ?? 'az');
             } else {
                 $type = "warning";
                 $message = trans("additional.messages.yenidenbaxisdancixarildi", [], $request->language ?? 'az');

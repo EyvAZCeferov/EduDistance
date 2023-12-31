@@ -17,10 +17,10 @@ Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalizati
         Route::get('pages/{slug}', [RoutesController::class, 'standartpage'])->name('pages.show');
         Route::get('/', [RoutesController::class, 'welcome'])->name('page.welcome');
         Route::get('search', [RoutesController::class, 'search'])->name('action.search');
-        Route::get("examinations", [RoutesController::class, 'exams'])->name("front.exams.index");
-        Route::get("examinations/{slug}", [RoutesController::class, 'examinfo'])->name("front.exams.show");
-        Route::get("blogs_front/{slugs}", [RoutesController::class, 'blogs_front'])->name("blogs_front.show");
-        Route::get("teams_front/{slugs}", [RoutesController::class, 'teams_front'])->name("teams_front.show");
+        // Route::get("examinations", [RoutesController::class, 'exams'])->name("front.exams.index");
+        // Route::get("examinations/{slug}", [RoutesController::class, 'examinfo'])->name("front.exams.show");
+        // Route::get("blogs_front/{slugs}", [RoutesController::class, 'blogs_front'])->name("blogs_front.show");
+        // Route::get("teams_front/{slugs}", [RoutesController::class, 'teams_front'])->name("teams_front.show");
         Route::get('/exams', [HomeController::class, 'exams'])->name('exams_front.index');
         Route::get('/createoreditexam', [HomeController::class, 'createoreditexam'])->name('exams_front.createoredit');
         Route::get('/exams/{slug}', [HomeController::class, 'showexam'])->name('exams.show');

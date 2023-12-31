@@ -23,17 +23,9 @@
                 <div class="category_body_item" id="category_body_{{ $value->id }}">
                     @php($exams = \App\Models\Exam::where('category_id', $value->id)->get())
                     @if (!empty($exams) && count($exams) > 0)
-                        @if (auth('users')->check() && auth('users')->user()->user_type == 2)
-                            <div class="products_section">
-                                <a class="products_section_element add_product" href="{{ route("exams_front.createoredit",['category'=>$value->id]) }}">
-                                    <div class="content">
-                                        @lang('additional.buttons.add') <i class="fa fa-plus"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        @endif
                         @include('frontend.light_parts.products.products_grid', [
                             'products' => $exams,
+                            'addable'=>true
                         ])
                     @else
                         @if (auth('users')->check() && auth('users')->user()->user_type == 2)

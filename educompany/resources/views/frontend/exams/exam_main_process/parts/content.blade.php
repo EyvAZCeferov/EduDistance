@@ -1,36 +1,10 @@
-<div class="conlol hide" id="showfinishmodal">
-    <div class="footer_questions" id="footer_questions_top">
-        <div class="title">@lang('additional.pages.exams.questions_title_on_exam_page')</div>
-        <div class="question_info_row">
-            <div class="col-sm-4">
-                <i class="fas fa-map-marker-alt"></i> @lang('additional.pages.exams.cari')
-            </div>
-            <div class="col-sm-4">
-                <i class="fas fa-border-none"></i> @lang('additional.pages.exams.cavablandirilmamis')
-            </div>
-            <div class="col-sm-4">
-                <i class="fas fa-bookmark"></i> @lang('additional.pages.exams.saved')
-            </div>
-        </div>
-        <div class="questions_row">
-            @foreach ($questions as $key => $value)
-                <button class="btn btn-sm btn-question not_answered" type="button"
-                    id="question_row_button_{{ $value->id }}"
-                    onclick="getquestion({{ $value->id }})">{{ $key + 1 }}</button>
-            @endforeach
-        </div>
-        <div class="center_back_button">
-            <button type="button" onclick="togglequestions()" class="center_back">
-                <i class="fas fa-list-ul"></i>
-                @lang('additional.buttons.gotohome')
-            </button>
-        </div>
-        <div class="bottomcorner"></div>
+ <div class="conlol hide" id="showfinishmodal">
+     <div class="footer_questions" id="footer_questions_top">
     </div>
 </div>
 <div id="content_area_exam" class="conlol">
     @foreach ($questions as $key => $value)
-        <div class="content_exam @if ($key == 0) show @endif  {{ $value->layout }}"
+        <div class="content_exam @if ($key == 0) show @endif {{ $value->layout }}"
             data-key="{{ $key + 1 }}" data-id="{{ $value->id }}" id="content_exam_{{ $value->id }}"
             data-section_id="{{ $value->section_id }}" data-section_name="{{ $value->section->name }}">
             <div class="col left_col" id="left_col">
@@ -45,21 +19,20 @@
                         </div>
                     </div>
                 @endif
-                <div class="content_exam_info @if ($value->type == 5) classcenter @endif">
+                <div class="content_exam_info @if($value->type == 5) classcenter @endif" id="content_exam_info" style="flex-direction: column">
                     @if ($value->type == 5)
-                        <audio controlsList="nodownload" controls
-                            @if ($exam->repeat_sound == false) class="only1time" @endif id="audio_{{ $value->id }}">
-                            <source src="{{ getImageUrl($value->question, 'exam_questions') }}"
-                                type="audio/{{ pathinfo($value->question, PATHINFO_EXTENSION) }}">
-                            Your browser does not support the audio element.
-                        </audio>
+                        <div class="audio_tag_text">
+                            {!! $value->question !!}
+                        </div>
+                        <br />
+                        <audio @if ($exam->repeat_sound == false) class="only1time" @endif id="audio_{{ $value->id }}" controlsList="nodownload" controls><source src="{{ getImageUrl($value->file, 'exam_questions') }}" type="audio/mpeg">Your browser does not support the audio element.</audio>
                     @else
                         {!! $value->question !!}
                     @endif
                 </div>
             </div>
             @if ($value->layout != 'onepage')
-                <div id="resizer"></div>
+                <div id="resizer" class="resizer"></div>
             @endif
             <div class="col right_col" id="right_col">
                 <div class="question_header">
@@ -77,7 +50,7 @@
                         <span class="info_text">@lang('additional.pages.exams.question_info_text')</span>
                     </div>
                     <div>
-                        @if ($value->type != 3 && !isset($hide_abc))
+                        @if (($value->type!=4 && $value->type != 3 ) && !isset($hide_abc))
                             <a href="javascript:void(0)" class="remove_button" onclick="remove_button_toggler()">
                                 ABC
                             </a>

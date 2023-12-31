@@ -10,14 +10,14 @@ class Epoint
     public $epoint_transaction;
     public $order_id;
     public $card_uid;
-    public $private_key = "";
-    public $public_key = "";
+    public $private_key = "11hSxXEUIGoaVrmsSQ74EaZK";
+    public $public_key = "i000200279";
     public $amount;
     public $currency = 'AZN';
     public $language = 'az';
     public $description;
-    public $success_redirect_url = "";
-    public $error_redirect_url = "";
+    public $success_redirect_url = "https://sovqat369777.az/api/successpayment";
+    public $error_redirect_url = "https://sovqat369777.az/api/errorpayment";
 
     public $signature;
     public $data;
@@ -28,10 +28,6 @@ class Epoint
 
     public function __construct($data = [])
     {
-        $this->private_key = env("EPOINT_PRIVATE_KEY");
-        $this->public_key = env("EPOINT_PUBLIC_KEY");
-        $this->success_redirect_url = env("EPOINT_SUCCESS_URL");
-        $this->error_redirect_url = env("EPOINT_ERROR_URL");
         if (!empty($data)) {
             foreach ($data as $key => $value) {
                 $this->$key = $value;
