@@ -132,7 +132,7 @@ function searchinfields (e, t, n = 'exams', a = null) {
   } else
     i = {query: document.getElementsByName (e)[0].value, type: n, action: a};
   var r = document.getElementById (t);
-  sendAjaxRequest ('/api/searchinfilled', 'post', i, function (e, t) {
+  sendAjaxRequestOLD('/api/searchinfilled', 'post', i, function (e, t) {
     if (e) createalert ('error', e);
     else {
       let n = JSON.parse (t);

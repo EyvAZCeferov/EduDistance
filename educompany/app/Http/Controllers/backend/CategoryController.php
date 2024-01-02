@@ -150,6 +150,8 @@ class CategoryController extends Controller
         $model = Category::findOrFail($id);
         $model->delete();
 
+        dbdeactive();
+
         return redirect()->route('categories.index')->with(['success' => 'Silindi']);
     }
 }

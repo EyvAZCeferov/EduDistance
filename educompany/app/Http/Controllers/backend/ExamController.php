@@ -408,7 +408,6 @@ class ExamController extends Controller
         try {
             if ($request->method() == "POST") {
                 try {
-
                     $results = ExamResult::orderBy("id", 'DESC');
 
                     if ($request->has('user_id') && !empty($request->input("user_id"))) {
@@ -420,7 +419,6 @@ class ExamController extends Controller
                     }
 
                     $results = $results->with('answers', 'user', 'exam');
-                    // $results = $results->groupBy('exam_id');
                     $results = $results->get();
 
                     return response()->json(['status' => 'success', 'results' => $results]);

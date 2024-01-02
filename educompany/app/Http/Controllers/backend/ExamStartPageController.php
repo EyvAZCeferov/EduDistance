@@ -57,37 +57,14 @@ class ExamStartPageController extends Controller
                 }
                 $name = [
                     'az_name' => trim($request->az_name) ?? " ",
-                    'ru_name' => '',
-                    'en_name' => ''
+                    'ru_name' => $request->ru_name ?? trim(GoogleTranslate::trans($request->az_name, 'ru')),
+                    'en_name' => $request->en_name ?? trim(GoogleTranslate::trans($request->az_name, 'en')),
                 ];
-
                 $description = [
                     'az_description' => trim($request->az_description) ?? " ",
-                    'ru_description' => '',
-                    'en_description' => ''
+                    'ru_description' => $request->ru_description ?? trim(GoogleTranslate::trans($request->az_description, 'ru')),
+                    'en_description' => $request->en_description ?? trim(GoogleTranslate::trans($request->az_description, 'en')),
                 ];
-
-                // Rusça çevirisi
-                if ($request->ru_name) {
-                    $ru_translation = GoogleTranslate::trans($request->az_name, 'ru');
-                    $name['ru_name'] = $ru_translation !== false ? trim($ru_translation) : '';
-                }
-
-                if ($request->ru_description) {
-                    $ru_translation_desc = GoogleTranslate::trans($request->az_description, 'ru');
-                    $description['ru_description'] = $ru_translation_desc !== false ? trim($ru_translation_desc) : '';
-                }
-
-                // İngilizce çevirisi
-                if ($request->en_name) {
-                    $en_translation = GoogleTranslate::trans($request->az_name, 'en');
-                    $name['en_name'] = $en_translation !== false ? trim($en_translation) : '';
-                }
-
-                if ($request->en_description) {
-                    $en_translation_desc = GoogleTranslate::trans($request->az_description, 'en');
-                    $description['en_description'] = $en_translation_desc !== false ? trim($en_translation_desc) : '';
-                }
 
                 $model->name = $name;
                 $model->description = $description;

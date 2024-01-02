@@ -126,7 +126,7 @@
                         var percentagetotalquestions = getpercentanswers(answers);
                         var resultHtml = `
                         <div style="border:1px solid #ccc;width:100%;" class="my-4">
-                            <div class="row px-5 my-3 d-flex align-items-center align-center align-content-center justify-content-center text-center"><h2 class="font-weight-bold text-center w-100">${element.exam.name}</h2></div>
+                            <div class="row px-5 my-3 d-flex align-items-center align-center align-content-center justify-content-center text-center"><h2 class="font-weight-bold text-center w-100">${element.exam.name.az_name}</h2></div>
                             <div class='px-5 my-3 align-items-center align-center align-content-center justify-content-center'>
                                 ${createuserprofile(element.user,percentagetotalquestions,element)}
                             </div>
@@ -164,8 +164,6 @@
                 <div class="col-9 row">
                     <div class="col-6">
                         <p> <h4 class="d-inline-block">Ad Soyad: </h4> <span class="d-inline-block">${user.name}</span> </p>
-                        <p> <h4 class="d-inline-block">Oxuduğu məktəb: </h4> <span class="d-inline-block">${user.school}</span> </p>
-                        <p> <h4 class="d-inline-block">Oxuduğu sinif: </h4> <span class="d-inline-block">${user.classroom}</span> </p>
                     </div>
                     <div class="col-6">
                         <p> <h4 class="d-inline-block">Düz cavablar: </h4> <span class="d-inline-block">${percentage.correctQuestions}</span> </p>

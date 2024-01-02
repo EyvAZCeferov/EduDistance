@@ -9,7 +9,7 @@
                     @endif
                     @if (isset($slider->description[app()->getLocale() . '_description']) &&
                             !empty($slider->description[app()->getLocale() . '_description']))
-                        <p class="slider_description"> {!! $slider->description[app()->getLocale() . '_description'] !!}</p>
+                        <div class="slider_description"> {!! $slider->description[app()->getLocale() . '_description'] !!}</div>
                     @endif
                     @if (isset($slider->url) && !empty($slider->url))
                         <a href="{{ $slider->url }}" class="btn btn-sm btn-secondary more_button">@lang('additional.buttons.more')

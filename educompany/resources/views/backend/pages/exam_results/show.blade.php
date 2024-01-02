@@ -1,7 +1,6 @@
 @extends('backend.layouts.main')
 
 @section('content')
-
     <div class="row wrapper border-bottom white-bg page-heading">
         <div class="col-lg-10">
             <h2>İmatahan nəticələri</h2>
@@ -50,27 +49,35 @@
                     <div class="ibox-content">
 
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="">İstifadəçi</label>
-                                    <input type="text" value="{{  $result?->user?->name }}" readonly name="name"
-                                           class="form-control">
+                                    <input type="text" value="{{ $result?->user?->name }}" readonly name="name"
+                                        class="form-control">
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="">İmtahan</label>
-                                    <input type="text" value="{{  $result?->exam?->name }}" readonly name="name"
-                                           class="form-control">
+                                    <input type="text" value="{{ $result?->exam?->name['az_name'] }}" readonly
+                                        name="name" class="form-control">
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="">İmtahan nəticəsi</label>
-                                    <input type="text" value="{{  $result->exam->point??0 * $result->correctAnswers() }}"
-                                           readonly name="name" class="form-control">
+                                    <input type="text" value="{{ $result->exam->point ?? 0 * $result->correctAnswers() }}"
+                                        readonly name="name" class="form-control">
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="">İmtahan nəticəsi</label>
+                                    <input type="text" value="{{ $result->exam->point ?? 0 * $result->correctAnswers() }}"
+                                        readonly name="name" class="form-control">
                                 </div>
                             </div>
                         </div>
@@ -79,40 +86,38 @@
                             @php
                                 $index = 0;
                             @endphp
-                            @foreach($result->answers->groupBy('section_id') as $section_id => $answers)
+                            @foreach ($result->answers->groupBy('section_id') as $section_id => $answers)
                                 @php
                                     $section = \App\Models\Section::find($section_id);
                                 @endphp
                                 <div class="col-12">
                                     <h1>Bölmə: {{ $section->name }}</h1>
-                                    @foreach($answers as $answer)
+                                    @foreach ($answers as $answer)
                                         @php
                                             $index++;
                                         @endphp
-                                        <div
-                                            class="form-group alert alert-{{ $answer->result ? 'success' : 'danger' }}">
+                                        <div class="form-group alert alert-{{ $answer->result ? 'success' : 'danger' }}">
                                             <h3>{{ $index }}. {!! $answer->question?->question !!}</h3>
-                                            @if($answer->question?->getFirstMediaUrl('exam_question'))
+                                            @if ($answer->question?->getFirstMediaUrl('exam_question'))
                                                 <div class="exam__video">
                                                     <img class="image" style="width: 150px; height: auto;"
-                                                         src="{{ $answer->question?->getFirstMediaUrl('exam_question') }}"
-                                                         alt="">
+                                                        src="{{ $answer->question?->getFirstMediaUrl('exam_question') }}"
+                                                        alt="">
                                                 </div>
                                                 <br>
                                             @endif
                                             <div class="row">
                                                 <div class="col-xs-6 col-md-3">İstifadəçinin cavabı</div>
                                                 <div class="col-xs-6 col-md-9">
-                                                    @if($answer->question->type === 1)
+                                                    @if ($answer->question->type === 1)
                                                         <p>{!! $answer->answer->answer !!}</p>
                                                     @elseif($answer->question->type === 2)
                                                         @php
                                                             $user_answers = \App\Models\ExamAnswer::whereIn('id', $answer->answers)->get();
                                                         @endphp
-                                                        @foreach($user_answers as $user_answer)
+                                                        @foreach ($user_answers as $user_answer)
                                                             <p>{!! $user_answer->answer !!} </p>
                                                         @endforeach
-
                                                     @else
                                                         {!! $answer->value !!}
                                                     @endif
@@ -122,14 +127,16 @@
                                             <div class="row">
                                                 <div class="col-xs-6 col-md-3">Düzgün cavab</div>
                                                 <div class="col-xs-6 col-md-9">
-                                                    @if($answer->question->type === 1)
+                                                    @if ($answer->question->type === 1)
                                                         <p>{!! $answer->question?->correctAnswer()?->answer !!}</p>
                                                     @elseif($answer->question->type === 2)
-                                                        @foreach($answer->question?->correctAnswer() as $a)
+                                                        @foreach ($answer->question?->correctAnswer() as $a)
                                                             <p>{!! $a->answer !!}</p>
                                                         @endforeach
+                                                    @elseif($answer->question->type === 4)
+                                                        Salam
                                                     @else
-                                                        <p>{!! $answer->question?->correctAnswer()?->answer !!}</p>
+                                                        {{-- <p>{!! $answer->question?->correctAnswer()?->answer !!}</p> --}}
                                                     @endif
                                                 </div>
                                             </div>
@@ -144,5 +151,4 @@
             </div>
         </div>
     </div>
-
 @endsection

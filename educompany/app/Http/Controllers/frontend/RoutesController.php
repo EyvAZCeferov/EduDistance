@@ -19,11 +19,9 @@ class RoutesController extends Controller
             return view("frontend.pages.contactus");
         }
     }
-    public function welcome(Request $request)
+    public function welcome()
     {
         try {
-            if (Session::has("subdomain") || $request->route('subdomain') != null)
-                return redirect(route("page.welcome.subdomain", ['subdomain' => Session::get("subdomain") ?? $request->route('subdomain')]));
             return view('frontend.welcome');
         } catch (\Exception $e) {
             dd($e->getMessage());
@@ -36,9 +34,7 @@ class RoutesController extends Controller
             $data = collect();
             $categories = collect();
             $category = collect();
-            $subdomain = null;
-            if (Session::has("subdomain") || $request->route('subdomain') != null)
-                $subdomain = Session::get("subdomain") ?? $request->route('subdomain');
+            $subdomain = Session::get("subdomain")??null;
 
             if (isset($request->slug) && !empty($request->slug)) {
                 $category = Category::where('slugs->az_slug', $request->slug)

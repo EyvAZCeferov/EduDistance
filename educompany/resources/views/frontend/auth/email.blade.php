@@ -10,7 +10,9 @@
             <div class="col-sm-12 col-md-6 col-lg-5 right_column">
                 <h2 class="text-center mt-2 mb-5">@lang('additional.pages.auth.forgetpassword')</h2>
                 <form action="{{ route('send.token') }}" method="post" class="w-100" enctype="multipart/form-data">
-                    <div class="row">
+                    @csrf
+                    <input name="subdomain" value="{{session()->get('subdomain')??null}}" type="hiden">
+                    {{-- <div class="row">
                         <div class="user_or_freelancer_row">
                             <div class="user_or_freelancer_tab user_or_freelancer_tab_student active"
                                 onclick="tabselect('student')">
@@ -21,7 +23,7 @@
                                 @lang('additional.forms.phone')
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
 
                     @csrf
                     <input type="hidden" name="user_type" id="user_type" value="1">

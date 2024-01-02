@@ -60,11 +60,11 @@
                                     <button class="nav-link AZ active" id="nav-home-tab" data-bs-toggle="tab"
                                         data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
                                         aria-selected="true" onclick="changeTabElements('AZ')">AZ</button>
-                                    &nbsp;
+                                    {{-- &nbsp;
                                     <button class="nav-link RU" id="nav-profile-tab" data-bs-toggle="tab"
                                         data-bs-target="#nav-profile" type="button" role="tab"
                                         aria-controls="nav-profile" aria-selected="false"
-                                        onclick="changeTabElements('RU')">RU</button>
+                                        onclick="changeTabElements('RU')">RU</button> --}}
                                     &nbsp;
                                     <button class="nav-link EN" id="nav-contact-tab" data-bs-toggle="tab"
                                         data-bs-target="#nav-contact" type="button" role="tab"
@@ -103,7 +103,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="tab-pane RU fade pt-3" id="nav-profile" role="tabpanel"
+                                {{-- <div class="tab-pane RU fade pt-3" id="nav-profile" role="tabpanel"
                                     aria-labelledby="nav-profile-tab">
                                     <div class="row">
                                         <div class="col-md-12">
@@ -132,7 +132,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                                 <div class="tab-pane EN fade pt-3" id="nav-contact" role="tabpanel"
                                     aria-labelledby="nav-contact-tab">
                                     <div class="row">

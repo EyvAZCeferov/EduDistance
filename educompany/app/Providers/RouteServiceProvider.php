@@ -29,12 +29,16 @@ class RouteServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         $this->routes(function () {
+            Route::middleware('web')->domain('{subdomain}.digitalexam.az')
+            ->group(base_path('routes/subdomain_web.php'));
+
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
+
             Route::middleware('web')
                 ->group(base_path('routes/backend.php'));
         });

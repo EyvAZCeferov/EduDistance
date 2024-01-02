@@ -53,11 +53,11 @@
                                         data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
                                         aria-selected="true" onclick="changeTabElements('AZ')">AZ</button>
                                     &nbsp;
-                                    <button class="nav-link RU" id="nav-profile-tab" data-bs-toggle="tab"
+                                    {{-- <button class="nav-link RU" id="nav-profile-tab" data-bs-toggle="tab"
                                         data-bs-target="#nav-profile" type="button" role="tab"
                                         aria-controls="nav-profile" aria-selected="false"
                                         onclick="changeTabElements('RU')">RU</button>
-                                    &nbsp;
+                                    &nbsp; --}}
                                     <button class="nav-link EN" id="nav-contact-tab" data-bs-toggle="tab"
                                         data-bs-target="#nav-contact" type="button" role="tab"
                                         aria-controls="nav-contact" aria-selected="false"
@@ -104,7 +104,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="tab-pane RU fade pt-3" id="nav-profile" role="tabpanel"
+                                {{-- <div class="tab-pane RU fade pt-3" id="nav-profile" role="tabpanel"
                                     aria-labelledby="nav-profile-tab">
                                     <div class="row">
                                         <div class="col-md-6">
@@ -125,7 +125,7 @@
                                                     class="form-control {{ $errors->first('ru_address') ? 'is-invalid' : '' }}">
                                             </div>
                                         </div>
-                                        {{-- <div class="col-md-4">
+                                        <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="">Адрес 2</label>
                                                 <input type="text"
@@ -133,7 +133,7 @@
                                                     name="ru_address_2"
                                                     class="form-control {{ $errors->first('ru_address_2') ? 'is-invalid' : '' }}">
                                             </div>
-                                        </div> --}}
+                                        </div>
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <label for="">Раскрытие информации </label>
@@ -142,7 +142,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                                 <div class="tab-pane EN fade pt-3" id="nav-contact" role="tabpanel"
                                     aria-labelledby="nav-contact-tab">
                                     <div class="row">
@@ -266,7 +266,7 @@
                                             class="form-control {{ $errors->first('maps_google') ? 'is-invalid' : '' }}">
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                {{-- <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="">Ana səhifədəki video</label>
                                         <input type="url"
@@ -274,7 +274,7 @@
                                             name="homepage_video"
                                             class="form-control {{ $errors->first('homepage_video') ? 'is-invalid' : '' }}">
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
 
                             <div class="row my-3">

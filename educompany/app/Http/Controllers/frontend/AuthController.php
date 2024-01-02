@@ -55,20 +55,22 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'password' => $request->password,
             ];
-
             if (Auth::guard('users')->attempt($credentials)) {
-                $userwith_subdomain = User::where('id', Auth::guard('users')->id())->whereNotNull("subdomain")->first();
+                $userwith_subdomain = $request->input("subdomain")?? User::where('id', Auth::guard('users')->id())->whereNotNull("subdomain")->first()->subdomain;
 
-                if (!empty($userwith_subdomain) && isset($userwith_subdomain->subdomain) && !empty($userwith_subdomain->subdomain))
-                    Session::put('subdomain', $userwith_subdomain->subdomain ?? null);
+                if (isset($userwith_subdomain) && !empty($userwith_subdomain)){
+                    Session::put('subdomain', $userwith_subdomain ?? null);
+                    create_dns_record($userwith_subdomain);
+                }
 
                 if (Session::has("savethisurl") && !empty(Session::get("savethisurl"))) {
                     return redirect(Session::get("savethisurl"));
                 } else {
-                    if (!empty($userwith_subdomain) && isset($userwith_subdomain->subdomain) && !empty($userwith_subdomain->subdomain))
-                        return redirect()->route('user.profile.subdomain', ['subdomain' => $userwith_subdomain->subdomain]);
-                    else
+                    if (isset($userwith_subdomain) && !empty($userwith_subdomain)){
+                        return redirect()->route('user.profile.subdomain');
+                    }else{
                         return redirect()->route('user.profile');
+                    }
                 }
             } else {
                 return redirect()->back()->with(['error' => trans('additional.messages.passwords_incorrect')]);
@@ -94,11 +96,11 @@ class AuthController extends Controller
 
             $credentials = [];
 
-            DB::transaction(function () use ($request, &$credentials) {
-
+            $user=User::where("phone",$request->phone)->orWhere("email",$request->email)->first();
+            if(empty($user) && !isset($user->id)){
                 $user = new User();
                 $image = null;
-                if ($request->hasFile('picture')) {
+                if ($request->hasFile('picture') && $request->file('picture')->isValid()) {
                     $image = image_upload($request->file("picture"), 'users');
                 }
                 $user->name = $request->name;
@@ -109,10 +111,11 @@ class AuthController extends Controller
                 if (isset($image) && !empty($image)) {
                     $user->picture = $image;
                 }
-                $subdomain = Session::get('subdomain') ?? $request->route('subdomain');
-                if ($user->user_type == 2)
+                $subdomain = Session::has("subdomain")? Session::get("subdomain") : $request->input("subdomain");
+                if ($user->user_type == 2){
                     $subdomain = Str::slug($request->name);
-
+                    create_dns_record($subdomain);
+                }
                 $user->subdomain = $subdomain;
                 $user->save();
 
@@ -120,27 +123,28 @@ class AuthController extends Controller
                     'email' => $request->email,
                     'password' => $request->password,
                 ];
-            });
 
-            if (Auth::guard('users')->attempt($credentials)) {
-                $userwith_subdomain = User::where('id', Auth::guard('users')->id())->whereNotNull("subdomain")->first();
+                if (Auth::guard('users')->attempt($credentials)) {
+                    $userwith_subdomain = $request->input("subdomain")?? User::where('id', Auth::guard('users')->id())->whereNotNull("subdomain")->first()->subdomain;
 
-                if (!empty($userwith_subdomain) && isset($userwith_subdomain->subdomain) && !empty($userwith_subdomain->subdomain))
-                    Session::put("subdomain", $userwith_subdomain->subdomain);
+                    if (isset($userwith_subdomain) && !empty($userwith_subdomain))
+                        Session::put("subdomain", $userwith_subdomain);
 
-                if (!empty(Session::get("savethisurl"))) {
-                    return redirect(Session::get("savethisurl"));
+                    if (!empty(Session::get("savethisurl"))) {
+                        return redirect(Session::get("savethisurl"));
+                    } else {
+                        if (!empty($userwith_subdomain))
+                            return redirect()->route('user.profile.subdomain', ['subdomain' => $userwith_subdomain]);
+                        else
+                            return redirect()->route('user.profile');
+                    }
                 } else {
-                    if (!empty($userwith_subdomain))
-                        return redirect()->route('user.profile.subdomain', ['subdomain' => $userwith_subdomain->subdomain]);
-                    else
-                        return redirect()->route('user.profile');
+                    return redirect()->back()->with(['error' => trans('additional.messages.passwords_incorrect')]);
                 }
-            } else {
-                return redirect()->back()->with(['error' => trans('additional.messages.passwords_incorrect')]);
+            }else{
+                return redirect(route("login"))->with(['error' => trans('additional.messages.email_or_phone_mathced')]);
             }
         } catch (\Exception $e) {
-            dd($e->getMessage(), $e->getLine());
             return redirect()->back()->with(['error' => $e->getMessage()]);
         }
     }
@@ -210,6 +214,7 @@ class AuthController extends Controller
     public function logout()
     {
         Auth::guard('users')->logout();
+        session()->forget("subdomain");
         return redirect()->route('login');
     }
 

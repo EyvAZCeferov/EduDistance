@@ -28,6 +28,8 @@ use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
+
 
 if (!function_exists('answerChoice')) {
     function answerChoice($key): string
@@ -55,6 +57,11 @@ if (!function_exists('getImageUrl')) {
 
             return url($tempurl);
         } catch (\Exception $e) {
+            \Log::info([
+                '----------------GET IMAGE ERROR-----------------',
+                $e->getMessage(),
+                $e->getLine()
+            ]);
             return url($tempurl);
         }
     }
@@ -104,9 +111,17 @@ if (!function_exists('dbdeactive')) {
 if (!function_exists('image_upload')) {
     function image_upload($image, $clasor, $imagename = null)
     {
-        $filename = $imagename ?? time() . '.' . $image->extension();
-        $image->storeAs($clasor, $filename, 'uploads');
-        return $filename;
+        try {
+            $filename = $imagename ?? time() . '.' . $image->extension();
+            $image->storeAs($clasor, $filename, 'uploads');
+            return $filename;
+        } catch (\Exception $e) {
+            \Log::info([
+                '------------------IMAGE UPLOAD ERROR-----------------',
+                $e->getMessage(),
+                $e->getLine(),
+            ]);
+        }
     }
 }
 
@@ -149,8 +164,9 @@ if (!function_exists('count_endirim_faiz')) {
     function count_endirim_faiz($price, $endirim_price)
     {
         $model = 0;
-        if ($price != 0) {
-            $model = ($endirim_price / $price) * 100;
+        if ($price > 0 && $endirim_price > 0 && $endirim_price <= $price) {
+            $discount_percentage = (($price - $endirim_price) / $price) * 100;
+            $model = $discount_percentage;
         }
         return Cache::rememberForever("count_endirim_faiz" . $price . $endirim_price, fn () => $model);
     }
@@ -159,11 +175,47 @@ if (!function_exists('count_endirim_faiz')) {
 if (!function_exists('settings')) {
     function settings($key = null)
     {
-        if (isset($key) && !empty($key))
-            $model = User::where("subdomain", $key)->where("user_type", 2)->first();
-        else
-            $model = Settings::latest()->first();
-        return Cache::rememberForever("settings", fn () => $model);
+        $mdsettings = Settings::latest()->first();
+        if (isset($key) && !empty($key)) {
+            $subdomain = session()->has("subdomain") ? session()->get("subdomain") : null;
+            if (!empty($subdomain)) {
+                $mds = users($subdomain,'subdomain');
+                if (!empty($mds) && isset($mds->id)) {
+                    if ($key == "name") {
+                        $model = isset($mds->name) && !empty($mds->name) ? $mds->name : $mdsettings->name[app()->getLocale() . '_name'];
+                    } else if ($key == "description") {
+                        $model = isset($mds->name) && !empty($mds->name) ? $mds->name . '-' . $mds->subdomain : $mdsettings->description[app()->getLocale() . '_description'];
+                    } else if ($key == "logo") {
+                        $model = isset($mds->picture) && !empty($mds->picture) ? getImageUrl($mds->picture, 'users') : getImageUrl($key, 'settings');
+                    } else if ($key == "logo_white") {
+                        $model = getImageUrl($mdsettings->logo_white, 'settings');
+                    }
+                } else {
+                    if ($key == "name") {
+                        $model = $mdsettings->name[app()->getLocale() . '_name'];
+                    } else if ($key == "description") {
+                        $model = $mdsettings->description[app()->getLocale() . '_description'];
+                    } else if ($key == "logo") {
+                        $model = getImageUrl($mdsettings->logo, 'settings');
+                    } else if ($key == "logo_white") {
+                        $model = getImageUrl($mdsettings->logo_white, 'settings');
+                    }
+                }
+            } else {
+                if ($key == "name") {
+                    $model = $mdsettings->name[app()->getLocale() . '_name'];
+                } else if ($key == "description") {
+                    $model = $mdsettings->description[app()->getLocale() . '_description'];
+                } else if ($key == "logo") {
+                    $model = getImageUrl($mdsettings->logo, 'settings');
+                } else if ($key == "logo_white") {
+                    $model = getImageUrl($mdsettings->logo_white, 'settings');
+                }
+            }
+        } else {
+            $model = $mdsettings;
+        }
+        return Cache::rememberForever("settings" . $key.session()->getId(), fn () => $model);
     }
 }
 
@@ -175,7 +227,7 @@ if (!function_exists('standartpages')) {
         } else if (isset($key) && !empty($key) && $type == "slug") {
             $model = StandartPages::where('slugs->az_slug', $key)->orWhere('slugs->ru_slug', $key)->orWhere('slugs->en_slug', $key)->first();
         } else {
-            $model = StandartPages::orderBy('id', 'DESC')->get();
+            $model = StandartPages::orderBy('id', 'ASC')->get();
         }
         return Cache::rememberForever("standartpages" . $key . $type, fn () => $model);
     }
@@ -221,6 +273,8 @@ if (!function_exists('users')) {
             $model = User::where('user_type', 2)->orderBy("id", "DESC")->whereHas('exams')->get();
         } else if ($type == "company") {
             $model = User::where('user_type', 2)->orderBy("id", "DESC")->get();
+        }else if ($type == "subdomain") {
+            $model = User::where('subdomain', $key)->where('user_type',2)->orderBy("id", "DESC")->first();
         } else if ($type == "id") {
             $model = User::where('id', $key)->first();
         } else {
@@ -246,7 +300,12 @@ if (!function_exists('exams')) {
         } else if (isset($key) && $type == "slug") {
             $model = Exam::where("slug", $key)->first();
         } else if (isset($key) && $type == "subdomain") {
-            $model = Exam::where("user_id", $key)->orderBy("id", 'DESC')->get();
+            $model = Exam::where("user_id", $key)->orderBy("id", 'DESC');
+            if(session()->has("subdomain")){
+                $user=users(session()->get("subdomain"),'subdomain');
+                $model=$model->where("user_id",$user->id);
+            }
+            $model=$model->get();
         } else if (isset($key) && $type == "search") {
             $model = Exam::whereRaw('LOWER(JSON_EXTRACT(`name`, "$.az_name")) like ?', ['%' . $key . '%'])
                 ->orWhereRaw('LOWER(JSON_EXTRACT(`name`, "$.ru_name")) like ?', ['%' . $key . '%'])
@@ -254,19 +313,27 @@ if (!function_exists('exams')) {
                 ->orWhereRaw('LOWER(JSON_EXTRACT(`description`, "$.az_description")) like ?', ['%' . $key . '%'])
                 ->orWhereRaw('LOWER(JSON_EXTRACT(`description`, "$.ru_description")) like ?', ['%' . $key . '%'])
                 ->orWhereRaw('LOWER(JSON_EXTRACT(`description`, "$.en_description")) like ?', ['%' . $key . '%'])
-                ->orderBy("order_number", 'ASC')
-                ->get();
+                ->orderBy("order_number", 'ASC');
+                if(session()->has("subdomain")){
+                    $user=users(session()->get("subdomain"),'subdomain');
+                    $model=$model->where("user_id",$user->id);
+                }
+                $model=$model->get();
         } else if (empty($key) && $type == "most_used_tests") {
             $model = Exam::with([
                 'results' => function ($query) {
                     $query->orderBy('point', 'DESC');
                 }
-            ])
-                ->orderByDesc('id')
-                ->get();
+            ])->orderByDesc('id');
+            if(session()->has("subdomain")){
+                $user=users(session()->get("subdomain"),'subdomain');
+                $model=$model->where("user_id",$user->id);
+            }
+            $model=$model->get();
         } else {
-            $model = Exam::where('status', true)->orderBy("order_number", 'ASC')->get();
+            $model = Exam::where('status', true)->orderBy("order_number", 'ASC');
         }
+
         return Cache::rememberForever("exams" . $key . $type, fn () => $model);
     }
 }
@@ -353,36 +420,36 @@ if (!function_exists('coupon_codes')) {
 }
 
 if (!function_exists('payments')) {
-    function payments($auth_id = null, $exam_id = null, $exam_result_id = null, $transaction_id = null, $coupon_id=null, $id = null)
+    function payments($auth_id = null, $exam_id = null, $exam_result_id = null, $transaction_id = null, $coupon_id = null, $id = null)
     {
         $model = Payments::orderBy('id', 'DESC');
-        if (isset($auth_id) && !empty($auth_id)){
+        if (isset($auth_id) && !empty($auth_id)) {
             $model = $model->where("user_id", $auth_id);
         }
 
-        if (isset($exam_id) && !empty($exam_id)){
+        if (isset($exam_id) && !empty($exam_id)) {
             $model = $model->where("exam_id", $exam_id);
         }
 
-        if (isset($exam_result_id) && !empty($exam_result_id)){
+        if (isset($exam_result_id) && !empty($exam_result_id)) {
             $model = $model->where("exam_result_id", $exam_result_id);
         }
 
-        if (isset($transaction_id) && !empty($transaction_id)){
+        if (isset($transaction_id) && !empty($transaction_id)) {
             $model = $model->where("transaction_id", $transaction_id);
         }
 
-        if (isset($coupon_id) && !empty($coupon_id)){
+        if (isset($coupon_id) && !empty($coupon_id)) {
             $model = $model->where("coupon_id", $coupon_id);
         }
 
-        if (isset($id) && !empty($id)){
+        if (isset($id) && !empty($id)) {
             $model = $model->where("id", $id);
         }
 
         $model = $model->where('payment_status', 0);
         $model = $model->get();
-        if (count($model) == 1){
+        if (count($model) == 1) {
             $model = $model[0];
         }
         return Cache::rememberForever("payments" . $auth_id . $exam_id . $exam_result_id . $transaction_id . $coupon_id . $id, fn () => $model);
@@ -528,5 +595,87 @@ if (!function_exists('exam_for_profile')) {
 
         $model = $model->get();
         return Cache::rememberForever("exam_for_profile"  . $type . $auth_id, fn () => $model);
+    }
+}
+
+if (!function_exists('create_dns_record')) {
+    function create_dns_record($domain)
+    {
+        try {
+            $recordType = 'A';
+            $recordContent = '46.175.148.19';
+            $url = "https://api.cloudflare.com/client/v4/zones/" . env('CL_ZN_ID') . "/dns_records";
+            $client = new Client();
+            $response = $client->request('POST', $url, [
+                'headers' => [
+                    'X-Auth-Email' => env('CL_AC_MAIL'),
+                    'X-Auth-Key' => env('CL_API_TOKEN'),
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'type' => $recordType,
+                    'name' => $domain,
+                    'content' => $recordContent,
+                    'proxied' => true,
+                    'ttl' => 300
+                ],
+            ]);
+
+            $statusCode = $response->getStatusCode();
+            if ($statusCode === 200) {
+                $responseData = json_decode($response->getBody(), true);
+                purge_cache();
+                return response()->json(['message' => 'DNS kaydı oluşturuldu.', 'data' => $responseData]);
+            } else {
+                \Log::info([
+                    'CREATE DNS RECORD ERROR',
+                    $statusCode
+                ]);
+                return response()->json(['error' => 'API isteği başarısız oldu. Durum Kodu:' . $statusCode]);
+            }
+        } catch (\Exception $e) {
+            \Log::info([
+                'CREATE DNS RECORD ERROR',
+                $e->getMessage(),
+                $e->getLine()
+            ]);
+        }
+    }
+}
+
+if (!function_exists('purge_cache')) {
+    function purge_cache()
+    {
+        try {
+            $url = "https://api.cloudflare.com/client/v4/zones/" . env('CL_ZN_ID') . "/purge_cache";
+            $client = new Client();
+            $response = $client->request('DELETE', $url, [
+                'headers' => [
+                    'X-Auth-Email' => env('CL_AC_MAIL'),
+                    'X-Auth-Key' => env('CL_API_TOKEN'),
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'purge_everything' => true,
+                ],
+            ]);
+
+            $statusCode = $response->getStatusCode();
+            if ($statusCode === 200) {
+                return response()->json(['message' => 'Önbellek temizlendi.']);
+            } else {
+                \Log::info([
+                    'PURGE CACHE ERROR',
+                    $statusCode
+                ]);
+                return response()->json(['error' => 'API isteği başarısız oldu. Durum Kodu:' . $statusCode]);
+            }
+        } catch (\Exception $e) {
+            \Log::info([
+                'PURGE CACHE ERROR',
+                $e->getMessage(),
+                $e->getLine()
+            ]);
+        }
     }
 }

@@ -173,6 +173,7 @@ return [
         "required_fill"=>"Məcburi xanaları doldurun",
         "success"=>"Uğurlu!",
         "suredelete"=>"Silmək istədiyinizdən əminsiniz?",
-        "dontrestore"=>"Siləcəyiniz məlumat geri qaytarılmır!!!"
+        "dontrestore"=>"Siləcəyiniz məlumat geri qaytarılmır!!!",
+        "email_or_phone_mathced"=>"Daxil etdiyiniz email/telefon nömrəsi ilə hesab mövcuddur.",
     ],
 ];

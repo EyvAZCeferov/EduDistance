@@ -9,16 +9,17 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="#6E91F3">
     <meta name="msapplication-navbutton-color" content="#6E91F3">
     <meta name="theme-color" content="#6E91F3">
-    <title>@yield('title', settings()->name[app()->getLocale() . '_name'] )</title>
-    <meta name="description" content="{{ settings()->description[app()->getLocale().'_description'] }}">
-    <meta property="og:site_name" content="{{ settings()->name[app()->getLocale() . '_name'] }}" />
-    <meta property="og:title" content="@yield('title', settings()->name[app()->getLocale() . '_name'])" />
-    <meta property="og:description" content="@yield('description', settings()->description[app()->getLocale() . '_description'])" />
+    <title>@yield('title', settings('name'))</title>
+    <meta name="description" content="{{ settings('description') }}">
+    <meta property="og:site_name"
+        content="{{ settings('name') }}" />
+    <meta property="og:title" content="@yield('title', settings('name'))" />
+    <meta property="og:description" content="@yield('description', settings('description'))" />
     <meta property="og:locale" content="{{ app()->getLocale() }}_{{ strtoupper(app()->getLocale()) }}" />
     <meta property="og:url" content="{{ url()->current() }}" />
-    <meta property="og:image:url" content="@yield('image', getImageUrl(settings()->logo, 'settings'))" />
-    <meta property="og:image:secure_url" content="@yield('image', getImageUrl(settings()->logo, 'settings'))" />
-    <meta property="og:image:alt" content="@yield('title', getImageUrl(settings()->logo, 'settings'))" />
+    <meta property="og:image:url" content="@yield('image', settings('logo'))" />
+    <meta property="og:image:secure_url" content="@yield('image', settings('logo'))" />
+    <meta property="og:image:alt" content="@yield('title', settings('logo'))" />
     <meta property="og:type" content="website" />
     <meta name="robots" content="index,follow">
     <meta name="googlebot" content="index,follow">
@@ -31,6 +32,25 @@
     <link rel="stylesheet" href="{{ asset('front/assets/css/fontawesome-all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('front/assets/js/eyvaz/vendor/jquery-ui/jquery-ui.min.css') }}">
     <link rel="stylesheet" href="{{ asset('front/assets/js/eyvaz/vendor/jquery-ui/jquery-ui.theme.min.css') }}">
+    {{-- Favicon --}}
+    <link rel="apple-touch-icon" sizes="57x57" href="{{ asset('assets/favicons/apple-icon-57x57.png') }}">
+    <link rel="apple-touch-icon" sizes="60x60" href="{{ asset('assets/favicons/apple-icon-60x60.png') }}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ asset('assets/favicons/apple-icon-72x72.png') }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('assets/favicons/apple-icon-76x76.png') }}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ asset('assets/favicons/apple-icon-114x114.png') }}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ asset('assets/favicons/apple-icon-120x120.png') }}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{{ asset('assets/favicons/apple-icon-144x144.png') }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ asset('assets/favicons/apple-icon-152x152.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/favicons/apple-icon-180x180.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192"  href="{{ asset('assets/favicons/android-icon-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/favicons/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ asset('assets/favicons/favicon-96x96.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/favicons/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ asset('assets/favicons/manifest.json') }}">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="{{ asset('assets/favicons/ms-icon-144x144.png') }}">
+    <meta name="theme-color" content="#ffffff">
+    {{-- Favicon --}}
     @stack('css')
 
     @vite(['resources/css/app.scss', 'resources/js/app.js'])
@@ -65,22 +85,22 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script async crossorigin defer>
         $(function() {
-            @if (Session::has('message'))
+            @if (session()->has('message'))
                 toast("{{ session('message') }}", 'info');
             @endif
 
-            @if (Session::has('error'))
+            @if (session()->has('error'))
                 toast("{{ session('error') }}", 'error');
             @endif
 
-            @if (Session::has('info'))
+            @if (session()->has('info'))
                 toast("{{ session('info') }}", 'info');
             @endif
 
-            @if (Session::has('warning'))
+            @if (session()->has('warning'))
                 toast("{{ session('warning') }}", 'warning');
             @endif
-            @if (Session::has('success'))
+            @if (session()->has('success'))
                 toast("{{ session('success') }}", 'success');
             @endif
         });

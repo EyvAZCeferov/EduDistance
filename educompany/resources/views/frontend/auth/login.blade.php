@@ -11,6 +11,7 @@
                 <h2 class="text-center mt-2 mb-5">@lang('additional.headers.login')</h2>
                 <form action="{{ route('user.authenticate') }}" method="post" class="w-100">
                     @csrf
+                    <input name="subdomain" value="{{session()->get('subdomain')??null}}" type="hiden">
                     <div class="account-form-item mb-3">
                         <div class="account-form-input">
                             <input type="email" placeholder="@lang('additional.forms.email')" name="email" value="{{ old('email') }}"

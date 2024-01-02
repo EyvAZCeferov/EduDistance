@@ -22,16 +22,14 @@ class IfSubdomain
             if (Session::has('subdomain') == false)
                 Session::put('subdomain', $request->route('subdomain'));
 
-
-            $urlParts = parse_url($url);
-            $host = $urlParts['host'];
-            if(env("APP_ENV")=="dev")
-                $host=env('APP_DOMAIN');
-            $urlWithoutProtocol = preg_replace('~^(?:f|ht)tps?://~i', '', $host);
-            if (Session::has('subdomain'))
-                return redirect(env('HTTP_OR_HTTPS') . Session::get('subdomain') . '.' . $urlWithoutProtocol);
-            else
-                return redirect(env('HTTP_OR_HTTPS') .  $urlWithoutProtocol);
+                $urlParts = parse_url($url);            
+                $host = $urlParts['host'];
+            
+                $newUrl = 'https://' . Session::get('subdomain') . '.' . env('APP_DOMAIN') . $urlParts['path'];
+                if (isset($urlParts['query'])) {
+                    $newUrl .= '?' . $urlParts['query'];
+                }
+                return redirect($newUrl);
         }else{
             return $next($request);
         }

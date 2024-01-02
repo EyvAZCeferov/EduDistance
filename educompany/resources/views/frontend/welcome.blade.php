@@ -7,7 +7,9 @@
 @section('content')
     @include('frontend.light_parts.sliders')
     @include('frontend.light_parts.categories')
-    @include('frontend.light_parts.about')
+    @if(!session()->has('subdomain'))
+        @include('frontend.light_parts.about')
+    @endif
 @endsection
 @push('js')
     <script defer type="text/javascript" src="{{ asset('front/assets/js/slick/slick.min.js') }}"></script>

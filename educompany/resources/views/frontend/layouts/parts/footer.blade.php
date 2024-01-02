@@ -4,8 +4,8 @@
             @if (!empty(settings()) && isset(settings()->logo_white) && !empty(settings()->logo_white))
                 <div class="logo_footer">
                     <a href="{{ route('page.welcome') }}">
-                        <img src="{{ \Illuminate\Support\Facades\Session::has('subdomain') ? getImageUrl(settings(\Illuminate\Support\Facades\Session::get('subdomain'))->picture, 'users') : getImageUrl(settings()->logo_white, 'settings') }}"
-                            alt="{{ \Illuminate\Support\Facades\Session::has('subdomain') ? settings(\Illuminate\Support\Facades\Session::get('subdomain'))->name : settings()->name[app()->getLocale() . '_name'] }}" />
+                        <img src="{{ settings('logo_white') }}"
+                            alt="{{ settings("name") }}" />
                     </a>
                 </div>
             @endif
@@ -13,12 +13,10 @@
                 <div class="col-sm-6 col-md-5">
                     <h3 class="title">@lang('additional.footer.networking')</h3>
                     <div class="sub_links"><a href="{{ route('exams_front.index') }}">@lang('additional.pages.exams.exams')</a>
-                        @if (
-                            (!empty(standartpages('about', 'type')) && !empty(standartpages('about', 'type')->name)) ||
-                                session()->has('subdomain') == false)
+                        @foreach(standartpages() as $key => $value)
                             <a
-                                href="{{ route('pages.show', standartpages('about', 'type')->slugs[app()->getLocale() . '_slug']) }}">{{ standartpages('about', 'type')->name[app()->getLocale() . '_name'] }}</a>
-                        @endif
+                            href="{{ route('pages.show', $value->slugs[app()->getLocale() . '_slug']) }}">{{ $value->name[app()->getLocale() . '_name'] }}</a>
+                        @endforeach
                     </div>
                     <div class="social_media_icon_and_links">
                         <ul>
