@@ -24,13 +24,15 @@ class SetSubdomain
         $host = $urlParts['host'];
         if (strpos($host, $mainDomain) !== false) {
             $subdomain = str_replace('.' . $mainDomain, '', $host);
-        }else{
-            if(Auth::guard('users')->check() && isset(Auth::guard('users')->user()->subdomain) && !empty(Auth::guard('users')->user()->subdomain)){
-                $subdomain = Auth::guard('users')->user()->subdomain;
-            }else{
-                $subdomain = $request->route('subdomain')??Session::get('subdomain');
+            if($subdomain=='digitalexam.az'){
+                $subdomain=null;
             }
+        }
 
+        if($subdomain==null && Auth::guard('users')->check() && isset(Auth::guard('users')->user()->subdomain) && !empty(Auth::guard('users')->user()->subdomain)){
+            $subdomain = Auth::guard('users')->user()->subdomain;
+        }else{
+            $subdomain = Session::get('subdomain')??null;
         }
         if($subdomain!='digitalexam.az'){
             Session::put('subdomain', $subdomain??null);

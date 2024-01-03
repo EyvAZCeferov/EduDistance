@@ -13,7 +13,7 @@
                 <div class="exam_info_list">
                     <div class="exam_info_list_item left">
                         <div class="bold_text">@lang('additional.pages.exams.company'):</div>
-                        <div class="normal_text">{{ $data->company ?? settings()->name[app()->getLocale() . '_name'] }}</div>
+                        <div class="normal_text">{{ !empty($data->user) ? $data->user->name : settings()->name[app()->getLocale() . '_name'] }}</div>
                     </div>
                     <div class="exam_info_list_item right">
                         <div class="bold_text">@lang('additional.pages.exams.price'):</div>

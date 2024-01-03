@@ -107,6 +107,10 @@ class Exam extends Model
             ])
             ->with('exam');
     }
+    public function user()
+    {
+        return $this->hasOne(User::class,'id','user_id');
+    }
     public function references()
     {
         return $this->hasMany(ExamReferences::class, 'exam_id', 'id')->with([

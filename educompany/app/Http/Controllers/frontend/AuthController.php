@@ -218,15 +218,29 @@ class AuthController extends Controller
     {
         session()->forget("subdomain");
         session()->forget("user_id");
-        Auth::guard('users')->logout();        
+        Auth::guard('users')->logout();
         return redirect()->route('login');
     }
 
     public function profile(Request $request)
     {
         try {
+            $url = $request->url();
+            $urlParts = parse_url($url);
+            $mainDomain = 'digitalexam.az';
+            $host = $urlParts['host'];
+            if (strpos($host, $mainDomain) !== false) {
+                $subdomain = str_replace('.' . $mainDomain, '', $host);
+                if($subdomain=='digitalexam.az'){
+                    $subdomain=null;
+                }
+            }
+            if (Session::has("subdomain") && empty($subdomain) && Auth::guard('users')->check()){
+                session()->put("user_mail",Auth::guard('users')->user()->email);
+                return redirect('https://'.Session::get("subdomain").'.digitalexam.az/az/profile?user_id='.Auth::guard('users')->id());
+            }
             return view('frontend.auth.profile');
-            
+
         } catch (\Exception $e) {
             return redirect()->back()->with('error',$e->getMessage());
         }
