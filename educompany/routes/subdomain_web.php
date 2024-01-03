@@ -12,11 +12,11 @@ Route::group([
     function ($subdomain) {
         Route::get('/', [RoutesController::class, 'welcome'])->name('page.welcome.subdomain');
         Route::get('search', [RoutesController::class, 'search'])->name('action.search.subdomain');
-        Route::get('/exams', [HomeController::class, 'exams'])->name('exams_front.index.subdomain');
+        Route::get('/exams', [HomeController::class, 'exams_subdomain'])->name('exams_front.index.subdomain');
         Route::get('/createoreditexam', [HomeController::class, 'createoreditexam'])->name('exams_front.createoredit.subdomain');
-        Route::get('/exams/{slug}', [HomeController::class, 'showexam'])->name('exams.show.subdomain');
+        Route::get('/exams/{slug}', [HomeController::class, 'showexam_subdomain'])->name('exams.show.subdomain');
         Route::get('/exams/{category_id?}', [HomeController::class, 'exams'])->name('exams.subdomain');
-        Route::get('/category_exam/{category?}', [HomeController::class, 'category_exam'])->name('category_exam.subdomain');
+        Route::get('/category_exam/{category?}', [HomeController::class, 'category_exam_subdomain'])->name('category_exam.subdomain');
         Route::middleware(['user.guest'])->group(function () {
             Route::get('/login', [AuthController::class, 'login'])->name('login.subdomain');
             Route::get('/register', [AuthController::class, 'register'])->name('register.subdomain');
@@ -29,11 +29,11 @@ Route::group([
         });
 
         Route::group(['middleware' => 'users', 'as' => 'user.'], function () {
-            Route::get('profile', [AuthController::class, 'profile'])->name('profile.subdomain');
+            Route::any('profile', [AuthController::class, 'profile'])->name('profile.subdomain');
             Route::any('/logout', [AuthController::class, 'logout'])->name('logout.subdomain');
 
             Route::group(['prefix' => 'exam'], function () {
-                Route::post('add_edit_exam', [CommonController::class, 'add_edit_exam'])->name("exam.add_edit_exam.subdomain");
+                Route::post('add_edit_exam', [CommonController::class, 'add_edit_exam_subdomain'])->name("exam.add_edit_exam.subdomain");
                 Route::get('results', [CommonController::class, 'examResults'])->name('exam.results.subdomain');
                 Route::get('resultpage/{result_id}', [CommonController::class, 'examResultPage'])->name('exam.resultpage.subdomain');
                 Route::get('results/{result_id}', [CommonController::class, 'examResult'])->name('exam.result.subdomain');

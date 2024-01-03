@@ -21,7 +21,7 @@ use App\Models\ExamStartPageIds;
 class CommonController extends Controller
 {
 
-    public function exam($exam_id)
+    public function exam($subdomain=null,$exam_id)
     {
         $exam = Exam::findOrFail($exam_id);
         $sections = Section::where('exam_id', $exam->id)->orderBy('created_at')->get();
@@ -143,7 +143,7 @@ class CommonController extends Controller
         return view('frontend.pages.exam.results', compact('results'));
     }
 
-    public function examResultPage($result_id)
+    public function examResultPage($subdomain=null,$result_id)
     {
         $exam_result = ExamResult::where('user_id', auth('users')->user()->id)
             ->with('answers.answer')
@@ -153,7 +153,7 @@ class CommonController extends Controller
         return view('frontend.exams.resultpage', compact('exam_result'));
     }
 
-    public function examResult($result_id)
+    public function examResult($subdomain=null,$result_id)
     {
         $exam_result = ExamResult::where('user_id', auth('users')->user()->id)
             ->with('answers.answer')
@@ -332,6 +332,93 @@ class CommonController extends Controller
     }
 
     public function add_edit_exam(Request $request)
+    {
+        try {
+            $data = collect();
+            // DB::transaction(function () use (&$data, $request) {
+            if (isset($request->top_id) && !empty($request->top_id)) {
+                $data = Exam::where("id", $request->top_id)->first();
+            } else {
+                $data = new Exam();
+            }
+
+            if ($request->hasFile('image')) {
+                $image = image_upload($request->file("image"), 'exams');
+            }
+
+            $name = [
+                'az_name' => trim(GoogleTranslate::trans($request->exam_name, 'az')),
+                'ru_name' => trim(GoogleTranslate::trans($request->exam_name, 'ru')),
+                'en_name' => trim(GoogleTranslate::trans($request->exam_name, 'en')),
+            ];
+            $description = [
+                'az_description' => trim(GoogleTranslate::trans($request->description ?? $request->mce_0, 'az')),
+                'ru_description' => trim(GoogleTranslate::trans($request->description ?? $request->mce_0, 'ru')),
+                'en_description' => trim(GoogleTranslate::trans($request->description ?? $request->mce_0, 'en')),
+            ];
+            $start_time = null;
+            if ($request->input('start_time') != null)
+                $start_time = Carbon::parse($request->input('start_time'));
+
+            $data->category_id = intval($request->input('category_id'));
+            $data->name = $name;
+            $data->content = $description;
+            $data->slug = Str::slug($name['az_name']);
+            $data->duration = $request->input('duration') ?? 0;
+            $data->point = $request->input('point') ?? 0;
+            $data->status = $request->input('exam_status') == "on" ? 1 : 0;
+            $data->order_number = 1;
+            $data->price = $request->input('price') ?? 0;
+            $data->endirim_price = $request->input('endirim_price') ?? 0;
+            $data->user_id = intval($request->auth_id) ?? auth('users')->id();
+            $data->user_type = "users";
+            $data->repeat_sound = false;
+            $data->show_result_user = $request->input('exam_show_result_answer') == "on" ? 1 : 0;
+            $data->show_calc = $request->input('show_calculator') == "on" ? 1 : 0;
+            $data->start_time = $start_time ?? null;
+            if (!empty($image))
+                $data->image = $image;
+            $data->layout_type = $request->layout_type ?? 'standart';
+            $data->save();
+
+            $exam_start_pages = ExamStartPageIds::where("exam_id", $data->id)->get();
+            foreach ($exam_start_pages as $val) {
+                $val->delete();
+            }
+
+            if (!empty($request->exam_start_page_id)) {
+                foreach ($request->exam_start_page_id as $id) {
+                    $page = new ExamStartPageIds();
+                    $page->exam_id = $data->id;
+                    $page->start_page_id = $id;
+                    $page->save();
+                }
+            }
+
+            $references = ExamReferences::where("exam_id", $data->id)->get();
+            foreach ($references as $val) {
+                $val->delete();
+            }
+
+            if (!empty($request->exam_references)) {
+                foreach ($request->exam_references as $id) {
+                    $page = new ExamReferences();
+                    $page->exam_id = $data->id;
+                    $page->reference_id = $id;
+                    $page->save();
+                }
+            }
+
+            // });
+            dbdeactive();
+            return redirect(route('exams_front.createoredit', ['slug' => $data->slug]))->with('success', "Əlavə edildi");
+        } catch (\Exception $e) {
+            dd([$e->getMessage(), $e->getLine()]);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function add_edit_exam_subdomain(Request $request,$subdomain=null)
     {
         try {
             $data = collect();

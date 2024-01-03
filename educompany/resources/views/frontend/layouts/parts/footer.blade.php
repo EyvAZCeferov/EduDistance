@@ -12,7 +12,7 @@
             <div class="row social_network">
                 <div class="col-sm-6 col-md-5">
                     <h3 class="title">@lang('additional.footer.networking')</h3>
-                    <div class="sub_links"><a href="{{ route('exams_front.index') }}">@lang('additional.pages.exams.exams')</a>
+                    <div class="sub_links"><a href="{{ session()->has("subdomain") ? route('exams_front.index.subdomain',['subdomain'=>session()->get("subdomain")]) : route('exams_front.index') }}">@lang('additional.pages.exams.exams')</a>
                         @foreach(standartpages() as $key => $value)
                             <a
                             href="{{ route('pages.show', $value->slugs[app()->getLocale() . '_slug']) }}">{{ $value->name[app()->getLocale() . '_name'] }}</a>

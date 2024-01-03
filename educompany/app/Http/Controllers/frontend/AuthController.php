@@ -56,6 +56,8 @@ class AuthController extends Controller
                 'password' => $request->password,
             ];
             if (Auth::guard('users')->attempt($credentials)) {
+                session()->put("user_id",Auth::guard('users')->id());
+                session()->put("user_mail",Auth::guard('users')->user()->email);
                 $userwith_subdomain = $request->input("subdomain")?? User::where('id', Auth::guard('users')->id())->whereNotNull("subdomain")->first()->subdomain;
 
                 if (isset($userwith_subdomain) && !empty($userwith_subdomain)){
@@ -67,7 +69,7 @@ class AuthController extends Controller
                     return redirect(Session::get("savethisurl"));
                 } else {
                     if (isset($userwith_subdomain) && !empty($userwith_subdomain)){
-                        return redirect()->route('user.profile.subdomain');
+                        return redirect('https://'.$userwith_subdomain.'.digitalexam.az/az/profile?user_id='.Auth::guard('users')->id());
                     }else{
                         return redirect()->route('user.profile');
                     }
@@ -125,16 +127,17 @@ class AuthController extends Controller
                 ];
 
                 if (Auth::guard('users')->attempt($credentials)) {
-                    $userwith_subdomain = $request->input("subdomain")?? User::where('id', Auth::guard('users')->id())->whereNotNull("subdomain")->first()->subdomain;
-
-                    if (isset($userwith_subdomain) && !empty($userwith_subdomain))
-                        Session::put("subdomain", $userwith_subdomain);
+                    session()->put("user_id",Auth::guard('users')->id());
+                    session()->put("user_mail",Auth::guard('users')->user()->email);
+                    if (isset($subdomain) && !empty($subdomain)){
+                        Session::put("subdomain", $subdomain);
+                    }
 
                     if (!empty(Session::get("savethisurl"))) {
                         return redirect(Session::get("savethisurl"));
                     } else {
-                        if (!empty($userwith_subdomain))
-                            return redirect()->route('user.profile.subdomain', ['subdomain' => $userwith_subdomain]);
+                        if (!empty($subdomain))
+                            return redirect('https://'.$subdomain.'.digitalexam.az/az/profile?user_id='.Auth::guard('users')->id());
                         else
                             return redirect()->route('user.profile');
                     }
@@ -213,15 +216,17 @@ class AuthController extends Controller
     }
     public function logout()
     {
-        Auth::guard('users')->logout();
         session()->forget("subdomain");
+        session()->forget("user_id");
+        Auth::guard('users')->logout();        
         return redirect()->route('login');
     }
 
-    public function profile()
+    public function profile(Request $request)
     {
         try {
             return view('frontend.auth.profile');
+            
         } catch (\Exception $e) {
             return redirect()->back()->with('error',$e->getMessage());
         }

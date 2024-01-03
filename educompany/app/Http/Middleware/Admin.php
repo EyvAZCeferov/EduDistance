@@ -24,8 +24,14 @@ class Admin
                     && auth('admins')->user()->hasPermissionFor($permission));
             }
             return $next($request);
+        }else{
+            $admin_id=session()->get("admin_id")??$request->admin_id;
+            if(isset($admin_id) && !empty($admin_id)){
+                Auth::guard('admins')->loginUsingId($admin_id);
+                return $next($request);
+            }else{
+                return redirect()->route('admin.login');
+            }
         }
-
-        return redirect()->route('admin.login');
     }
 }

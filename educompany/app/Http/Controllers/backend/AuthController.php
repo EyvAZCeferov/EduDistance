@@ -14,25 +14,31 @@ class AuthController extends Controller
 
     public function auth (Request $request) {
 
-        $this->validate($request, [
-            'email' => 'required|email|exists:admins',
-            'password' => 'required'
-        ]);
+        try{
+            $this->validate($request, [
+                'email' => 'required|email|exists:admins',
+                'password' => 'required'
+            ]);
 
-        $credentials = [
-            'email' => $request->email,
-            'password' => $request->password,
-        ];
+            $credentials = [
+                'email' => $request->email,
+                'password' => $request->password,
+            ];
 
-        if (Auth::guard('admins')->attempt($credentials, request()->has('rememberme'))) {
-            return redirect()->route('dashboard');
-        } else {
+            if (Auth::guard('admins')->attempt($credentials, request()->has('rememberme'))) {
+                session()->put("admin_id",Auth::guard('admins')->id());
+                return redirect()->route('dashboard',['admin_id'=>Auth::guard('admins')->id()]);
+            } else {
+                return back()->withInput()->withErrors(['error' => 'Yanlış giriş']);
+            }
+        }catch(\Exception $e){
             return back()->withInput()->withErrors(['error' => 'Yanlış giriş']);
         }
     }
 
     public function logout () {
-        Auth::guard('admins')->logout();
+        session()->forget('admin_id');
+        Auth::guard('admins')->logout();        
         return redirect()->route('admin.login');
     }
 }

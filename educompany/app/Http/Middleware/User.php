@@ -19,8 +19,15 @@ class User
     {
         if (Auth::guard('users')->check()) {
             return $next($request);
+        }else{
+            $user_id=session()->get("user_id")??$request->user_id;
+            $email=session()->get("email");
+            if(isset($user_id) && !empty($user_id) && isset($email) && !empty($email)){
+                Auth::guard('users')->loginUsingId($user_id);
+                return $next($request);
+            }else{
+                return redirect()->route('login');
+            }
         }
-
-        return redirect()->route('login');
     }
 }

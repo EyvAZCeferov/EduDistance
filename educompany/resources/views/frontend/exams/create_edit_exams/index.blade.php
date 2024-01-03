@@ -78,14 +78,14 @@
                 </div>
 
                 <div class="col-sm-12 col-md-6 col-lg-3 my-1">
-                    <input type="number" required
+                    <input type="number"
                         value="{{ old('price', isset($data) && !empty($data) && isset($data->price) && !empty($data->price) ? $data->price : null) }}"
                         name="price" placeholder="@lang('additional.forms.exam_price')"
                         class="form-control {{ $errors->first('price') ? 'is-invalid' : '' }}">
                 </div>
 
                 <div class="col-sm-12 col-md-6 col-lg-3 my-1">
-                    <input type="number" required
+                    <input type="number"
                         value="{{ old('endirim_price', isset($data) && !empty($data) && isset($data->endirim_price) && !empty($data->endirim_price) ? $data->endirim_price : null) }}"
                         name="endirim_price" placeholder="@lang('additional.forms.exam_endirim_price')"
                         class="form-control {{ $errors->first('endirim_price') ? 'is-invalid' : '' }}">

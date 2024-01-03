@@ -34,7 +34,7 @@ Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalizati
         });
 
         Route::group(['middleware' => 'users', 'as' => 'user.'], function () {
-            Route::get('profile', [AuthController::class, 'profile'])->name('profile');
+            Route::any('profile', [AuthController::class, 'profile'])->name('profile');
             Route::any('/logout', [AuthController::class, 'logout'])->name('logout');
 
             Route::group(['prefix' => 'exam'], function () {

@@ -69,21 +69,21 @@ class RoutesController extends Controller
             return redirect()->back()->with("error", $e->getMessage());
         }
     }
-    public function examinfo(Request $request, $slug)
+    public function examinfo(Request $request,$subdomain=null, $slug)
     {
         try {
             $data = collect();
             if (is_numeric($slug) && preg_match('/^\d+$/', $slug)) {
-                $data = exams($slug, 'id');
+                $data = Exam::where('id',$slug)->first();
             } else {
-                $data = exams($slug, 'slug');
+                $data = Exam::where('slug',$slug)->first();
             }
             return view('frontend.exams.show', compact('data'));
         } catch (\Exception $e) {
             return redirect()->back()->with("error", $e->getMessage());
         }
     }
-    public function blogs_front(Request $request, $slug)
+    public function blogs_front(Request $request,$subdomain=null, $slug)
     {
         try {
             $data = blogs($slug);
@@ -93,7 +93,7 @@ class RoutesController extends Controller
         }
     }
 
-    public function teams_front(Request $request, $slug)
+    public function teams_front(Request $request,$subdomain=null, $slug)
     {
         try {
             $data = teams($slug);
@@ -102,7 +102,7 @@ class RoutesController extends Controller
             return redirect()->back()->with("error", $e->getMessage());
         }
     }
-    public function search(Request $request)
+    public function search(Request $request,$subdomain=null)
     {
         try {
             $key = $request->input("search");

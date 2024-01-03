@@ -4,7 +4,7 @@
     @endphp
     @if (auth('users')->check() && auth('users')->user()->user_type == 2 && auth('users')->id() == $product->user_id)
         <div class="products_section_element"
-            @if ($start_time === null || \Carbon\Carbon::now()->greaterThan($start_time)) href="{{ route('exams.show', $product->slug) }}" @endif>
+            @if ($start_time === null || \Carbon\Carbon::now()->greaterThan($start_time)) @if(session()->has('subdomain')) href="{{ route('exams.show.subdomain', ['slug'=>$product->slug,'subdomain'=>session()->get("subdomain")]) }}" @else href="{{ route('exams.show', $product->slug) }}" @endif @endif>
             @if ($product->price > 0)
                 @if ($product->endirim_price > 0)
                     <div class="products_section_element_price_endirim">@lang('additional.pages.exams.endirim_with_faiz', ['count' => count_endirim_faiz($product->price, $product->endirim_price)])</div>
@@ -51,7 +51,7 @@
         </div>
     @else
         <a class="products_section_element"
-            @if ($start_time === null || \Carbon\Carbon::now()->greaterThan($start_time)) href="{{ route('exams.show', $product->slug) }}" @endif>
+            @if ($start_time === null || \Carbon\Carbon::now()->greaterThan($start_time)) @if(session()->has('subdomain')) href="{{ route('exams.show.subdomain', ['slug'=>$product->slug,'subdomain'=>session()->get("subdomain")]) }}" @else href="{{ route('exams.show', $product->slug) }}" @endif @endif>
             @if ($product->price > 0)
                 @if ($product->endirim_price > 0)
                     <div class="products_section_element_price_endirim">@lang('additional.pages.exams.endirim_with_faiz', ['count' => count_endirim_faiz($product->price, $product->endirim_price)])</div>
@@ -64,7 +64,7 @@
 
             @if (auth('users')->check() && auth('users')->user()->user_type == 2 && auth('users')->id() == $product->user_id)
                 <span class="product_section_element_edit"
-                    onclick="window.location.href='{{ route('exams_front.createoredit', ['slug' => $product->slug]) }}';"><i
+                @if(session()->has('subdomain')) onclick="window.location.href='{{ route('exams_front.createoredit.subdomain', ['slug' => $product->slug,'subdomain'=>session()->get("subdomain")]) }}';" @else onclick="window.location.href='{{ route('exams_front.createoredit', ['slug' => $product->slug]) }}';" @endif ><i
                         class="fa fa-pencil"></i></span>
                 <span class="product_section_element_destroy destroy_elements"
                     onclick="deleteproduct(${item.id},'product')"><i class="fa fa-trash"></i></span>

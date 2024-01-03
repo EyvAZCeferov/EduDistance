@@ -11,7 +11,7 @@
                 <h2 class="text-center mt-2 mb-5">@lang('additional.headers.register')</h2>
                 <form action="{{ route('user.register') }}" method="post" class="w-100" enctype="multipart/form-data">
                     @csrf
-                    <input name="subdomain" value="{{session()->get('subdomain')??null}}" type="hiden">
+                    <input name="subdomain" value="{{session()->get('subdomain')??null}}" type="hidden">
                     <div class="row">
                         <div class="user_or_freelancer_row">
                             <div class="user_or_freelancer_tab user_or_freelancer_tab_student active"

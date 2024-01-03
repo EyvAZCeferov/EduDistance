@@ -166,7 +166,8 @@ if (!function_exists('count_endirim_faiz')) {
         $model = 0;
         if ($price > 0 && $endirim_price > 0 && $endirim_price <= $price) {
             $discount_percentage = (($price - $endirim_price) / $price) * 100;
-            $model = $discount_percentage;
+            $formatted_discount = number_format($discount_percentage, 2); // İki ondalık basamak
+            $model = $formatted_discount;
         }
         return Cache::rememberForever("count_endirim_faiz" . $price . $endirim_price, fn () => $model);
     }
