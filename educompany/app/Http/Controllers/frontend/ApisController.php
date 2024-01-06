@@ -124,6 +124,14 @@ class ApisController extends Controller
             \Log::info(['------------------CallBack Error------------------', $e->getMessage(), $e->getLine()]);
         }
     }
+    public function success_error_page_payment(Request $request){
+        $url = $request->url();
+        $type="success";
+        if (strpos('success', $url) == false) {
+            $type="error";
+        }
+        return view("frontend.pages.payment_callback",compact('type'));
+    }
     public function create_payment($req)
     {
         try {
@@ -254,7 +262,7 @@ class ApisController extends Controller
             else
                 $model = new ExamQuestion();
 
-            $model->question = $request->input('question_input');
+            $model->question = modifyRelativeUrlsToAbsolute($request->input('question_input'));
             if ($request->input('question_type') == 5 || $request->input('question_type') == '5') {
                 if ($request->hasFile('question_audio')) {
                     $audio_file = file_upload($request->file("question_audio"), 'exam_questions');
@@ -278,7 +286,7 @@ class ApisController extends Controller
                 foreach ($request->except(['_token', 'question_id', 'answers_count', 'section_id', 'question_type', 'exam_id', 'question', 'question_audio', 'language']) as $key => $value) {
                     if (strpos($key, 'answerres_') === 0) {
                         $modelAnswer = new ExamAnswer();
-                        $modelAnswer->answer = $value;
+                        $modelAnswer->answer = modifyRelativeUrlsToAbsolute($value);
                         $answerNumber = explode('answerres_', $key)[1];
                         $modelAnswer->correct = isset($request->answers[$answerNumber]) ? true : false;
                         $modelAnswer->question_id = $model->id;
@@ -287,7 +295,7 @@ class ApisController extends Controller
                 }
             } else if ($request->input("question_type") == 3) {
                 $modelAnswer = new ExamAnswer();
-                $modelAnswer->answer = $request->input("textbox_0");
+                $modelAnswer->answer = modifyRelativeUrlsToAbsolute($request->input("textbox_0"));
                 $modelAnswer->correct = true;
                 $modelAnswer->question_id = $model->id;
                 $modelAnswer->save();

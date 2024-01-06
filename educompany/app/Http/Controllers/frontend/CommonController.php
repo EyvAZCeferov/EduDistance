@@ -111,14 +111,18 @@ class CommonController extends Controller
                     }
                 }
                 if ($exam->time_range_sections > 0) {
+                    $point = calculate_exam_result($result->id);
+                    session()->put('point', $point);
                 } else {
-                    $point = $exam->point * $result->correctAnswers();
+                    $pointlast = session()->has('point') ? session()->get('point') : 0;
+                    $point =$pointlast+ calculate_exam_result($result->id);
                     app()->setLocale(session()->get('changedLang'));
                     session()->put('language', session()->get('changedLang'));
                     session()->put('lang', session()->get('changedLang'));
                     $result->update([
                         'point' => $point
                     ]);
+                    session()->forget('point');
                 }
             });
 
@@ -330,7 +334,6 @@ class CommonController extends Controller
             ]);
         }
     }
-
     public function add_edit_exam(Request $request)
     {
         try {
@@ -352,9 +355,9 @@ class CommonController extends Controller
                 'en_name' => trim(GoogleTranslate::trans($request->exam_name, 'en')),
             ];
             $description = [
-                'az_description' => trim(GoogleTranslate::trans($request->description ?? $request->mce_0, 'az')),
-                'ru_description' => trim(GoogleTranslate::trans($request->description ?? $request->mce_0, 'ru')),
-                'en_description' => trim(GoogleTranslate::trans($request->description ?? $request->mce_0, 'en')),
+                'az_description' => trim(modifyRelativeUrlsToAbsolute(GoogleTranslate::trans($request->description ?? $request->mce_0, 'az'))),
+                'ru_description' => trim(modifyRelativeUrlsToAbsolute(GoogleTranslate::trans($request->description ?? $request->mce_0, 'ru'))),
+                'en_description' => trim(modifyRelativeUrlsToAbsolute(GoogleTranslate::trans($request->description ?? $request->mce_0, 'en'))),
             ];
             $start_time = null;
             if ($request->input('start_time') != null)
@@ -417,7 +420,6 @@ class CommonController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
-
     public function add_edit_exam_subdomain(Request $request,$subdomain=null)
     {
         try {
@@ -439,9 +441,9 @@ class CommonController extends Controller
                 'en_name' => trim(GoogleTranslate::trans($request->exam_name, 'en')),
             ];
             $description = [
-                'az_description' => trim(GoogleTranslate::trans($request->description ?? $request->mce_0, 'az')),
-                'ru_description' => trim(GoogleTranslate::trans($request->description ?? $request->mce_0, 'ru')),
-                'en_description' => trim(GoogleTranslate::trans($request->description ?? $request->mce_0, 'en')),
+                'az_description' => trim(modifyRelativeUrlsToAbsolute(GoogleTranslate::trans($request->description ?? $request->mce_0, 'az'))),
+                'ru_description' => trim(modifyRelativeUrlsToAbsolute(GoogleTranslate::trans($request->description ?? $request->mce_0, 'ru'))),
+                'en_description' => trim(modifyRelativeUrlsToAbsolute(GoogleTranslate::trans($request->description ?? $request->mce_0, 'en'))),
             ];
             $start_time = null;
             if ($request->input('start_time') != null)

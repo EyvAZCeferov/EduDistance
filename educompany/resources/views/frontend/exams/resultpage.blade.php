@@ -40,7 +40,7 @@
             </div>
             <div class="footer">
                 <div>
-                    @lang('additional.pages.exams.true_false_counts', ['true' => 10, 'false' => 2])
+                    @lang('additional.pages.exams.true_false_counts', ['true' => $exam_result->correctAnswers(), 'false' => $exam_result->wrongAnswers()])
                 </div>
                 <div>
                     @lang('additional.pages.exams.your_result', ['point' => $exam_result->point])

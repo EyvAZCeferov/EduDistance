@@ -91,43 +91,8 @@
             var section_start_time = document.getElementById("section_start_time");
             var loader_for_sections = document.getElementById("loader_for_sections");
             var form = document.getElementById("exam");
-            if (all_questions == currentDivQuestion.dataset.key || tolast==true) {
-                if (finishmodalshowed == false && tolast==false) {
-                    showfinishmodal('open');
-                } else {
-                    clearInterval(intervalTimerID);
-                    var forum = document.getElementById("exam");
-                    var formData = new FormData(forum);
-                    fetch("{{ route('finish_exam') }}", {
-                            method: "POST",
-                            body: formData
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error("Network response was not ok.");
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            toast(data.message, data.status);
-                            if (data.url != null && data.url != '' && data.url != ' ') {
-                                window.location.href = data.url;
-                            }
-                            console.log(data.status);
-                        })
-                        .catch(error => {
-                            toast(error.message, "error");
-                        });
-
-                    if (time_range_sections > 0) {
-                        if (next_section == 1) {
-                            section_start_time.value = document.getElementById("time_exam").value;
-                            form.classList.remove('d-block');
-                            form.style.display = "none";
-                            loader_for_sections.classList.add("active");
-                        }
-                    }
-                }
+            if (all_questions == currentDivQuestion.dataset.key) {
+                window.location.href="/";
             } else {
                 currentDivQuestion.classList.remove("show");
                 var new_key = parseInt(currentDivQuestion.dataset.key) + 1;
@@ -189,11 +154,11 @@
                             `@lang('additional.buttons.nextsection') @if ($exam->layout_type == 'standart')<i class="fa fa-angle-right"></i>@endif`;
                     } else {
                         next_button.innerHTML =
-                            `@lang('additional.buttons.finish') @if ($exam->layout_type == 'standart')<i class="fa fa-check"></i>@endif`;
+                            `@lang('additional.buttons.finished')`;
                     }
                 } else {
                     next_button.innerHTML =
-                        `@lang('additional.buttons.finish') @if ($exam->layout_type == 'standart')<i class="fa fa-check"></i>@endif`;
+                        `@lang('additional.buttons.finished')`;
                 }
             } else {
                 next_button.classList.add("btn-secondary");

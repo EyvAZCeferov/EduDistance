@@ -322,7 +322,7 @@
                                         </div>`;
                                 section_elements.innerHTML += divElement;
                             });
-                            
+
                             get_section(n.data[n.data.length - 1].id);
                         }
                     }
@@ -331,6 +331,7 @@
 
             function get_section(id) {
                 try {
+                    showLoader();
                     var section_id = document.getElementById(`section_element_${id}`);
                     var section_elements = document.getElementsByClassName('section_element');
                     var section_and_questions = document.getElementById('section_and_questions');
@@ -354,14 +355,18 @@
                             if (e) toast(e, "error");
                             else {
                                 let n = JSON.parse(t);
+                                hideLoader();
                                 if (n.message != null)
                                     toast(n.message, n.status);
 
                                 if (n.data != null && n.data.length > 0) {
                                     if (n.data != null && n.data.length > 0)
                                         for (var i = 0; i < n.data.length; i++) {
+                                            var questionContent = n.data[i].question;
+                                            var contentWithoutImages = questionContent.replace(/<img.*?>/g, '');
+
                                             var element = `<div class="question_list_element" id="question_list_element_${n.data[i].id}">
-                                        <div onclick="getquestion(${n.data[i].id})" class="question_name">${n.data[i].question}</div>
+                                        <div onclick="getquestion(${n.data[i].id})" class="question_name">${contentWithoutImages}</div>
                                         <button class='btn btn-outline-danger btn-sm' type='submit' onclick='deletequestion(${n.data[i].id},"question")'><i class='fa fa-trash'></i></i></button>
                                         </div>`;
                                             questions_list.innerHTML += element;
@@ -370,8 +375,8 @@
                             }
                         });
                 } catch (error) {
+                    hideLoader();
                     toast(error, 'error');
-                    console.log("---------------SETTYPE------------" + error);
                 }
             }
 
@@ -456,6 +461,7 @@
 
             function store_edit_question(event) {
                 event.preventDefault();
+                showLoader();
                 try {
                     var form = $('form#store_edit_question');
                     var formData = new FormData(form[0]);
@@ -498,11 +504,10 @@
                         formData.append("match_data", JSON.stringify(matching_datas));
                     }
 
-                    console.log(matching_datas);
-
                     sendAjaxRequest("{{ route('front.questions.store') }}", "post", formData, function(e, t) {
                         if (e) toast(e, "error");
                         else {
+                            hideLoader();
                             let n = JSON.parse(t);
                             toast(n.message, n.status);
                             get_section(current_section_id);
@@ -516,6 +521,7 @@
 
             function getquestion(id) {
                 try {
+                    showLoader();
                     var question_list_elements = document.getElementsByClassName('question_list_element');
                     for (let index = 0; index < question_list_elements.length; index++) {
                         const element = question_list_elements[index];
@@ -529,6 +535,7 @@
                         t) {
                         if (e) toast(e, "error");
                         else {
+                            hideLoader();
                             let n = JSON.parse(t);
                             let idscontenteditable = [];
                             if (n.message != null)
@@ -617,9 +624,9 @@
                                         </div>
                                         </div>
                                     `;
-                                    }else if(n.data.type==4){
-                                        var answer=JSON.parse(answer.answer);
-                                        elementContent=`
+                                    } else if (n.data.type == 4) {
+                                        var answer = JSON.parse(answer.answer);
+                                        elementContent = `
                                         <div class="answer ${type}" id="${codeofelement}">
                                             <div class="answer_content">
                                                 <div class="sides left_side">
@@ -666,7 +673,7 @@
                                                         <div class="form-group">
                                                             <input type="file" name="question_audio" id="question_audio" onchange="audiofileselect(event)" class="question_audio" class="file" accept="audio/*">
                                                             <label for="question_audio" class="custom-audio-input">
-                                                                <i class="fa fa-music"></i> ${n.data.file!=null && n.data.file!='' && n.data.file!=' ' ? "@lang('additional.forms.change_audio')" : "@lang('additional.forms.upload_audio')"} 
+                                                                <i class="fa fa-music"></i> ${n.data.file!=null && n.data.file!='' && n.data.file!=' ' ? "@lang('additional.forms.change_audio')" : "@lang('additional.forms.upload_audio')"}
                                                             </label>
                                                         </div>
                                                         <div id="selectedAudioFile">${audiotag}</div>
@@ -731,7 +738,7 @@
                                     createeditor('answer__input_' + idscontenteditable[i]);
                                 }
 
-                                var matching_elements=document.getElementsByClassName("matching_element");
+                                var matching_elements = document.getElementsByClassName("matching_element");
                                 for (var i = 0; i < matching_elements.length; i++) {
                                     createeditor(matching_elements[i].id);
                                 }
@@ -743,12 +750,13 @@
                         }
                     });
                 } catch (error) {
+                    hideLoader();
                     toast(error, 'error');
-                    console.log("---------------SETTYPE------------" + error);
                 }
             }
 
             function deletequestion(id = null, type = null) {
+                showLoader();
                 var deleting_question_id = document.getElementById('deleting_question_id');
                 var deleting_question_type = document.getElementById('deleting_question_type');
                 var current_section = document.getElementById('current_section');
@@ -759,6 +767,7 @@
                     var deleting_question_id = document.getElementById('deleting_question_id');
                     deleting_question_id.value = id;
                     toggleModalnow('deleteModal', 'open');
+                    hideLoader();
                 } else {
                     sendAjaxRequestOLD(`{{ route('front.questionsorsection.remove') }}`, "post", {
                         element_id: deleting_question_id.value,
@@ -768,6 +777,7 @@
                         t) {
                         if (e) toast(e, "error");
                         else {
+                            hideLoader();
                             let n = JSON.parse(t);
                             if (n.message != null)
                                 toast(n.message, n.status);
@@ -776,7 +786,7 @@
                             deleting_question_type.value = null;
                             toggleModalnow('deleteModal', 'hide');
 
-                            if(deleting_question_type=="question")
+                            if (deleting_question_type == "question")
                                 get_section(current_section.value);
                             else
                                 getsectiondatas();
@@ -989,50 +999,35 @@
                     image_title: true,
                     images_upload_credentials: true,
                     images_upload_url: "{{ route('api.upload_image_editor') }}",
-                    images_upload_handler: function(blobInfo, success, failure) {
-                        try {
+                    automatic_uploads: true,
+                    block_unsupported_drop: false,
+                    file_picker_types: 'file image media',
+                    images_upload_handler: function(blobInfo, progress) {
+                        return new Promise((resolve, reject) => {
                             var url = "{{ route('api.upload_image_editor') }}";
                             var formData = new FormData();
                             formData.append('image', blobInfo.blob(), blobInfo.filename());
-                            var myHeaders = new Headers();
-                            var myInit = {
-                                method: 'POST',
-                                headers: myHeaders,
-                                body: formData,
-                                mode: 'cors',
-                                cache: 'default'
-                            };
-                            var myRequest = new Request(url, myInit);
 
-                            new Promise(function(resolve, reject) {
-                                    fetch(myRequest)
-                                        .then(function(response) {
-                                            if (!response.ok) {
-                                                throw new Error('Network response was not ok');
-                                            }
-                                            return response.json();
-                                        })
-                                        .then(function(data) {
-                                            resolve(data);
-                                        })
-                                        .catch(function(error) {
-                                            reject(error);
-                                        });
+                            fetch(url, {
+                                    method: 'POST',
+                                    body: formData,
+                                })
+                                .then(function(response) {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.json();
                                 })
                                 .then(function(data) {
-                                    console.log(data);
-                                    success(data.location);
+                                    resolve(data.location);
                                 })
                                 .catch(function(error) {
-                                    console.error('There has been a problem with your fetch operation:',
-                                        error);
-                                    toast(error.message, 'error');
-                                    failure('Resim yüklenirken bir hata oluştu.');
+                                    console.error('Error during image upload:', error);
+                                    reject(error); // Hata durumunda reddet
                                 });
-                        } catch (e) {
-                            toast(e, 'error');
-                        }
+                        });
                     },
+
                     toolbar_mode: 'floating',
                     inline: true,
                     directionality: 'ltr'

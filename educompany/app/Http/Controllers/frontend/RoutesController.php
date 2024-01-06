@@ -7,6 +7,9 @@ use App\Models\Category;
 use App\Models\Exam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Spatie\Sitemap\Sitemap;
+use Spatie\Sitemap\Tags\Url;
+use Carbon\Carbon;
 
 class RoutesController extends Controller
 {
@@ -112,6 +115,93 @@ class RoutesController extends Controller
         } catch (\Exception $e) {
             dd($e->getMessage());
             return redirect('/notfound')->with("error", $e->getMessage());
+        }
+    }
+    public function sitemap(Request $request)
+    {
+        try {
+            $path = public_path('uploads/sitemaps/sitemap.xml');
+            $sitemap=Sitemap::create();
+            $sitemap->add(Url::create(route('user.page.welcome'))
+            ->setLastModificationDate(Carbon::now())
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_YEARLY)
+            ->setPriority(1));
+
+            foreach(standartpages() as $page){
+                $sitemap->add(Url::create(route('pages.show',$page->slugs[app()->getLocale().'_slug']))
+                ->setLastModificationDate(Carbon::now())
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_YEARLY)
+                ->setPriority(0.9));
+            }
+
+            $sitemap->add(Url::create(route('login'))
+            ->setLastModificationDate(Carbon::now())
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_YEARLY)
+            ->setPriority(0.9));
+            $sitemap->add(Url::create(route('user.register'))
+            ->setLastModificationDate(Carbon::now())
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_YEARLY)
+            ->setPriority(0.9));
+            $sitemap->add(Url::create(route('email'))
+            ->setLastModificationDate(Carbon::now())
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_YEARLY)
+            ->setPriority(0.9));
+            $sitemap->add(Url::create(route('user.logout'))
+            ->setLastModificationDate(Carbon::now())
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_YEARLY)
+            ->setPriority(0.9));
+            $sitemap->add(Url::create(route('user.action.search'))
+            ->setLastModificationDate(Carbon::now())
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
+            ->setPriority(0.8));
+            $sitemap->add(Url::create(route('user.front.exams.index'))
+            ->setLastModificationDate(Carbon::now())
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
+            ->setPriority(0.8));
+            foreach(exams() as $exam){
+                $sitemap->add(Url::create(route('user.front.exams.show',$exam->id))
+                ->setLastModificationDate(Carbon::now())
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
+                ->setPriority(0.7));
+            }
+            foreach(blogs(null,'blogs') as $exam){
+                $sitemap->add(Url::create(route('user.blogs_front.show',$exam->slugs[app()->getLocale().'_slug']))
+                ->setLastModificationDate(Carbon::now())
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
+                ->setPriority(0.6));
+            }
+            foreach(blogs(null,'lessons') as $exam){
+                $sitemap->add(Url::create(route('user.lessons_front.show',$exam->slugs[app()->getLocale().'_slug']))
+                ->setLastModificationDate(Carbon::now())
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
+                ->setPriority(0.7));
+            }
+            foreach(teams() as $exam){
+                $sitemap->add(Url::create(route('user.lessons_front.show',$exam->slugs[app()->getLocale().'_slug']))
+                ->setLastModificationDate(Carbon::now())
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
+                ->setPriority(0.7));
+            }
+            $sitemap->add(Url::create(route('user.index'))
+            ->setLastModificationDate(Carbon::now())
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
+            ->setPriority(0.8));
+            $sitemap->add(Url::create(route('user.lessons_front.index'))
+            ->setLastModificationDate(Carbon::now())
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
+            ->setPriority(0.8));
+            $sitemap->add(Url::create(route('user.exam.results'))
+            ->setLastModificationDate(Carbon::now())
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
+            ->setPriority(0.7));
+            $sitemap->add(Url::create('/notfound')
+            ->setLastModificationDate(Carbon::now())
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
+            ->setPriority(0.7));
+            $sitemap=$sitemap->writeToFile($path);
+            return $sitemap;
+        } catch (\Exception $e) {
+            return ['error' => $e->getMessage(), 'line' => $e->getLine(), 'status' => 'error'];
         }
     }
 }

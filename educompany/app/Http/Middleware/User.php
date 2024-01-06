@@ -22,6 +22,11 @@ class User
         }else{
             $user_id=session()->get("user_id")??$request->user_id;
             $email=session()->get("email");
+            $user=users($user_id,'id');
+            if(!session()->has("subdomain") && !empty($user) && isset($user->subdomain) && !empty($user->subdomain)){
+                session()->put('subdomain',$user->subdomain);
+            }
+
             if(isset($user_id) && !empty($user_id) && isset($email) && !empty($email)){
                 Auth::guard('users')->loginUsingId($user_id);
                 return $next($request);

@@ -3,8 +3,7 @@
         $start_time = $product->start_time ? \Carbon\Carbon::createFromTimestamp($product->start_time) : null;
     @endphp
     @if (auth('users')->check() && auth('users')->user()->user_type == 2 && auth('users')->id() == $product->user_id)
-        <div class="products_section_element"
-            @if ($start_time === null || \Carbon\Carbon::now()->greaterThan($start_time)) @if(session()->has('subdomain')) href="{{ route('exams.show.subdomain', ['slug'=>$product->slug,'subdomain'=>session()->get("subdomain")]) }}" @else href="{{ route('exams.show', $product->slug) }}" @endif @endif>
+        <div class="products_section_element">
             @if ($product->price > 0)
                 @if ($product->endirim_price > 0)
                     <div class="products_section_element_price_endirim">@lang('additional.pages.exams.endirim_with_faiz', ['count' => count_endirim_faiz($product->price, $product->endirim_price)])</div>
@@ -17,18 +16,35 @@
 
             @if (auth('users')->check() && auth('users')->user()->user_type == 2 && auth('users')->id() == $product->user_id)
                 <span class="product_section_element_edit"
-                    onclick="window.location.href='{{ route('exams_front.createoredit', ['slug' => $product->slug]) }}';"><i
+                onclick="redirect_tourl('{{ session()->has('subdomain') ? route('exams_front.createoredit.subdomain', ['slug' => $product->slug, 'subdomain' => session()->get('subdomain')]) : route('exams_front.createoredit', ['slug' => $product->slug])  }}')"><i
                         class="fa fa-pencil"></i></span>
+            @endif
+            @if (
+                (auth('users')->check() && auth('users')->user()->user_type == 2) ||
+                    (auth('users')->check() &&
+                        auth('users')->user()->user_type == 1 &&
+                        !empty(exam_result($product->id, auth('users')->id()))))
+                <span
+                    class="product_section_element_result result_element @if (auth('users')->user()->user_type == 1 ||
+                            !(auth('users')->user()->user_type == 2 && auth('users')->id() == $product->user_id)) result_on_left @endif"
+                    onclick="redirect_tourl('{{ route('user.exam.resultpage', exam_result($product->id, auth('users')->id())) }}')">
+                    <i class="fa fa-sticky-note"></i>
+                </span>
+            @endif
+
+            @if (auth('users')->check() && auth('users')->user()->user_type == 2 && auth('users')->id() == $product->user_id)
                 <span class="product_section_element_destroy destroy_elements"
                     onclick="deleteproduct({{ $product->id }},'product')"><i class="fa fa-trash"></i></span>
             @endif
 
-            <div class="products_section_element_header">
+            <div class="products_section_element_header" @if ($start_time === null || \Carbon\Carbon::now()->greaterThan($start_time)) onclick="redirect_tourl('{{ session()->has('subdomain')? route('exams.show.subdomain', ['slug' => $product->slug, 'subdomain' => session()->get('subdomain')]) :  route('exams.show', $product->slug) }}')"
+                @endif>
                 <img src="{{ getImageUrl($product->image, 'exams') }}"
                     alt="{{ $product->name[app()->getLocale() . '_name'] }}">
             </div>
 
-            <div class="products_section_element_content">
+            <div class="products_section_element_content" @if ($start_time === null || \Carbon\Carbon::now()->greaterThan($start_time)) onclick="redirect_tourl('{{ session()->has('subdomain')? route('exams.show.subdomain', ['slug' => $product->slug, 'subdomain' => session()->get('subdomain')]) :  route('exams.show', $product->slug) }}')"
+                @endif>
                 <h5 class="products_section_element_content_name">
                     {{ mb_substr($product->name[app()->getLocale() . '_name'], 0, 10) }}</h5>
                 @if ($start_time === null || \Carbon\Carbon::now()->greaterThan($start_time))
@@ -50,8 +66,7 @@
             </div>
         </div>
     @else
-        <a class="products_section_element"
-            @if ($start_time === null || \Carbon\Carbon::now()->greaterThan($start_time)) @if(session()->has('subdomain')) href="{{ route('exams.show.subdomain', ['slug'=>$product->slug,'subdomain'=>session()->get("subdomain")]) }}" @else href="{{ route('exams.show', $product->slug) }}" @endif @endif>
+        <div class="products_section_element">
             @if ($product->price > 0)
                 @if ($product->endirim_price > 0)
                     <div class="products_section_element_price_endirim">@lang('additional.pages.exams.endirim_with_faiz', ['count' => count_endirim_faiz($product->price, $product->endirim_price)])</div>
@@ -64,18 +79,35 @@
 
             @if (auth('users')->check() && auth('users')->user()->user_type == 2 && auth('users')->id() == $product->user_id)
                 <span class="product_section_element_edit"
-                @if(session()->has('subdomain')) onclick="window.location.href='{{ route('exams_front.createoredit.subdomain', ['slug' => $product->slug,'subdomain'=>session()->get("subdomain")]) }}';" @else onclick="window.location.href='{{ route('exams_front.createoredit', ['slug' => $product->slug]) }}';" @endif ><i
+                    onclick="redirect_tourl('{{ session()->has('subdomain') ? route('exams_front.createoredit.subdomain', ['slug' => $product->slug, 'subdomain' => session()->get('subdomain')]) : route('exams_front.createoredit', ['slug' => $product->slug])  }}')"><i
                         class="fa fa-pencil"></i></span>
+            @endif
+            @if (
+                (auth('users')->check() && auth('users')->user()->user_type == 2) ||
+                    (auth('users')->check() &&
+                        auth('users')->user()->user_type == 1 &&
+                        !empty(exam_result($product->id, auth('users')->id()))
+                    ))
+                <span
+                    class="product_section_element_result result_element @if (auth('users')->user()->user_type == 1 ||
+                            !(auth('users')->user()->user_type == 2 && auth('users')->id() == $product->user_id)) result_on_left @endif "
+                    onclick="redirect_tourl('{{ route('user.exam.resultpage', exam_result($product->id, auth('users')->id())) }}')">
+                    <i class="fa fa-sticky-note"></i>
+                </span>
+            @endif
+            @if (auth('users')->check() && auth('users')->user()->user_type == 2 && auth('users')->id() == $product->user_id)
                 <span class="product_section_element_destroy destroy_elements"
                     onclick="deleteproduct(${item.id},'product')"><i class="fa fa-trash"></i></span>
             @endif
 
-            <div class="products_section_element_header">
+            <div class="products_section_element_header" @if ($start_time === null || \Carbon\Carbon::now()->greaterThan($start_time)) onclick="redirect_tourl('{{ session()->has('subdomain')? route('exams.show.subdomain', ['slug' => $product->slug, 'subdomain' => session()->get('subdomain')]) :  route('exams.show', $product->slug) }}')"
+                @endif>
                 <img src="{{ getImageUrl($product->image, 'exams') }}"
                     alt="{{ $product->name[app()->getLocale() . '_name'] }}">
             </div>
 
-            <div class="products_section_element_content">
+            <div class="products_section_element_content" @if ($start_time === null || \Carbon\Carbon::now()->greaterThan($start_time)) onclick="redirect_tourl('{{ session()->has('subdomain')? route('exams.show.subdomain', ['slug' => $product->slug, 'subdomain' => session()->get('subdomain')]) :  route('exams.show', $product->slug) }}')"
+                @endif>
                 <h5 class="products_section_element_content_name">
                     {{ mb_substr($product->name[app()->getLocale() . '_name'], 0, 10) }}</h5>
                 @if ($start_time === null || \Carbon\Carbon::now()->greaterThan($start_time))
@@ -95,6 +127,6 @@
                     </button>
                 @endif
             </div>
-        </a>
+        </div>
     @endif
 @endif

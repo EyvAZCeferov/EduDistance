@@ -218,7 +218,9 @@ class AuthController extends Controller
     {
         session()->forget("subdomain");
         session()->forget("user_id");
+        session()->forget("user_email");
         Auth::guard('users')->logout();
+        dbdeactive();
         return redirect()->route('login');
     }
 

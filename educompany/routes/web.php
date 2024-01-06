@@ -17,7 +17,8 @@ Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalizati
         Route::get('/', [RoutesController::class, 'welcome'])->name('page.welcome');
         Route::get('search', [RoutesController::class, 'search'])->name('action.search');
         Route::get('/exams', [HomeController::class, 'exams'])->name('exams_front.index');
-        Route::get('/createoreditexam', [HomeController::class, 'createoreditexam'])->name('exams_front.createoredit');
+        Route::get('/createoreditexam', [HomeController::class, 'createoreditexam'])->middleware('users')->name('exams_front.createoredit');
+        Route::get('/result', [HomeController::class, 'result'])->middleware('users')->name('exams_front.result');
         Route::get('/exams/{slug}', [HomeController::class, 'showexam'])->name('exams.show');
         Route::get('/exams/{category_id?}', [HomeController::class, 'exams'])->name('exams');
         Route::get('/category_exam/{category?}', [HomeController::class, 'category_exam'])->name('category_exam');
@@ -56,3 +57,9 @@ Route::post("upload_image_editor", [ApisController::class, 'upload_image_editor'
 Route::post("qyestions_store", [ApisController::class, 'questions_store'])->name("front.questions.store");
 Route::post("get_question_data", [ApisController::class, 'get_question_data'])->name("front.questions.get");
 Route::post("remove_questionorsection_data", [ApisController::class, 'remove_questionorsection_data'])->name("front.questionsorsection.remove");
+
+Route::any('callbackpayment', [ApisController::class, 'callback'])->name("payments.callback");
+Route::any('successpayment', [ApisController::class, 'success_error_page_payment'])->name("payments.success");
+Route::any('errorpayment', [ApisController::class, 'success_error_page_payment'])->name("payments.error");
+Route::get("sitemap.xml",[RoutesController::class,'sitemap'])->name("sitemap.xml");
+

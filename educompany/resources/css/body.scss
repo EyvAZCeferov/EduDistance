@@ -485,6 +485,20 @@ body {
                     font-weight: 500;
                     text-align: justify;
                     word-break: break-word;
+                    flex-wrap:wrap;
+                    display:flex;
+                    p{
+                        max-width:100%;
+                        max-height:100%;
+                        word-break: break-word;
+                        flex-wrap:wrap;
+                        display:flex;
+                    }
+                    img{
+                        object-fit:contain !important;
+                        max-height:80%;
+                        max-width:100%;
+                    }
                 }
 
                 .right_column_image {
@@ -571,14 +585,14 @@ body {
                 }
 
                 .product_section_element_edit,
-                .product_section_element_destroy {
+                .product_section_element_destroy,
+                .product_section_element_result {
                     @extend.classcenter;
-                    display: inline-block;
+                    display: inline-block !important;
                     position: absolute;
                     top: 0;
                     left: 0;
                     border-top-left-radius: 8px;
-
                     width: 45px;
                     color: #fff;
                     font-size: $page_size;
@@ -593,6 +607,7 @@ body {
                     -o-transition: all ease 0.6s;
                     cursor: pointer;
                     z-index: 10001;
+                    pointer-events: auto;
 
                     &:hover,
                     &:focus,
@@ -600,8 +615,26 @@ body {
                         background-color: #fff;
                         color: $warning-color;
                     }
-                    &.destroy_elements{
+                    &.result_element{
                         left: 45px;
+                        background-color:$success-color;
+                        border-bottom-right-radius: 0;
+                        border-top-left-radius: 0;
+                        &:hover,
+                        &:focus,
+                        &:active {
+                            color: $success-color;
+                            background-color: #fff;
+                        }
+
+                        &.result_on_left{
+                            border-top-left-radius: 8px;
+                            border-bottom-right-radius: 8px;
+                            left:0;
+                        }
+                    }
+                    &.destroy_elements{
+                        left: 90px;
                         background-color:$error-color;
                         border-bottom-right-radius: 8px;
                         border-top-left-radius: 0;
@@ -1125,10 +1158,30 @@ body {
                         div.content_exam_info {
                             text-align: left;
                             font-family: $secondary-font;
+                            word-break: break-word;
+                            flex-wrap:wrap;
+                            display:flex;
+
+                            p{
+                                max-width:100%;
+                                max-height:100%;
+                                word-break: break-word;
+                                flex-wrap:wrap;
+                                display:flex;
+                            }
+                            img{
+                                object-fit:contain !important;
+                                max-height:80%;
+                                max-width:100%;
+                            }
+
+                            .audio_tag_text{
+                                width:100%;
+                            }
 
                             audio {
                                 width: 100%;
-                                margin-top: 60%;
+                                margin-top: 10px;
                             }
                         }
 
@@ -1276,6 +1329,7 @@ body {
                                     height: 100%;
                                     @extend .classjustifstart;
                                     transition: all ease 0.8s;
+                                    max-height:100%;
 
                                     &.rowNumber {
                                         padding: 0 10px;
@@ -1285,6 +1339,24 @@ body {
                                         background-color: $gray-color;
                                         transition: all ease 0.8s;
                                         border: 1px solid $gray-color;
+                                    }
+                                    &.question{
+                                        max-width:100%;
+                                        word-break: break-word;
+                                        flex-wrap:wrap;
+                                        display:flex;
+                                        p{
+                                            max-width:100%;
+                                            max-height:100%;
+                                            word-break: break-word;
+                                            flex-wrap:wrap;
+                                            display:flex;
+                                        }
+                                        img{
+                                            object-fit:contain !important;
+                                            max-height:80%;
+                                            max-width:100%;
+                                        }
                                     }
                                 }
 
@@ -1367,8 +1439,17 @@ body {
                                         -ms-border-radius:10px;
                                         -o-border-radius:10px;
                                         line-height:$small_size;
+                                        max-width:100%;
+                                        word-break: break-word;
+                                        flex-wrap:wrap;
+                                        display:flex;
                                         p{
                                             margin:0;
+                                            max-width:100%;
+                                            max-height:100%;
+                                            word-break: break-word;
+                                            flex-wrap:wrap;
+                                            display:flex;
                                         }
                                         &.question_match_element{
                                             background-color:$primary-color;
@@ -1377,6 +1458,12 @@ body {
                                         &.answer_match_element{
                                             background-color:$secondary-color;
                                             border-color:$secondary-color;
+                                        }
+
+                                        img{
+                                            object-fit:contain !important;
+                                            max-height:80%;
+                                            max-width:100%;
                                         }
                                     }
                                 }

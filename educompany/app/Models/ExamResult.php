@@ -45,6 +45,10 @@ class ExamResult extends Model
     {
         return $this->answers->where('result', 1)->count();
     }
+    public function wrongAnswers(): int
+    {
+        return $this->answers->where('result', 0)->count();
+    }
     public function marked(){
         return $this->hasMany(MarkQuestions::class,'exam_result_id','id');
     }

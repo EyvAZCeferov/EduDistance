@@ -15,6 +15,12 @@ return [
         "networking"=>"Bağlantılar"
     ],
     "pages" => [
+        'callback'=>[
+            'success'=>"Uğurlu",
+            'success_description'=>"Ödəniş uğurlu oldu, imtahana yönləndirilirsiniz.",
+            'error'=>"Uğursuz",
+            'error_description'=>"Ödəniş uğursuz oldu, geri yönləndirilirsiniz.",
+        ],
         "notfound" => [
             "title" => "Bağışlayın, Səhifə Tapılmadı!"
         ],
@@ -117,6 +123,7 @@ return [
         'hide'=>"Gizlət",
         'show'=>"Göstər",
         'finish'=>"Bitir",
+        'finished'=>"Bitdi",
         'nextsection'=>'Sonrakı bölmə',
         'add'=>"Əlavə et",
         'edit'=>"Yenilə",

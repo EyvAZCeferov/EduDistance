@@ -13,7 +13,7 @@ Route::group([
         Route::get('/', [RoutesController::class, 'welcome'])->name('page.welcome.subdomain');
         Route::get('search', [RoutesController::class, 'search'])->name('action.search.subdomain');
         Route::get('/exams', [HomeController::class, 'exams_subdomain'])->name('exams_front.index.subdomain');
-        Route::get('/createoreditexam', [HomeController::class, 'createoreditexam'])->name('exams_front.createoredit.subdomain');
+        Route::get('/createoreditexam', [HomeController::class, 'createoreditexam'])->middleware('users')->name('exams_front.createoredit.subdomain');
         Route::get('/exams/{slug}', [HomeController::class, 'showexam_subdomain'])->name('exams.show.subdomain');
         Route::get('/exams/{category_id?}', [HomeController::class, 'exams'])->name('exams.subdomain');
         Route::get('/category_exam/{category?}', [HomeController::class, 'category_exam_subdomain'])->name('category_exam.subdomain');

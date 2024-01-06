@@ -180,7 +180,7 @@ if (!function_exists('settings')) {
         if (isset($key) && !empty($key)) {
             $subdomain = session()->has("subdomain") ? session()->get("subdomain") : null;
             if (!empty($subdomain)) {
-                $mds = users($subdomain,'subdomain');
+                $mds = users($subdomain, 'subdomain');
                 if (!empty($mds) && isset($mds->id)) {
                     if ($key == "name") {
                         $model = isset($mds->name) && !empty($mds->name) ? $mds->name : $mdsettings->name[app()->getLocale() . '_name'];
@@ -216,7 +216,7 @@ if (!function_exists('settings')) {
         } else {
             $model = $mdsettings;
         }
-        return Cache::rememberForever("settings" . $key.session()->getId(), fn () => $model);
+        return Cache::rememberForever("settings" . $key . session()->getId(), fn () => $model);
     }
 }
 
@@ -274,8 +274,8 @@ if (!function_exists('users')) {
             $model = User::where('user_type', 2)->orderBy("id", "DESC")->whereHas('exams')->get();
         } else if ($type == "company") {
             $model = User::where('user_type', 2)->orderBy("id", "DESC")->get();
-        }else if ($type == "subdomain") {
-            $model = User::where('subdomain', $key)->where('user_type',2)->orderBy("id", "DESC")->first();
+        } else if ($type == "subdomain") {
+            $model = User::where('subdomain', $key)->where('user_type', 2)->orderBy("id", "DESC")->first();
         } else if ($type == "id") {
             $model = User::where('id', $key)->first();
         } else {
@@ -302,11 +302,11 @@ if (!function_exists('exams')) {
             $model = Exam::where("slug", $key)->first();
         } else if (isset($key) && $type == "subdomain") {
             $model = Exam::where("user_id", $key)->orderBy("id", 'DESC');
-            if(session()->has("subdomain")){
-                $user=users(session()->get("subdomain"),'subdomain');
-                $model=$model->where("user_id",$user->id);
+            if (session()->has("subdomain")) {
+                $user = users(session()->get("subdomain"), 'subdomain');
+                $model = $model->where("user_id", $user->id);
             }
-            $model=$model->get();
+            $model = $model->get();
         } else if (isset($key) && $type == "search") {
             $model = Exam::whereRaw('LOWER(JSON_EXTRACT(`name`, "$.az_name")) like ?', ['%' . $key . '%'])
                 ->orWhereRaw('LOWER(JSON_EXTRACT(`name`, "$.ru_name")) like ?', ['%' . $key . '%'])
@@ -315,22 +315,22 @@ if (!function_exists('exams')) {
                 ->orWhereRaw('LOWER(JSON_EXTRACT(`description`, "$.ru_description")) like ?', ['%' . $key . '%'])
                 ->orWhereRaw('LOWER(JSON_EXTRACT(`description`, "$.en_description")) like ?', ['%' . $key . '%'])
                 ->orderBy("order_number", 'ASC');
-                if(session()->has("subdomain")){
-                    $user=users(session()->get("subdomain"),'subdomain');
-                    $model=$model->where("user_id",$user->id);
-                }
-                $model=$model->get();
+            if (session()->has("subdomain")) {
+                $user = users(session()->get("subdomain"), 'subdomain');
+                $model = $model->where("user_id", $user->id);
+            }
+            $model = $model->get();
         } else if (empty($key) && $type == "most_used_tests") {
             $model = Exam::with([
                 'results' => function ($query) {
                     $query->orderBy('point', 'DESC');
                 }
             ])->orderByDesc('id');
-            if(session()->has("subdomain")){
-                $user=users(session()->get("subdomain"),'subdomain');
-                $model=$model->where("user_id",$user->id);
+            if (session()->has("subdomain")) {
+                $user = users(session()->get("subdomain"), 'subdomain');
+                $model = $model->where("user_id", $user->id);
             }
-            $model=$model->get();
+            $model = $model->get();
         } else {
             $model = Exam::where('status', true)->orderBy("order_number", 'ASC');
         }
@@ -678,5 +678,74 @@ if (!function_exists('purge_cache')) {
                 $e->getLine()
             ]);
         }
+    }
+}
+
+if (!function_exists('modifyRelativeUrlsToAbsolute')) {
+    function modifyRelativeUrlsToAbsolute($content)
+    {
+        $domain = 'https://digitalexam.az';
+        $pattern = '/<img.*?src=[\"\'](.*?)\.\.\/(.*?)["\']/';
+        $replacement = '<img src="' . $domain . '/$2"';
+        $modifiedContent = preg_replace($pattern, $replacement, $content);
+        return $modifiedContent;
+    }
+}
+
+if (!function_exists('calculate_exam_result')) {
+    function calculate_exam_result($exam_result_id)
+    {
+        $examResult = ExamResult::where("id", $exam_result_id)->first();
+        $exam = Exam::where('id', $examResult->exam_id)->first();
+        $examsections = Section::where("exam_id", $exam->id);
+        if (session()->has('selected_section')) {
+            $examsections = $examsections->where('id', session()->get('selected_section'));
+        }
+        $examsections = $examsections->pluck('id');
+        $examquestions = ExamQuestion::orderBy("id", 'DESC')->whereIn("section_id", $examsections)->get();
+        $exampoint = $exam->point;
+        $correctAnswers = $examResult->correctAnswers();
+        $examquestionscount = count($examquestions);
+        $model = 0;
+        $model = ($correctAnswers / $examquestionscount) * $exampoint;
+        return $model;
+    }
+}
+
+if (!function_exists('exam_result')) {
+    function exam_result($exam_id, $auth_id)
+    {
+        $model = ExamResult::orderBy('id', 'DESC');
+
+        if (isset($auth_id) && !empty($auth_id)) {
+            $user = users($auth_id, 'id');
+        }
+
+        if ($user->user_type == 2) {
+            $model = Exam::orderBy('id', 'DESC');
+        } else {
+            $model = $model->where('user_id', $auth_id);
+            $model = $model->where("point", '>', 0);
+            $model = $model->where("time_reply", '>', 0);
+            $model = $model->where("payed", 1);
+        }
+
+        if (isset($exam_id) && !empty($exam_id)) {
+            if ($user->user_type == 2) {
+                $model = $model->where("id", $exam_id);
+            } else {
+                $model = $model->where('exam_id', $exam_id);
+            }
+        }
+
+        $model = $model->first();
+
+        if ($user->user_type == 2 && $model->user_id==$user->id) {
+            $model = !empty($model) && isset($model->slug) ? $model->slug : null;
+        } else {
+            $model = !empty($model) && isset($model->id) ? $model->id : null;
+        }
+
+        return Cache::rememberForever("exam_result"  . $exam_id . $auth_id, fn () => $model);
     }
 }

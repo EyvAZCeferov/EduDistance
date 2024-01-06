@@ -47,7 +47,7 @@
                         </div>
                     @endif
                 </div>
-                <p class="exam_description">{!! $data->content[app()->getLocale() . '_description'] !!}</p>
+                <div class="exam_description">{!! $data->content[app()->getLocale() . '_description'] !!}</div>
 
                 <div class="my-2">
                     @if (auth('users')->check())

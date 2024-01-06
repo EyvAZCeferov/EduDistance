@@ -9,7 +9,7 @@
             value="{{ $value->id }}">
         <div class="rowNumber">{{ int_to_abcd_value($key) }}</div>
         <div class="question">
-            {{ your_answer_result_true_or_false($question->id, $value->id, $exam_result->id) }} {!! $value->answer !!}
+            {!! $value->answer !!}
         </div>
     </div>
 @endforeach

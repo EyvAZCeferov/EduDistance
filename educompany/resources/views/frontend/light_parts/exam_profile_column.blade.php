@@ -1,9 +1,11 @@
 <div class="my-4 py-2">
     <div class="row section_title">
         <h3>{{ trans('additional.pages.exams.' . $title) }}</h3>
-        <a href="{{ route("exams_front.createoredit") }}" class="btn btn-primary">@lang('additional.buttons.add') <i
-                class="fa-solid fa-circle-plus"></i>
-        </a>
+        @if(auth('users')->check() && auth('users')->user()->user_type==2)
+            <a href="{{ route("exams_front.createoredit") }}" class="btn btn-primary">@lang('additional.buttons.add') <i
+                    class="fa-solid fa-circle-plus"></i>
+            </a>
+        @endif
     </div>
     <ul class="nav nav-pills custom_nav-pills mb-3" id="{{ $nav_id }}_tab" role="tablist">
         @foreach ($tab_datas as $key => $value)

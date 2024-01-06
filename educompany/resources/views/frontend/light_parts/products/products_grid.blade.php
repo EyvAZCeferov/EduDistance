@@ -54,4 +54,8 @@
             });
         }
     }
+
+    function redirect_tourl(url){
+        window.location.href=url;
+    }
 </script>
