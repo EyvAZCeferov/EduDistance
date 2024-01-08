@@ -1,5 +1,20 @@
 @extends('frontend.layouts.app')
 @section('title', $data->name[app()->getLocale() . '_name'])
+@push('css')
+    <script language='javascript' type='text/javascript'>
+        function DisableBackButton() {
+            window.history.forward()
+        }
+        DisableBackButton();
+        window.onload = DisableBackButton;
+        window.onpageshow = function(evt) {
+            if (evt.persisted) DisableBackButton()
+        }
+        window.onunload = function() {
+            void(0)
+        }
+    </script>
+@endpush
 @section('content')
     <section class="examsshow my-3">
         <a class="btn btn-primary goback" href="{{ url()->previous() }}"><i class="fa fa-arrow-left"></i>&nbsp;
@@ -13,7 +28,9 @@
                 <div class="exam_info_list">
                     <div class="exam_info_list_item left">
                         <div class="bold_text">@lang('additional.pages.exams.company'):</div>
-                        <div class="normal_text">{{ !empty($data->user) ? $data->user->name : settings()->name[app()->getLocale() . '_name'] }}</div>
+                        <div class="normal_text">
+                            {{ !empty($data->user) ? $data->user->name : settings()->name[app()->getLocale() . '_name'] }}
+                        </div>
                     </div>
                     <div class="exam_info_list_item right">
                         <div class="bold_text">@lang('additional.pages.exams.price'):</div>
@@ -50,12 +67,14 @@
                 <div class="exam_description">{!! $data->content[app()->getLocale() . '_description'] !!}</div>
 
                 <div class="my-2">
-                    @if (auth('users')->check())
-                        <a href="{{ route('user.exams.redirect_exam',['exam_id'=>$data->id]) }}"
+                    @if (auth('users')->check()==true && !empty(auth('users')->user()) && auth('users')->user()!=null)
+                        <a href="{{ route('user.exams.redirect_exam', ['exam_id' => $data->id]) }}"
                             class="btn btn-block btn-imtahanver">@lang('additional.buttons.imtahanver')</a>
                     @else
-                        <a href="{{ route('login',['savethisurl'=>url()->current()]) }}"
-                            class="btn btn-block btn-loginandredirect">@lang("additional.headers.login") / @lang('additional.headers.register') </a>
+                        @if(!auth('users')->check() || (auth('users')->check() && isset(auth('users')->user()->user_type) && auth('users')->user()->user_type==1))
+                            <a href="{{ route('login', ['savethisurl' => url()->current()]) }}"
+                                class="btn btn-block btn-loginandredirect">@lang('additional.headers.login') / @lang('additional.headers.register') </a>
+                        @endif
                     @endif
                 </div>
             </div>

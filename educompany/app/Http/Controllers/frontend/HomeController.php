@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\frontend;
 
 use App\Models\Exam;
-use App\Models\Terms;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -158,7 +158,7 @@ class HomeController extends Controller
             $data = collect();
             $slug = strip_tags_with_whitespace($request->get("slug"));
             if (isset($slug) && !empty($slug)) {
-                $data = Exam::where('slug', $slug)->first();
+                $data = Exam::where('slug', $slug)->where('user_id',Auth::guard("users")->id())->first();
             }
             return view('frontend.exams.create_edit_exams.index', compact('data'));
         } catch (\Exception $e) {

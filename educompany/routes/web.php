@@ -41,8 +41,8 @@ Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalizati
             Route::group(['prefix' => 'exam'], function () {
                 Route::post('add_edit_exam', [CommonController::class, 'add_edit_exam'])->name("exam.add_edit_exam");
                 Route::get('results', [CommonController::class, 'examResults'])->name('exam.results');
-                Route::get('resultpage/{result_id}', [CommonController::class, 'examResultPage'])->name('exam.resultpage');
-                Route::get('results/{result_id}', [CommonController::class, 'examResult'])->name('exam.result');
+                Route::get('resultpage/{result_id}', [CommonController::class, 'examResultPage_nosubdomain'])->name('exam.resultpage');
+                Route::get('results/{result_id}', [CommonController::class, 'examResult_nosubdomain'])->name('exam.result');
                 Route::get("exams/redirect_exam", [CommonController::class, 'redirect_exam'])->name("exams.redirect_exam");
                 Route::any("exams/set_exam", [CommonController::class, 'set_exam'])->name("exams.set_exam");
                 // Route::get('/{exam_id}', [CommonController::class, 'exam'])->name('exam');

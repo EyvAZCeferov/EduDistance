@@ -27,8 +27,8 @@ class MarkQuestions extends Model
     public function exam():BelongsTo{
         return $this->belongsTo(Exam::class);
     }
-    public function result():BelongsTo{
-        return $this->belongsTo(ExamResult::class);
+    public function result():HasOne{
+        return $this->hasOne(ExamResult::class,'id','exam_result_id');
     }
     public function question():BelongsTo{
         return $this->belongsTo(ExamQuestion::class);

@@ -9,11 +9,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="#1365A0">
     <meta name="msapplication-navbutton-color" content="#1365A0">
     <meta name="theme-color" content="#1365A0">
-    <meta name="subdomain" content="{{session()->get('subdomain')}}">
+    <meta name="subdomain" content="{{ session()->get('subdomain') }}">
     <title>@yield('title', settings('name'))</title>
     <meta name="description" content="{{ settings('description') }}">
-    <meta property="og:site_name"
-        content="{{ settings('name') }}" />
+    <meta property="og:site_name" content="{{ settings('name') }}" />
     <meta property="og:title" content="@yield('title', settings('name'))" />
     <meta property="og:description" content="@yield('description', settings('description'))" />
     <meta property="og:locale" content="{{ app()->getLocale() }}_{{ strtoupper(app()->getLocale()) }}" />
@@ -50,7 +49,7 @@
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="{{ asset('front/assets/favicons/ms-icon-144x144.png') }}">
     <meta name="theme-color" content="#ffffff">
-    <base href="{{env('APP_DOMAIN')}}"/>
+    <base href="{{ env('APP_DOMAIN') }}" />
     {{-- Favicon --}}
 
     {{-- Analystics Scripts --}}
@@ -99,19 +98,6 @@
 
     @stack('css')
     @vite(['resources/css/app.scss', 'resources/js/app.js'])
-    <script language='javascript' type='text/javascript'>
-        function DisableBackButton() {
-            window.history.forward()
-        }
-        DisableBackButton();
-        window.onload = DisableBackButton;
-        window.onpageshow = function(evt) {
-            if (evt.persisted) DisableBackButton()
-        }
-        window.onunload = function() {
-            void(0)
-        }
-    </script>
 </head>
 
 <body>
@@ -149,8 +135,13 @@
                 <div class="modal-footer justify-content-center">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal"
                         onclick="toggleModalnow('deleteModal','hide')">@lang('additional.buttons.back')</button>
-                    <button type="button" onclick="deletequestion()"
-                        class="btn btn-danger">@lang('additional.buttons.remove')</button>
+                    @if (Illuminate\Support\Str::contains(url()->current(), 'createoreditexam'))
+                        <button type="button" onclick="deletequestion()"
+                            class="btn btn-danger">@lang('additional.buttons.remove')</button>
+                    @else
+                        <button type="button" onclick="deleteproduct()"
+                            class="btn btn-danger">@lang('additional.buttons.remove')</button>
+                    @endif
                 </div>
             </div>
         </div>
@@ -181,6 +172,46 @@
                 toast("{{ session('success') }}", 'success');
             @endif
         });
+    </script>
+
+    <script defer>
+        function deleteproduct(id = null, type = null) {
+            var deleting_question_id = document.getElementById('deleting_question_id');
+            var deleting_question_type = document.getElementById('deleting_question_type');
+            var current_section = document.getElementById('current_section');
+            if (type != null)
+                deleting_question_type.value = type
+
+            if (id != null) {
+                var deleting_question_id = document.getElementById('deleting_question_id');
+                deleting_question_id.value = id;
+                toggleModalnow('deleteModal', 'open');
+            } else {
+                sendAjaxRequestOLD(`{{ route('front.questionsorsection.remove') }}`, "post", {
+                    element_id: deleting_question_id.value,
+                    element_type: deleting_question_type.value,
+                    language: '{{ app()->getLocale() }}'
+                }, function(e,
+                    t) {
+                    if (e) toast(e, "error");
+                    else {
+                        let n = JSON.parse(t);
+                        if (n.message != null)
+                            toast(n.message, n.status);
+
+                        deleting_question_id.value = null;
+                        deleting_question_type.value = null;
+                        toggleModalnow('deleteModal', 'hide');
+
+                        window.location.reload();
+                    }
+                });
+            }
+        }
+
+        function redirect_tourl(url) {
+            window.location.href = url;
+        }
     </script>
 
 

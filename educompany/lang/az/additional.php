@@ -78,7 +78,12 @@ return [
             'true_false_counts'=>'Düzgün cavablar: :true, Yanlış cavablar: :false',
             'your_result'=>'İmtahan nəticəsi: :point',
             "audiofile_played"=>"Səs faylı sadəcə 1 dəfə səsləndiriləcək.",
-            "sort_right_tab_elements"=>"Sağ tərəfdəki cavabları uyğun olaraq yerləşdirin."
+            "sort_right_tab_elements"=>"Sağ tərəfdəki cavabları uyğun olaraq yerləşdirin.",
+            "students"=>"Tələbələr",
+            "earned_point"=>"Topladığı bal",
+            "timespent"=>"Xərclədiyi vaxd",
+            "forviewselected"=>"Baxış üçün işarələnmişlər",
+            "answered_students"=>"Cavab vermiş şəxslər",
         ],
         'blogs'=>[
             'blogs'=>"Bloqlar"
@@ -165,7 +170,8 @@ return [
         "answer"=>"Cavab",
         'upload_audio'=>"Audio fayl əlavə et",
         'change_audio'=>"Audio faylı dəyişdir",
-        "your_question"=>"Sualınız"
+        "your_question"=>"Sualınız",
+        'repeat_sound'=>'Audio təkrar etsin'
     ],
     "messages"=>[
         "passwords_incorrect"=>"Şifrəniz yanlışdır",

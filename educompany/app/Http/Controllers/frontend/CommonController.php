@@ -20,7 +20,6 @@ use App\Models\ExamStartPageIds;
 
 class CommonController extends Controller
 {
-
     public function exam($subdomain=null,$exam_id)
     {
         $exam = Exam::findOrFail($exam_id);
@@ -147,7 +146,7 @@ class CommonController extends Controller
         return view('frontend.pages.exam.results', compact('results'));
     }
 
-    public function examResultPage($subdomain=null,$result_id)
+    public function examResultPage_nosubdomain($result_id)
     {
         $exam_result = ExamResult::where('user_id', auth('users')->user()->id)
             ->with('answers.answer')
@@ -156,7 +155,32 @@ class CommonController extends Controller
 
         return view('frontend.exams.resultpage', compact('exam_result'));
     }
+    public function examResultPage($subdomain=null,$result_id)
+    {
+        if(Auth::guard("users")->check() && Auth::guard("users")->user()->user_type==2){
+            $exam=Exam::where('slug',$result_id)->where("user_id",Auth::guard("users")->id())->first();
+            $exam_results = ExamResult::where('exam_id', $exam->id)
+                ->with('answers.answer')
+                ->orderByDesc('id')->get();
+            return view('frontend.exams.results.resultoncompany', compact('exam_results','exam'));
+        }else{
+            $exam_result = ExamResult::where('user_id', auth('users')->user()->id)
+                ->with('answers.answer')
+                ->orderByDesc('id')
+                ->findOrFail($result_id);
+            return view('frontend.exams.resultpage', compact('exam_result'));
+        }
+    }
 
+    public function examResult_nosubdomain($result_id)
+    {
+        $exam_result = ExamResult::where('user_id', auth('users')->user()->id)
+            ->with('answers.answer')
+            ->orderByDesc('id')
+            ->findOrFail($result_id);
+
+        return view('frontend.exams.result', compact('exam_result'));
+    }
     public function examResult($subdomain=null,$result_id)
     {
         $exam_result = ExamResult::where('user_id', auth('users')->user()->id)
@@ -349,13 +373,17 @@ class CommonController extends Controller
                 $image = image_upload($request->file("image"), 'exams');
             }
 
+            if(Auth::guard('users')->user()->user_type==1){
+                return redirect('/logout')->with("error","Hesabınıza şirkət olaraq daxil olmalısınız");
+            }
+
             $name = [
-                'az_name' => trim(GoogleTranslate::trans($request->exam_name, 'az')),
+                'az_name' => trim($request->exam_name, 'az'),
                 'ru_name' => trim(GoogleTranslate::trans($request->exam_name, 'ru')),
                 'en_name' => trim(GoogleTranslate::trans($request->exam_name, 'en')),
             ];
             $description = [
-                'az_description' => trim(modifyRelativeUrlsToAbsolute(GoogleTranslate::trans($request->description ?? $request->mce_0, 'az'))),
+                'az_description' => trim(modifyRelativeUrlsToAbsolute($request->description ?? $request->mce_0, 'az')),
                 'ru_description' => trim(modifyRelativeUrlsToAbsolute(GoogleTranslate::trans($request->description ?? $request->mce_0, 'ru'))),
                 'en_description' => trim(modifyRelativeUrlsToAbsolute(GoogleTranslate::trans($request->description ?? $request->mce_0, 'en'))),
             ];
@@ -375,7 +403,7 @@ class CommonController extends Controller
             $data->endirim_price = $request->input('endirim_price') ?? 0;
             $data->user_id = intval($request->auth_id) ?? auth('users')->id();
             $data->user_type = "users";
-            $data->repeat_sound = false;
+            $data->repeat_sound = $request->input('repeat_sound') == "on" ? 1 : 0;
             $data->show_result_user = $request->input('exam_show_result_answer') == "on" ? 1 : 0;
             $data->show_calc = $request->input('show_calculator') == "on" ? 1 : 0;
             $data->start_time = $start_time ?? null;
@@ -431,17 +459,21 @@ class CommonController extends Controller
                 $data = new Exam();
             }
 
+            if(Auth::guard('users')->user()->user_type==1){
+                return redirect('/logout')->with("error","Hesabınıza şirkət olaraq daxil olmalısınız");
+            }
+
             if ($request->hasFile('image')) {
                 $image = image_upload($request->file("image"), 'exams');
             }
 
             $name = [
-                'az_name' => trim(GoogleTranslate::trans($request->exam_name, 'az')),
+                'az_name' => trim($request->exam_name, 'az'),
                 'ru_name' => trim(GoogleTranslate::trans($request->exam_name, 'ru')),
                 'en_name' => trim(GoogleTranslate::trans($request->exam_name, 'en')),
             ];
             $description = [
-                'az_description' => trim(modifyRelativeUrlsToAbsolute(GoogleTranslate::trans($request->description ?? $request->mce_0, 'az'))),
+                'az_description' => trim(modifyRelativeUrlsToAbsolute($request->description ?? $request->mce_0, 'az')),
                 'ru_description' => trim(modifyRelativeUrlsToAbsolute(GoogleTranslate::trans($request->description ?? $request->mce_0, 'ru'))),
                 'en_description' => trim(modifyRelativeUrlsToAbsolute(GoogleTranslate::trans($request->description ?? $request->mce_0, 'en'))),
             ];
@@ -461,7 +493,7 @@ class CommonController extends Controller
             $data->endirim_price = $request->input('endirim_price') ?? 0;
             $data->user_id = intval($request->auth_id) ?? auth('users')->id();
             $data->user_type = "users";
-            $data->repeat_sound = false;
+            $data->repeat_sound = $request->input('repeat_sound') == "on" ? 1 : 0;
             $data->show_result_user = $request->input('exam_show_result_answer') == "on" ? 1 : 0;
             $data->show_calc = $request->input('show_calculator') == "on" ? 1 : 0;
             $data->start_time = $start_time ?? null;

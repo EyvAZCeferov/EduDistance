@@ -67,6 +67,7 @@
                             class="img-fluid img-responsive" style="height: 150px;margin-bottom:10px;">
                     @endif
                     <input type="file" @if (!(isset($data) && !empty($data) && !empty($data->image))) required @endif name="image"
+                    accept="image/*"
                         class="form-control {{ $errors->first('image') ? 'is-invalid' : '' }}">
                 </div>
 
@@ -119,6 +120,14 @@
                         <label class="form-check-label" for="show_calculator">@lang('additional.forms.show_calculator')</label>
                     </div>
                     {{-- show_calc --}}
+
+                    {{-- repeat_sound --}}
+                    <div class="form-check form-switch">
+                        <input class="form-check-input"
+                        @if (isset($data) && !empty($data) && !empty($data->repeat_sound)) @if ($data->repeat_sound == true) checked @endif @endif type="checkbox" id="repeat_sound" name="repeat_sound">
+                        <label class="form-check-label" for="repeat_sound">@lang('additional.forms.repeat_sound')</label>
+                    </div>
+                    {{-- repeat_sound --}}
                 </div>
 
                 <div class="col-sm-12 col-md-6 col-lg-3 my-1">
@@ -285,6 +294,7 @@
                             if (e) toast(e, "error");
                             else {
                                 getsectiondatas();
+                                document.getElementById('section_name').value=null;
                             }
                         });
                     } else {
@@ -362,8 +372,12 @@
                                 if (n.data != null && n.data.length > 0) {
                                     if (n.data != null && n.data.length > 0)
                                         for (var i = 0; i < n.data.length; i++) {
+                                            var maxLength = 32;
                                             var questionContent = n.data[i].question;
                                             var contentWithoutImages = questionContent.replace(/<img.*?>/g, '');
+                                            if (contentWithoutImages.length > maxLength) {
+                                                contentWithoutImages = truncateString(contentWithoutImages, maxLength);
+                                            }
 
                                             var element = `<div class="question_list_element" id="question_list_element_${n.data[i].id}">
                                         <div onclick="getquestion(${n.data[i].id})" class="question_name">${contentWithoutImages}</div>
@@ -793,6 +807,27 @@
                         }
                     });
                 }
+            }
+
+            function truncateString(str, maxLength) {
+                let truncated = '';
+                let i = 0;
+                let len = 0;
+
+                while (len < maxLength && i < str.length) {
+                    let char = str.charAt(i);
+                    let code = str.charCodeAt(i);
+                    len += code < 128 ? 1 : 2;
+                    if (len <= maxLength) {
+                        truncated += char;
+                    }
+                    i++;
+                }
+
+                if (i < str.length) {
+                    truncated += '...';
+                }
+                return truncated;
             }
         </script>
     @endif

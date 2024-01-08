@@ -749,3 +749,22 @@ if (!function_exists('exam_result')) {
         return Cache::rememberForever("exam_result"  . $exam_id . $auth_id, fn () => $model);
     }
 }
+
+if (!function_exists('get_answer_choised')) {
+    function get_answer_choised($exam_results_ids,$question_id,$question_type,$value_id=null)
+    {
+        $model = ExamResultAnswer::orderBy('id', 'DESC')
+        ->whereIn('result_id',$exam_results_ids)
+        ->where('question_id',$question_id);
+
+        if($question_type==1){
+            $model=$model->where('answer_id',$value_id);
+        }else if($question_type==2){
+            $model=$model->whereIn('answer_id',$value_id);
+        }
+
+        $model=$model->with('result_model')->get();
+
+        return Cache::rememberForever("get_answer_choised"  . $exam_results_ids .$question_id.$question_type.$value_id, fn () => $model);
+    }
+}

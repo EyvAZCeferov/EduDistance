@@ -20,11 +20,12 @@ class SetSubdomain
     {
         $url = $request->url();
         $urlParts = parse_url($url);
-        $mainDomain = 'digitalexam.az';
+        $mainDomain = env('APP_DOMAIN');
         $host = $urlParts['host'];
+        $subdomain=null;
         if (strpos($host, $mainDomain) !== false) {
             $subdomain = str_replace('.' . $mainDomain, '', $host);
-            if($subdomain=='digitalexam.az'){
+            if($subdomain==env('APP_DOMAIN')){
                 $subdomain=null;
             }
         }
@@ -34,7 +35,7 @@ class SetSubdomain
         }else{
             $subdomain = Session::get('subdomain')??null;
         }
-        if($subdomain!='digitalexam.az'){
+        if($subdomain!=env('APP_DOMAIN')){
             Session::put('subdomain', $subdomain??null);
         }else{
             Session::put('subdomain', null);

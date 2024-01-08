@@ -43,6 +43,9 @@ class AuthController extends Controller
     public function authenticate(Request $request)
     {
         try {
+            session()->forget("subdomain");
+            session()->forget("user_id");
+            session()->forget("user_email");
             $this->validate($request, [
                 'email' => 'required|email',
                 'password' => 'required'
@@ -69,7 +72,7 @@ class AuthController extends Controller
                     return redirect(Session::get("savethisurl"));
                 } else {
                     if (isset($userwith_subdomain) && !empty($userwith_subdomain)){
-                        return redirect('https://'.$userwith_subdomain.'.digitalexam.az/az/profile?user_id='.Auth::guard('users')->id());
+                        return redirect(env('HTTP_OR_HTTPS').$userwith_subdomain.'.'.env('APP_DOMAIN').'/az/profile?user_id='.Auth::guard('users')->id());
                     }else{
                         return redirect()->route('user.profile');
                     }
@@ -84,6 +87,9 @@ class AuthController extends Controller
     public function registerSave(Request $request)
     {
         try {
+            session()->forget("subdomain");
+            session()->forget("user_id");
+            session()->forget("user_email");
             $this->validate($request, [
                 'email' => 'required|email|string|unique:users,email',
                 'password' => 'required|string|min:6',
@@ -137,7 +143,7 @@ class AuthController extends Controller
                         return redirect(Session::get("savethisurl"));
                     } else {
                         if (!empty($subdomain))
-                            return redirect('https://'.$subdomain.'.digitalexam.az/az/profile?user_id='.Auth::guard('users')->id());
+                            return redirect(env('HTTP_OR_HTTPS').$subdomain.'.'.env('APP_DOMAIN').'/az/profile?user_id='.Auth::guard('users')->id());
                         else
                             return redirect()->route('user.profile');
                     }
@@ -229,17 +235,17 @@ class AuthController extends Controller
         try {
             $url = $request->url();
             $urlParts = parse_url($url);
-            $mainDomain = 'digitalexam.az';
+            $mainDomain = env('APP_DOMAIN');
             $host = $urlParts['host'];
             if (strpos($host, $mainDomain) !== false) {
                 $subdomain = str_replace('.' . $mainDomain, '', $host);
-                if($subdomain=='digitalexam.az'){
+                if($subdomain==env('APP_DOMAIN')){
                     $subdomain=null;
                 }
             }
             if (Session::has("subdomain") && empty($subdomain) && Auth::guard('users')->check()){
                 session()->put("user_mail",Auth::guard('users')->user()->email);
-                return redirect('https://'.Session::get("subdomain").'.digitalexam.az/az/profile?user_id='.Auth::guard('users')->id());
+                return redirect(env('HTTP_OR_HTTPS').Session::get("subdomain").'.'.env('APP_DOMAIN').'/az/profile?user_id='.Auth::guard('users')->id());
             }
             return view('frontend.auth.profile');
 

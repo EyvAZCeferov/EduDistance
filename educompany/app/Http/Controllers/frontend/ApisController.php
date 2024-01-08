@@ -12,6 +12,7 @@ use App\Models\ExamAnswer;
 use App\Models\CouponCodes;
 use App\Models\Section;
 use Illuminate\Support\Str;
+use App\Models\MarkQuestions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -126,11 +127,13 @@ class ApisController extends Controller
     }
     public function success_error_page_payment(Request $request){
         $url = $request->url();
-        $type="success";
-        if (strpos('success', $url) == false) {
-            $type="error";
+        $type = "error"; 
+
+        if (strpos($url, "success") !== false) {
+            $type = "success";
         }
-        return view("frontend.pages.payment_callback",compact('type'));
+
+        return view("frontend.pages.payment_callback", compact('type'));
     }
     public function create_payment($req)
     {
@@ -352,6 +355,7 @@ class ApisController extends Controller
                 $data = ExamQuestion::where('id', $request->input("element_id"))->first();
                 if (!empty($data) && isset($data->id)) {
                     $data->delete();
+                    dbdeactive();
                     return response()->json(['status' => 'success', 'message' => trans('additional.messages.success', [], $request->input('language') ?? 'az')]);
                 } else {
                     return response()->json(['status' => 'warning', 'message' => trans('additional.pages.exams.notfound', [], $request->input('language') ?? 'az')]);
@@ -360,6 +364,7 @@ class ApisController extends Controller
                 $data = Section::where('id', $request->input("element_id"))->first();
                 if (!empty($data) && isset($data->id)) {
                     $data->delete();
+                    dbdeactive();
                     return response()->json(['status' => 'success', 'message' => trans('additional.messages.success', [], $request->input('language') ?? 'az')]);
                 } else {
                     return response()->json(['status' => 'warning', 'message' => trans('additional.pages.exams.notfound', [], $request->input('language') ?? 'az')]);
@@ -368,6 +373,7 @@ class ApisController extends Controller
                 $data = Exam::where('id', $request->input("element_id"))->first();
                 if (!empty($data) && isset($data->id)) {
                     $data->delete();
+                    dbdeactive();
                     return response()->json(['status' => 'success', 'message' => trans('additional.messages.success', [], $request->input('language') ?? 'az')]);
                 } else {
                     return response()->json(['status' => 'warning', 'message' => trans('additional.pages.exams.notfound', [], $request->input('language') ?? 'az')]);
@@ -399,6 +405,17 @@ class ApisController extends Controller
             return response()->json(['status' => 'success', 'data' => $sections]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+    public function get_markedquestions_users(Request $request){
+        try{
+            $markedQuestionUsers=MarkQuestions::where('question_id',$request->input('question_id'))
+            ->where("exam_id",$request->input('exam_id'))->whereNotNull('user_id')->whereHas('result',function($query){
+                $query->whereNotNull('point');
+            })->with('user')->get();
+            return response()->json(['status'=>'success','data'=>$markedQuestionUsers]);
+        }catch(\Exception $e){
+            return response()->json(['status'=>'error','message'=>$e->getMessage()]);
         }
     }
 }

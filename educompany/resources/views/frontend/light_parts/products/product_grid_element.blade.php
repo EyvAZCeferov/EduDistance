@@ -27,7 +27,12 @@
                 <span
                     class="product_section_element_result result_element @if (auth('users')->user()->user_type == 1 ||
                             !(auth('users')->user()->user_type == 2 && auth('users')->id() == $product->user_id)) result_on_left @endif"
-                    onclick="redirect_tourl('{{ route('user.exam.resultpage', exam_result($product->id, auth('users')->id())) }}')">
+                    onclick="redirect_tourl('{{
+                        session()->has('subdomain') ?
+                            route('user.exam.resultpage', ['subdomain'=>session()->get('subdomain'),'result_id'=>exam_result($product->id, auth('users')->id())]) :
+                            route('user.exam.resultpage', exam_result($product->id, auth('users')->id()))
+                    }}')"
+                    >
                     <i class="fa fa-sticky-note"></i>
                 </span>
             @endif
@@ -91,7 +96,12 @@
                 <span
                     class="product_section_element_result result_element @if (auth('users')->user()->user_type == 1 ||
                             !(auth('users')->user()->user_type == 2 && auth('users')->id() == $product->user_id)) result_on_left @endif "
-                    onclick="redirect_tourl('{{ route('user.exam.resultpage', exam_result($product->id, auth('users')->id())) }}')">
+                    onclick="redirect_tourl('{{
+                        session()->has('subdomain') ?
+                            route('user.exam.resultpage', ['subdomain'=>session()->get('subdomain'),'result_id'=>exam_result($product->id, auth('users')->id())]) :
+                            route('user.exam.resultpage', exam_result($product->id, auth('users')->id()))
+                    }}')"
+                    >
                     <i class="fa fa-sticky-note"></i>
                 </span>
             @endif

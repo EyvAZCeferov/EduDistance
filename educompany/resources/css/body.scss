@@ -1000,7 +1000,7 @@ body {
                 margin-bottom: 10px;
 
                 .section_name {
-                    font-size: $subsubheading_size;
+                    font-size: $normal_size;
                     font-weight: 600;
                     font-family: $secondary-font;
                     color: #000;
@@ -1310,6 +1310,17 @@ body {
                                 height: 45px;
                                 transition: all ease 0.8s;
                                 position: relative;
+
+                                .sizing_counters_forquestion_value{
+                                    width:30px;
+                                    border:1px solid #ccc;
+                                    height:30px;
+                                    border-radius:50%;
+                                    margin-left:5px;
+                                    @extend .classcenter;
+                                    font-size:$normal_size;
+                                    color:#000;
+                                }
 
                                 input {
                                     opacity: 0;

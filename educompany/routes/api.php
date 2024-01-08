@@ -18,3 +18,4 @@ Route::any('finish_exam', [CommonController::class, 'examFinish'])->name('finish
 Route::post('getsectiondata',[ApisController::class,'getsectiondata'])->name("api.getsectiondata");
 Route::post('setsectiondata',[ApisController::class,'setsectiondata'])->name("api.setsectiondata");
 Route::post('getexamsections',[ApisController::class,'getexamsections'])->name("api.getexamsections");
+Route::post('get_markedquestions_users',[ApisController::class,'get_markedquestions_users'])->name("api.get_markedquestions_users");
