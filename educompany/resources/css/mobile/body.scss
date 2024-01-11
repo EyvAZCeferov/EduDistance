@@ -458,171 +458,177 @@
                             }
                         }
 
-                        &.right_col {
-                            flex-direction: column;
+                        .question_header {
+                            width: 90%;
+                            border-radius: 10px;
+                            margin: 0 auto;
+                            font-size: $normal_size;
+                            font-family: $secondary-font;
+                            height: 45px;
 
-                            .question_header {
-                                width: 90%;
+                            div {
                                 border-radius: 10px;
-                                margin: 0 auto;
-                                font-size: $normal_size;
-                                font-family: $secondary-font;
-                                height: 45px;
 
-                                div {
-                                    border-radius: 10px;
+                                span,
+                                a {
+                                    height: 100%;
+                                    width: max-content;
+                                    padding: 2px 5px;
+                                    margin: 0;
+                                    transition: all ease 0.7s;
 
-                                    span,
-                                    a {
-                                        height: 100%;
-                                        width: max-content;
-                                        padding: 2px 5px;
-                                        margin: 0;
-                                        transition: all ease 0.7s;
+                                    &.question_number {
+                                        background-color: $secondary-color;
+                                        padding: 2px 10px;
+                                        border-top-left-radius: 10px;
+                                        border-bottom-left-radius: 10px;
+                                    }
 
-                                        &.question_number {
-                                            background-color: $secondary-color;
-                                            padding: 2px 10px;
-                                            border-top-left-radius: 10px;
-                                            border-bottom-left-radius: 10px;
+                                    &.mark_button {
+                                        margin-left: 10px;
+                                        margin-right: 2px;
+
+                                        &:hover,
+                                        &:focus,
+                                        &:active,
+                                        &.active {
+                                            color: $secondary-color;
                                         }
+                                    }
 
-                                        &.mark_button {
-                                            margin-left: 10px;
-                                            margin-right: 2px;
+                                    &.remove_button {
+                                        margin-right: 10px;
+                                        border: 1px solid #fff;
+                                        padding: 3px;
+                                        height: 60%;
+                                        transition: all ease 0.6s;
+                                        font-size: $page_size;
+                                        text-decoration: line-through;
 
-                                            &:hover,
-                                            &:focus,
-                                            &:active,
-                                            &.active {
-                                                color: $secondary-color;
-                                            }
-                                        }
-
-                                        &.remove_button {
-                                            margin-right: 10px;
-                                            border: 1px solid #fff;
-                                            padding: 3px;
-                                            height: 60%;
-                                            transition: all ease 0.6s;
-                                            font-size: $page_size;
-                                            text-decoration: line-through;
-
-                                            &:hover,
-                                            &:focus,
-                                            &:active,
-                                            &.active {
-                                                text-decoration: none;
-                                                border-color: $secondary-color;
-                                                color: $secondary-color;
-                                            }
+                                        &:hover,
+                                        &:focus,
+                                        &:active,
+                                        &.active {
+                                            text-decoration: none;
+                                            border-color: $secondary-color;
+                                            color: $secondary-color;
                                         }
                                     }
                                 }
                             }
+                        }
+
+                        &.right_col {
+                            flex-direction: column;
 
                             .question_content {
                                 width: 90%;
                                 margin-top: 50px;
 
-                                .question_answer_one {
-                                    width: 100%;
-                                    margin-bottom: 10px;
-                                    border: 1px solid #666;
-                                    color: #666;
-                                    border-radius: 10px;
-                                    height: 45px;
-                                    transition: all ease 0.8s;
-                                    position: relative;
-
-                                    input {
-                                        opacity: 0;
+                                .question_answer_one_element_container{
+                                    display:flex !important;
+                                    width:100% !important;
+                                    @extend .classjustifybetween;
+                                    .question_answer_one {
                                         width: 100%;
-                                        height: 100%;
-                                        display: block;
-                                        position: absolute;
-                                    }
-
-                                    .rowNumber,
-                                    .question,
-                                    .question * {
-                                        font-size: $page_size;
-                                        font-family: $secondary-font;
-                                        margin: 0 5px;
-                                        padding: 0;
-                                        height: 100%;
+                                        margin-bottom: 10px;
+                                        border: 1px solid #666;
+                                        color: #666;
+                                        border-radius: 10px;
+                                        height: 45px;
                                         transition: all ease 0.8s;
+                                        position: relative;
 
-                                        &.rowNumber {
-                                            padding: 0 10px;
-                                            border-radius: 50%;
-                                            height: 30px;
-                                            width: 30px;
-                                            background-color: $gray-color;
+                                        input {
+                                            opacity: 0;
+                                            width: 100%;
+                                            height: 100%;
+                                            display: block;
+                                            position: absolute;
+                                        }
+
+                                        .rowNumber,
+                                        .question,
+                                        .question * {
+                                            font-size: $page_size;
+                                            font-family: $secondary-font;
+                                            margin: 0 5px;
+                                            padding: 0;
+                                            height: 100%;
                                             transition: all ease 0.8s;
-                                            border: 1px solid $gray-color;
-                                        }
-                                    }
-
-                                    &:hover,
-                                    &:focus,
-                                    &:active,
-                                    &.selected {
-                                        border: 1px solid $primary-color;
-                                        cursor: pointer;
-
-                                        .rowNumber,
-                                        .question,
-                                        .question * {
-                                            color: $primary-color;
-                                            border-color: $primary-color;
 
                                             &.rowNumber {
-                                                background-color: $primary-color;
-                                                color: #fff
+                                                padding: 0 10px;
+                                                border-radius: 50%;
+                                                height: 30px;
+                                                width: 30px;
+                                                background-color: $gray-color;
+                                                transition: all ease 0.8s;
+                                                border: 1px solid $gray-color;
                                             }
                                         }
-                                    }
 
-                                    &.true {
-                                        border: 1px solid $success-color;
-                                        cursor: pointer;
+                                        &:hover,
+                                        &:focus,
+                                        &:active,
+                                        &.selected {
+                                            border: 1px solid $primary-color;
+                                            cursor: pointer;
 
-                                        .rowNumber,
-                                        .question,
-                                        .question * {
-                                            color: $success-color;
-                                            border-color: $success-color;
+                                            .rowNumber,
+                                            .question,
+                                            .question * {
+                                                color: $primary-color;
+                                                border-color: $primary-color;
 
-                                            &.rowNumber {
-                                                background-color: $success-color;
-                                                color: #fff
+                                                &.rowNumber {
+                                                    background-color: $primary-color;
+                                                    color: #fff
+                                                }
                                             }
                                         }
-                                    }
 
-                                    &.false {
-                                        border: 1px solid $error-color;
-                                        cursor: pointer;
+                                        &.true {
+                                            border: 1px solid $success-color;
+                                            cursor: pointer;
 
-                                        .rowNumber,
-                                        .question,
-                                        .question * {
-                                            color: $error-color;
-                                            border-color: $error-color;
+                                            .rowNumber,
+                                            .question,
+                                            .question * {
+                                                color: $success-color;
+                                                border-color: $success-color;
 
-                                            &.rowNumber {
-                                                background-color: $error-color;
-                                                color: #fff
+                                                &.rowNumber {
+                                                    background-color: $success-color;
+                                                    color: #fff
+                                                }
                                             }
                                         }
-                                    }
 
-                                    &.your_choise {
-                                        border-bottom-color: $secondary-color;
-                                        border-bottom-width: 4px;
+                                        &.false {
+                                            border: 1px solid $error-color;
+                                            cursor: pointer;
+
+                                            .rowNumber,
+                                            .question,
+                                            .question * {
+                                                color: $error-color;
+                                                border-color: $error-color;
+
+                                                &.rowNumber {
+                                                    background-color: $error-color;
+                                                    color: #fff
+                                                }
+                                            }
+                                        }
+
+                                        &.your_choise {
+                                            border-bottom-color: $secondary-color;
+                                            border-bottom-width: 4px;
+                                        }
                                     }
                                 }
+
                                 .match_questions_one{
                                     .column{
                                         width:49%;
@@ -681,7 +687,8 @@
                                 width: 100%;
                                 height: auto;
                                 padding: 0;
-                                margin-bottom: 20px;
+                                width:95%;
+                                margin:20px auto;
 
                                 &.left_col {
                                     border-right: 0;
@@ -829,20 +836,18 @@
                 &.sat {
                     .content_exam {
                         .col {
-                            &.right_col {
-                                .question_header {
-
-                                    div {
-                                        span,
-                                        a {
-                                            &.remove_button {
-                                                border-radius: 7px;
-                                                border-width: 1px;
-                                            }
+                            .question_header {
+                                div {
+                                    span,
+                                    a {
+                                        &.remove_button {
+                                            border-radius: 7px;
+                                            border-width: 1px;
                                         }
                                     }
                                 }
-
+                            }
+                            &.right_col {
                                 .question_content {
                                     .match_questions_one{
                                         .column{

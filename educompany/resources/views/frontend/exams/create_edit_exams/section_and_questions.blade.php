@@ -18,8 +18,13 @@
                         {{ $value->name }}
 
                     </div>
-                    <button class="btn btn-danger btn-sm mt-1" type="button"
-                        onclick="deletequestion({{ $value->id }},'section')"><i class="fa fa-minus"></i></button>
+                    <div class="d-flex mt-1">
+                        <button class="btn btn-warning btn-sm mt-1"
+                            type="button"onclick="create_edit_section(event,{{ $value->id }})"><i
+                                class="fa fa-edit"></i></button>
+                        <button class="btn btn-danger btn-sm mt-1" type="button"
+                            onclick="deletequestion({{ $value->id }},'section')"><i class="fa fa-minus"></i></button>
+                    </div>
                 </div>
             @endforeach
         @endif

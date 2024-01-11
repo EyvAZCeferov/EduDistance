@@ -1,4 +1,5 @@
 @foreach ($question->answers as $key => $value)
+<div class="question_answer_one_element_container" id="question_answer_one_element_container_{{ $question->id }}_{{ $value->id }}">
     <div id="question_answer_one_{{ $question->id }}_{{ $value->id }}_radio"
         class="question_answer_one answers_{{ $question->id }}
         @if (!empty($exam_result->point)) @if (answer_result_true_or_false($question->id, $value->id) == true) true @else false @endif @endif
@@ -12,4 +13,9 @@
             {!! $value->answer !!}
         </div>
     </div>
+    <button type="button" class="btn btn-sm btn-question_container_undo_or_redo" id='question_container_undo_or_redo_{{ $question->id }}_{{ $value->id }}' onclick="toggleabcline({{ $question->id }},{{ $value->id }})">
+        <i class="fa fa-plus-circle"></i>
+    </button>
+</div>
 @endforeach
+

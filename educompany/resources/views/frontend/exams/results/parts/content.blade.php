@@ -58,12 +58,12 @@
                            'question' => $value,
                            'exam_results' => $exam_results,
                        ])
-                   {{-- @elseif($value->type == 2)
+                    @elseif($value->type == 2)
                        @include('frontend.exams.results.parts.question_checkbox', [
                            'question' => $value,
                            'exam_results' => $exam_results,
                        ])
-                   @elseif($value->type == 3)
+                   {{--@elseif($value->type == 3)
                        @include('frontend.exams.results.parts.question_textbox', [
                            'question' => $value,
                            'exam_results' => $exam_results,

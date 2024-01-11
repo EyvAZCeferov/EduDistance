@@ -19,5 +19,7 @@ class VerifyCsrfToken extends Middleware
         '/get_question_data',
         '*/authenticate',
         '/remove_questionorsection_data',
+        '*/register-save',
+        '*/authenticate',
     ];
 }

@@ -143,9 +143,8 @@
                     <select name="layout_type"
                         class="form-control {{ $errors->first('layout_type') ? 'is-invalid' : '' }}">
                         @foreach (\App\Models\Exam::LAYOUTS as $key => $type)
-                            <option
-                                {{ old('layout_type', isset($data) && !empty($data) && isset($data->id) ? $data->layout_type : null) == $type ? 'selected' : '' }}
-                                value="{{ $key }}">{{ $type }}</option>
+                            <option {{ old('layout_type', isset($data) && !empty($data) && isset($data->id) ? $data->layout_type : null) == $type ? 'selected' : '' }}
+                            value="{{ $key }}">{{ $type }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -217,7 +216,7 @@
                         </div>
                     </div>
                     <div class="row mt-2">
-                        <button type="button" onclick="create_section(event)"
+                        <button type="button" onclick="create_edit_section(event)"
                             class="btn btn-success btn-block">@lang('additional.buttons.add')</button>
                     </div>
                 </div>
@@ -277,7 +276,7 @@
     @if (isset($data) && !empty($data) && isset($data->id))
         {{-- Section Functions --}}
         <script defer>
-            function create_section(event) {
+            function create_edit_section(event,id=null) {
                 event.preventDefault();
                 try {
                     var section_name = document.getElementById('section_name').value.trim();
@@ -302,14 +301,14 @@
                     }
                 } catch (error) {
                     toast(error, 'error');
-                    console.log("---------------SETTYPE------------" + error);
                 }
             }
 
-            function getsectiondatas() {
+            function getsectiondatas(id=null) {
                 sendAjaxRequestOLD("{{ route('api.getexamsections') }}", "post", {
                     exam_id: {{ $data->id }},
                     language: document.getElementById("language").value,
+                    section_id:id,
                 }, function(e, t) {
                     if (e) toast(e, "error");
                     else {
@@ -327,8 +326,12 @@
                                                 id="section_element_${item.id}">
                                                 ${item.name}
                                             </div>
-                                            <button class="btn btn-danger btn-sm mt-1" type="button"
-                                                onclick="deletequestion(${item.id},'section')"><i class="fa fa-minus"></i></button>
+                                            <div class="d-flex mt-1">
+                                                <button class="btn btn-warning btn-sm mt-1" type="button"
+                                                    onclick="create_edit_section(event,${item.id})"><i class="fa fa-edit"></i></button>
+                                                <button class="btn btn-danger btn-sm mt-1" type="button"
+                                                    onclick="deletequestion(${item.id},'section')"><i class="fa fa-minus"></i></button>
+                                            </div>
                                         </div>`;
                                 section_elements.innerHTML += divElement;
                             });

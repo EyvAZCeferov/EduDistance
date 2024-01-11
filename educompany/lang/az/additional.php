@@ -84,6 +84,7 @@ return [
             "timespent"=>"Xərclədiyi vaxd",
             "forviewselected"=>"Baxış üçün işarələnmişlər",
             "answered_students"=>"Cavab vermiş şəxslər",
+            "youranswer"=>"Sizin cavab"
         ],
         'blogs'=>[
             'blogs'=>"Bloqlar"
@@ -135,6 +136,7 @@ return [
         "sector"=>"Bölmə",
         'createquestion'=>"Sual əlavə et",
         "answer_type"=>"Cavab növü",
+        "undo"=>"Geri al"
     ],
     "forms" => [
         'name' => 'Ad, Soyad',

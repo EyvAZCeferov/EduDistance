@@ -135,7 +135,7 @@ class AuthController extends Controller
                 if (Auth::guard('users')->attempt($credentials)) {
                     session()->put("user_id",Auth::guard('users')->id());
                     session()->put("user_mail",Auth::guard('users')->user()->email);
-                    if (isset($subdomain) && !empty($subdomain)){
+                     if (isset($subdomain) && !empty($subdomain)){
                         Session::put("subdomain", $subdomain);
                     }
 

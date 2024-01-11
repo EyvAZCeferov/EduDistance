@@ -30,7 +30,6 @@ class CommonController extends Controller
 
         return view('frontend.pages.exam.index', compact('exam', 'exam_id', 'sections'));
     }
-
     public function examFinish(Request $request)
     {
         try {
@@ -38,8 +37,10 @@ class CommonController extends Controller
                 return response()->json(['status' => 'eror', 'message' => trans("additional.messages.answersnotfound", [], $request->language ?? 'az')]);
             }
             $result = collect();
-            DB::transaction(function () use ($request, &$result) {
+            $nextsection=false;
+            DB::transaction(function () use ($request, &$result,&$nextsection) {
                 $exam = Exam::findOrFail($request->exam_id);
+                $examsection=Section::where("id",$request->current_section)->first();
                 $result = ExamResult::where("id", $request->exam_result_id)->first();
                 $result->update([
                     'time_reply' => $request->time_exam,
@@ -109,9 +110,11 @@ class CommonController extends Controller
                         }
                     }
                 }
-                if ($exam->time_range_sections > 0) {
+
+                if ($examsection->time_range_sections > 0) {
                     $point = calculate_exam_result($result->id);
                     session()->put('point', $point);
+                    $nextsection=true;
                 } else {
                     $pointlast = session()->has('point') ? session()->get('point') : 0;
                     $point =$pointlast+ calculate_exam_result($result->id);
@@ -128,7 +131,8 @@ class CommonController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => trans("additional.messages.exam_finished", [], $request->language ?? 'az'),
-                'url' => route("user.exam.resultpage", $result->id)
+                'url' => route("user.exam.resultpage", $result->id),
+                'nextsection'=>$nextsection
             ]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
@@ -136,7 +140,6 @@ class CommonController extends Controller
             dbdeactive();
         }
     }
-
     public function examResults()
     {
         $results = ExamResult::where('user_id', auth('users')->user()->id)
@@ -145,7 +148,6 @@ class CommonController extends Controller
 
         return view('frontend.pages.exam.results', compact('results'));
     }
-
     public function examResultPage_nosubdomain($result_id)
     {
         $exam_result = ExamResult::where('user_id', auth('users')->user()->id)
@@ -171,7 +173,6 @@ class CommonController extends Controller
             return view('frontend.exams.resultpage', compact('exam_result'));
         }
     }
-
     public function examResult_nosubdomain($result_id)
     {
         $exam_result = ExamResult::where('user_id', auth('users')->user()->id)
@@ -409,7 +410,7 @@ class CommonController extends Controller
             $data->start_time = $start_time ?? null;
             if (!empty($image))
                 $data->image = $image;
-            $data->layout_type = $request->layout_type ?? 'standart';
+            $data->layout_type = $request->input('layout_type') ?? 'standart';
             $data->save();
 
             $exam_start_pages = ExamStartPageIds::where("exam_id", $data->id)->get();
@@ -499,7 +500,7 @@ class CommonController extends Controller
             $data->start_time = $start_time ?? null;
             if (!empty($image))
                 $data->image = $image;
-            $data->layout_type = $request->layout_type ?? 'standart';
+            $data->layout_type = $request->input('layout_type') ?? 'standart';
             $data->save();
 
             $exam_start_pages = ExamStartPageIds::where("exam_id", $data->id)->get();

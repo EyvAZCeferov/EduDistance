@@ -8,6 +8,31 @@
             data-key="{{ $key + 1 }}" data-id="{{ $value->id }}" id="content_exam_{{ $value->id }}"
             data-section_id="{{ $value->section_id }}" data-section_name="{{ $value->section->name }}">
             <div class="col left_col" id="left_col">
+                @if($value->layout=='onepage')
+                    <div class="question_header mb-2">
+                        <div>
+                            <span class="question_number">{{ $key + 1 }}</span>
+                            <a href="javascript:void(0)" onclick="mark_unmark_question({{ $value->id }})"
+                                id="mark_question_button_{{ $value->id }}"
+                                class="mark_button @if (!empty(question_is_marked($value->id, $exam->id, $exam_result->id, auth('users')->id()))) active @endif">
+                                @if (!empty(question_is_marked($value->id, $exam->id, $exam_result->id, auth('users')->id())))
+                                    <i class="fa fa-bookmark"></i>
+                                @else
+                                    <i class="far fa-bookmark"></i>
+                                @endif
+                            </a>
+                            <span class="info_text">@lang('additional.pages.exams.question_info_text')</span>
+                        </div>
+                        <div>
+                            @if (($value->type!=4 && $value->type != 3 ) && !isset($hide_abc))
+                                <a href="javascript:void(0)" class="remove_button" onclick="remove_button_toggler()">
+                                    ABC
+                                </a>
+                            @endif
+                        </div>
+
+                    </div>
+                @endif
                 @if ($value->type != 5)
                     <div class="buttons_top_aplusandminus">
                         <div></div>
@@ -19,7 +44,7 @@
                         </div>
                     </div>
                 @endif
-                <div class="content_exam_info @if($value->type == 5) classcenter @endif" id="content_exam_info" style="flex-direction: column">
+                <div class="content_exam_info @if($value->type == 5 || $value->type==3) classcenter @endif" id="content_exam_info" style="flex-direction: column">
                     @if ($value->type == 5)
                         <div class="audio_tag_text">
                             {!! $value->question !!}
@@ -35,29 +60,31 @@
                 <div id="resizer" class="resizer"></div>
             @endif
             <div class="col right_col" id="right_col">
-                <div class="question_header">
-                    <div>
-                        <span class="question_number">{{ $key + 1 }}</span>
-                        <a href="javascript:void(0)" onclick="mark_unmark_question({{ $value->id }})"
-                            id="mark_question_button_{{ $value->id }}"
-                            class="mark_button @if (!empty(question_is_marked($value->id, $exam->id, $exam_result->id, auth('users')->id()))) active @endif">
-                            @if (!empty(question_is_marked($value->id, $exam->id, $exam_result->id, auth('users')->id())))
-                                <i class="fa fa-bookmark"></i>
-                            @else
-                                <i class="far fa-bookmark"></i>
-                            @endif
-                        </a>
-                        <span class="info_text">@lang('additional.pages.exams.question_info_text')</span>
-                    </div>
-                    <div>
-                        @if (($value->type!=4 && $value->type != 3 ) && !isset($hide_abc))
-                            <a href="javascript:void(0)" class="remove_button" onclick="remove_button_toggler()">
-                                ABC
+                @if($value->layout!='onepage')
+                    <div class="question_header">
+                        <div>
+                            <span class="question_number">{{ $key + 1 }}</span>
+                            <a href="javascript:void(0)" onclick="mark_unmark_question({{ $value->id }})"
+                                id="mark_question_button_{{ $value->id }}"
+                                class="mark_button @if (!empty(question_is_marked($value->id, $exam->id, $exam_result->id, auth('users')->id()))) active @endif">
+                                @if (!empty(question_is_marked($value->id, $exam->id, $exam_result->id, auth('users')->id())))
+                                    <i class="fa fa-bookmark"></i>
+                                @else
+                                    <i class="far fa-bookmark"></i>
+                                @endif
                             </a>
-                        @endif
-                    </div>
+                            <span class="info_text">@lang('additional.pages.exams.question_info_text')</span>
+                        </div>
+                        <div>
+                            @if (($value->type!=4 && $value->type != 3 ) && !isset($hide_abc))
+                                <a href="javascript:void(0)" class="remove_button" onclick="remove_button_toggler()">
+                                    ABC
+                                </a>
+                            @endif
+                        </div>
 
-                </div>
+                    </div>
+                @endif
                 <div class="question_content">
                     @if ($value->type == 1 || $value->type == 5)
                         @include('frontend.exams.exam_main_process.parts.question_radio', [

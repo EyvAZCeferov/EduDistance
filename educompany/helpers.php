@@ -758,9 +758,16 @@ if (!function_exists('get_answer_choised')) {
         ->where('question_id',$question_id);
 
         if($question_type==1){
-            $model=$model->where('answer_id',$value_id);
+            $model=$model->where('answer_id',$value_id)
+            ->whereNotNull("answer_id")
+            ->whereNull('value');
         }else if($question_type==2){
-            $model=$model->whereIn('answer_id',$value_id);
+            $model = $model->where(function ($query) use ($value_id) {
+                $query->whereIn('answers', [$value_id])
+                    ->whereNotNull("answers")
+                    ->whereNull("answer_id")
+                    ->whereNull('value');
+            });
         }
 
         $model=$model->with('result_model')->get();

@@ -318,10 +318,16 @@
         function showuserswhichanswered(object,type){
             try{
                 showLoader();
+
+                var showuseranswersmodal = document.getElementById('showuseranswers');
+                if (showuseranswersmodal != null) {
+                    showuseranswersmodal.remove();
+                }
+
                 if(object!=null && object.length>0){
                     var elementsanswers;
                     for (var i = 0; i < object.length; i++) {
-                        if(object[i]!=null && object[i].result_model!=null && object[i].result_model.user!=null){
+                        if(object[i]!=null && object[i]!=undefined && object[i].result_model!=null && object[i].result_model!=undefined && object[i].result_model.user!=null && object[i].result_model.user!=undefined && object[i].result_model.user.name!=null && object[i].result_model.user.name!=undefined && object[i].result_model.user.name!='' && object[i].result_model.user.name!=' '){
                             var element = `<div class="my-1 mb-2 p-1 row">
                                 <h6>${object[i].result_model.user.name} / ${object[i].result_model.user.email}</h6
                                 </div>`;
@@ -341,7 +347,7 @@
                                 </div>
 
                                 <div class="modal-body overflow-scroll max-h-32">
-                                    ${elements}
+                                    ${elementsanswers}
                                 </div>
 
                             </div>
@@ -352,11 +358,13 @@
                     document.body.innerHTML+=showuseranswers;
                     toggleModalnow('showuseranswers', 'open');
                 }else{
+                    hideLoader();
                     toast("@lang('additional.pages.exams.notfound')",'warning');
                 }
 
                 hideLoader();
             }catch(error){
+                hideLoader();
                 toast(error, 'error');
             }
         }

@@ -125,9 +125,10 @@ class ApisController extends Controller
             \Log::info(['------------------CallBack Error------------------', $e->getMessage(), $e->getLine()]);
         }
     }
-    public function success_error_page_payment(Request $request){
+    public function success_error_page_payment(Request $request)
+    {
         $url = $request->url();
-        $type = "error"; 
+        $type = "error";
 
         if (strpos($url, "success") !== false) {
             $type = "success";
@@ -182,7 +183,7 @@ class ApisController extends Controller
                 ];
                 $payment = new Payments();
                 $payment->token = $req['token'];
-                $payment->amount = $req['amount']==0?$exam_price:$req['amount'];
+                $payment->amount = $req['amount'] == 0 ? $exam_price : $req['amount'];
                 $payment->payment_status = 0;
                 $payment->data = $req;
                 $payment->user_id = $req['user_id'];
@@ -341,9 +342,9 @@ class ApisController extends Controller
             if (!empty($request->input('section_id'))) {
                 $section = Section::where('exam_id', $request->input("exam_id"))->orderBy('created_at')->findOrFail($request->input('section_id'));
             }
-            $questions = $section ? ExamQuestion::where('section_id', $section?->id)->orderBy('created_at')->get() : [];
+            $data = $section ? ExamQuestion::where('section_id', $section?->id)->orderBy('created_at')->get() : [];
 
-            return response()->json(['status' => 'success', 'data' => $questions]);
+            return response()->json(['status' => 'success', 'data' => $data, 'section_id' => isset($request->section_id) && !empty($request->section_id) ? $request->section_id : null]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
@@ -407,15 +408,16 @@ class ApisController extends Controller
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
-    public function get_markedquestions_users(Request $request){
-        try{
-            $markedQuestionUsers=MarkQuestions::where('question_id',$request->input('question_id'))
-            ->where("exam_id",$request->input('exam_id'))->whereNotNull('user_id')->whereHas('result',function($query){
-                $query->whereNotNull('point');
-            })->with('user')->get();
-            return response()->json(['status'=>'success','data'=>$markedQuestionUsers]);
-        }catch(\Exception $e){
-            return response()->json(['status'=>'error','message'=>$e->getMessage()]);
+    public function get_markedquestions_users(Request $request)
+    {
+        try {
+            $markedQuestionUsers = MarkQuestions::where('question_id', $request->input('question_id'))
+                ->where("exam_id", $request->input('exam_id'))->whereNotNull('user_id')->whereHas('result', function ($query) {
+                    $query->whereNotNull('point');
+                })->with('user')->get();
+            return response()->json(['status' => 'success', 'data' => $markedQuestionUsers]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
 }
