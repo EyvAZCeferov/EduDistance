@@ -220,7 +220,6 @@
                 showfinishmodal('hide');
                 if (current_question == first_question.dataset.id) {
                     hideLoader();
-                    window.location.href = '/exams';
                 } else {
                     currentDivQuestion.classList.remove("show");
                     var new_key = parseInt(currentDivQuestion.dataset.key) - 1;
@@ -239,13 +238,17 @@
             }
         }
 
-        function togglequestions() {
+        function togglequestions(modal=false) {
             var footer_questions = document.getElementById('footer_questions');
             showfinishmodal('hide');
             if (footer_questions.classList.contains('active')) {
                 footer_questions.classList.remove("active");
             } else {
                 footer_questions.classList.add("active");
+            }
+
+            if(modal==true){
+                showfinishmodal('open');
             }
         }
 
@@ -435,6 +438,7 @@
                 var selected = document.getElementById(`content_exam_${id}`);
                 selected.classList.add("show");
                 document.getElementById("current_question").value = id;
+                togglequestions();
                 hideLoader();
             } catch (error) {
                 hideLoader();

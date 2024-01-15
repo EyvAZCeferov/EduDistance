@@ -137,7 +137,8 @@ return [
         "sector"=>"Bölmə",
         'createquestion'=>"Sual əlavə et",
         "answer_type"=>"Cavab növü",
-        "undo"=>"Geri al"
+        "undo"=>"Geri al",
+        "gotoreviewpage"=>"Baxış səhifəsinə keçin"
     ],
     "forms" => [
         'name' => 'Ad, Soyad',

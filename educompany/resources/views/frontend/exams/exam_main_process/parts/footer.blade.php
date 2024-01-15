@@ -20,9 +20,9 @@
         @endforeach
     </div>
     <div class="center_back_button">
-        <button type="button" onclick="togglequestions()" class="center_back">
+        <button type="button" onclick="togglequestions(true)" class="center_back">
             <i class="fas fa-list-ul"></i>
-            @lang('additional.buttons.gotohome')
+            @lang('additional.buttons.gotoreviewpage')
         </button>
     </div>
     <div class="bottomcorner"></div>
