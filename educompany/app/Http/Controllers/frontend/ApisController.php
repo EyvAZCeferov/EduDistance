@@ -349,6 +349,14 @@ class ApisController extends Controller
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
+    public function getsectioninformation(Request $request){
+        try{
+            $data=sections($request->input('section_id'),'id');
+            return response()->json(['status'=>'success','data'=>$data]);
+        }catch(\Exception $e){
+            return response()->json(['status'=>'error','message'=>$e->getMessage()]);
+        }
+    }
     public function remove_questionorsection_data(Request $request)
     {
         try {
@@ -388,7 +396,11 @@ class ApisController extends Controller
     {
         try {
             DB::transaction(function () use ($request) {
-                $model = new Section();
+                if(isset($request->selected_section_id) && !empty($request->input('selected_section_id'))){
+                    $model = Section::where('id',$request->input('selected_section_id'))->first();
+                }else{
+                    $model = new Section();
+                }
                 $model->exam_id = $request->input('exam_id');
                 $model->name = $request->input('name');
                 $model->time_range_sections = $request->input('time_range_sections') ?? 0;

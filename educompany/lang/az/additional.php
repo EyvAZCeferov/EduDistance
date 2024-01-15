@@ -6,7 +6,8 @@ return [
         "register" => "Qeydiyyat",
         "welcome" => "Ana səhifə",
         "profile"=>"Profil",
-        "logout"=>"Çıxış"
+        "logout"=>"Çıxış",
+        "reset_password"=>"Şifrəni yenilə"
     ],
     "footer" => [
         "usefull_links" => "Əlçatımlı keçidlər",

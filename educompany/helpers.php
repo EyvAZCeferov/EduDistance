@@ -258,6 +258,8 @@ if (!function_exists('sections')) {
         if ($type == "exammed") {
             $model = Section::whereHas('questions')->select('name', DB::raw('MAX(id) as id'))
                 ->groupBy('name')->get();
+        }else if ($type == "id") {
+            $model = Section::where('id',$key)->first();
         } else {
             $model = Section::select('name', DB::raw('MAX(id) as id'))
                 ->groupBy('name')

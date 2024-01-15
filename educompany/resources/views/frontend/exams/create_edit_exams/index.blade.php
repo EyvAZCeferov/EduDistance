@@ -66,8 +66,7 @@
                             href="{{ getImageUrl($data->image, 'exams') }}" src="{{ getImageUrl($data->image, 'exams') }}"
                             class="img-fluid img-responsive" style="height: 150px;margin-bottom:10px;">
                     @endif
-                    <input type="file" @if (!(isset($data) && !empty($data) && !empty($data->image))) required @endif name="image"
-                    accept="image/*"
+                    <input type="file" @if (!(isset($data) && !empty($data) && !empty($data->image))) required @endif name="image" accept="image/*"
                         class="form-control {{ $errors->first('image') ? 'is-invalid' : '' }}">
                 </div>
 
@@ -124,7 +123,8 @@
                     {{-- repeat_sound --}}
                     <div class="form-check form-switch">
                         <input class="form-check-input"
-                        @if (isset($data) && !empty($data) && !empty($data->repeat_sound)) @if ($data->repeat_sound == true) checked @endif @endif type="checkbox" id="repeat_sound" name="repeat_sound">
+                            @if (isset($data) && !empty($data) && !empty($data->repeat_sound)) @if ($data->repeat_sound == true) checked @endif
+                            @endif type="checkbox" id="repeat_sound" name="repeat_sound">
                         <label class="form-check-label" for="repeat_sound">@lang('additional.forms.repeat_sound')</label>
                     </div>
                     {{-- repeat_sound --}}
@@ -143,8 +143,9 @@
                     <select name="layout_type"
                         class="form-control {{ $errors->first('layout_type') ? 'is-invalid' : '' }}">
                         @foreach (\App\Models\Exam::LAYOUTS as $key => $type)
-                            <option {{ old('layout_type', isset($data) && !empty($data) && isset($data->id) ? $data->layout_type : null) == $type ? 'selected' : '' }}
-                            value="{{ $key }}">{{ $type }}</option>
+                            <option
+                                {{ old('layout_type', isset($data) && !empty($data) && isset($data->id) ? $data->layout_type : null) == $type ? 'selected' : '' }}
+                                value="{{ $key }}">{{ $type }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -194,6 +195,7 @@
                 </div>
 
                 <div class="modal-body">
+                    <input type="hidden" name="selected_section_id" id="selected_section_id">
                     <div class="row my-2">
                         <div class="col-md-7">
                             <div class="form-group">
@@ -276,39 +278,49 @@
     @if (isset($data) && !empty($data) && isset($data->id))
         {{-- Section Functions --}}
         <script defer>
-            function create_edit_section(event,id=null) {
+            function create_edit_section(event, id = null) {
                 event.preventDefault();
                 try {
-                    var section_name = document.getElementById('section_name').value.trim();
-                    var section_duration = document.getElementById('section_duration').value.trim();
-                    if (section_name && section_duration) {
-                        sendAjaxRequestOLD("{{ route('api.setsectiondata') }}", "post", {
-                            exam_id: {{ $data->id }},
-                            language: document.getElementById("language").value,
-                            user_id: document.getElementById("auth_id").value,
-                            name: section_name,
-                            time_range_sections: section_duration,
-                            responseType: 'json'
-                        }, function(e, t) {
-                            if (e) toast(e, "error");
-                            else {
-                                getsectiondatas();
-                                document.getElementById('section_name').value=null;
-                            }
-                        });
+                    var selected_section_id=document.getElementById('selected_section_id');
+                    if (id != null) {
+                        selected_section_id.value=null;
+                        get_section_information(id);
                     } else {
-                        toast("@lang('additional.messages.required_fill')", 'error');
+                        var section_name = document.getElementById('section_name').value.trim();
+                        var section_duration = document.getElementById('section_duration').value.trim();
+
+                        if (section_name && section_duration) {
+                            sendAjaxRequestOLD("{{ route('api.setsectiondata') }}", "post", {
+                                exam_id: {{ $data->id }},
+                                language: document.getElementById("language").value,
+                                user_id: document.getElementById("auth_id").value,
+                                name: section_name,
+                                time_range_sections: section_duration,
+                                responseType: 'json',
+                                selected_section_id:selected_section_id.value,
+                            }, function(e, t) {
+                                if (e) toast(e, "error");
+                                else {
+                                    getsectiondatas();
+                                    selected_section_id.value=null;
+                                    document.getElementById('section_name').value = null;
+                                    document.getElementById('section_duration').value = null;
+                                }
+                            });
+                        } else {
+                            toast("@lang('additional.messages.required_fill')", 'error');
+                        }
                     }
                 } catch (error) {
                     toast(error, 'error');
                 }
             }
 
-            function getsectiondatas(id=null) {
+            function getsectiondatas(id = null) {
                 sendAjaxRequestOLD("{{ route('api.getexamsections') }}", "post", {
                     exam_id: {{ $data->id }},
                     language: document.getElementById("language").value,
-                    section_id:id,
+                    section_id: id,
                 }, function(e, t) {
                     if (e) toast(e, "error");
                     else {
@@ -388,6 +400,38 @@
                                         </div>`;
                                             questions_list.innerHTML += element;
                                         }
+                                }
+                            }
+                        });
+                } catch (error) {
+                    hideLoader();
+                    toast(error, 'error');
+                }
+            }
+
+            function get_section_information(id) {
+                try {
+                    showLoader();
+                    sendAjaxRequestOLD(`{{ route('api.getsectioninformation') }}`, "post", {
+                            section_id: id,
+                        },
+                        function(e,
+                            t) {
+                            if (e) toast(e, "error");
+                            else {
+                                let n = JSON.parse(t);
+                                hideLoader();
+                                if (n.message != null)
+                                    toast(n.message, n.status);
+
+                                if (n.data != null) {
+                                    var section_name=document.getElementById('section_name');
+                                    var section_duration=document.getElementById('section_duration');
+                                    var selected_section_id=document.getElementById('selected_section_id');
+                                    section_name.value=n.data.name;
+                                    section_duration.value=n.data.time_range_sections;
+                                    selected_section_id.value=n.data.id;
+                                    toggleModalnow('create_sections','open');
                                 }
                             }
                         });

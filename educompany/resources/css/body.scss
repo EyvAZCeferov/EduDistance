@@ -1601,6 +1601,14 @@ body {
 
                             &.left_col {
                                 border-right: 0;
+                                .buttons_top_aplusandminus{
+                                    width:90.5%;
+                                    margin:2px auto;
+                                }
+                                .content_exam_info {
+                                    width:96.5%;
+                                    margin:5px auto;
+                                }
                             }
                         }
                     }
@@ -1703,15 +1711,19 @@ body {
                                 background-image: url("../images/yellowbookmark.svg");
                                 position: absolute;
                                 top: -25%;
-                                left: 50%;
-                                transform: translate(-32%, -72%);
+                                left: 100;
+                                transform: translate(-32%, -5%);
                                 margin: 0 auto;
                                 text-align: center;
-                                height: 20px;
+                                height: 16px;
                                 width: 20px;
                                 background-repeat: no-repeat;
                                 background-size: contain;
-                            }
+                                -webkit-transform: translate(-32%, -5%);
+                                -moz-transform: translate(-32%, -5%);
+                                -ms-transform: translate(-32%, -5%);
+                                -o-transform: translate(-32%, -5%);
+}
                         }
 
                         &.current {
