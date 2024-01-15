@@ -85,7 +85,9 @@
                         </div>
 
                         <div class="modal-body">
-                            <iframe src="https://www.desmos.com/calculator/nqvcxb50ap" style="border:0px #ffffff none;width:100%;height:100%;" name="myiFrame" scrolling="no" frameborder="0" marginheight="0px" marginwidth="0px" allowfullscreen></iframe>
+                            <iframe src="https://www.desmos.com/calculator/nqvcxb50ap"
+                                style="border:0px #ffffff none;width:100%;height:100%;" name="myiFrame" scrolling="no"
+                                frameborder="0" marginheight="0px" marginwidth="0px" allowfullscreen></iframe>
                         </div>
 
                     </div>
@@ -207,10 +209,10 @@
     {{-- Footer Buttons --}}
     <script defer>
         let finishmodalshowed = false;
-        let redirect_url=null;
+        let redirect_url = null;
 
         function toback() {
-            try{
+            try {
                 showLoader();
                 var current_question = document.getElementById("current_question").value;
                 var first_question = document.getElementsByClassName('content_exam')[0];
@@ -231,9 +233,9 @@
                     });
                     hideLoader();
                 }
-            }catch(error){
+            } catch (error) {
                 hideLoader();
-                toast(error,'error');
+                toast(error, 'error');
             }
         }
 
@@ -248,7 +250,7 @@
         }
 
         function tonext(tolast = false) {
-            try{
+            try {
                 showLoader();
                 var current_question = document.getElementById("current_question").value;
                 var all_questions = document.getElementById("all_questions").value;
@@ -279,10 +281,10 @@
                                 toast(data.message, data.status);
                                 hideLoader();
                                 if (data.url != null && data.url != '' && data.url != ' ') {
-                                    redirect_url=data.url;
+                                    redirect_url = data.url;
                                 }
 
-                                if(data.nextsection==false){
+                                if (data.nextsection == false) {
                                     window.location.href = data.url;
                                 }
                             })
@@ -299,7 +301,7 @@
                                 form.style.display = "none";
                                 loader_for_sections.classList.add("active");
                             }
-                        }else{
+                        } else {
                             clearInterval(intervalTimerID);
                         }
                     }
@@ -315,9 +317,9 @@
                     });
                     hideLoader();
                 }
-            }catch(error){
+            } catch (error) {
                 hideLoader();
-                toast(error,'error');
+                toast(error, 'error');
             }
         }
 
@@ -339,11 +341,11 @@
             }
         }
 
-        function searchinarray(obj,searchVal){
+        function searchinarray(obj, searchVal) {
             var result = false;
-            for (var i=0 ; i < obj.length ; i++){
+            for (var i = 0; i < obj.length; i++) {
                 if (obj[i] == searchVal) {
-                    result= true;
+                    result = true;
                     break;
                 }
             }
@@ -359,12 +361,12 @@
             var marked_questions = document.getElementById('marked_questions').value;
 
             for (var i = 0; i < footer_question_buttons.length; i++) {
-                const element_for_saved=footer_question_buttons[i];
+                const element_for_saved = footer_question_buttons[i];
                 element_for_saved.classList.remove("current");
                 if (marked_questions != null && marked_questions.length > 0) {
                     marked_questions_jsoned = JSON.parse(marked_questions);
                     var buttonDataKey = element_for_saved.getAttribute('data-key');
-                    if (searchinarray(marked_questions_jsoned,buttonDataKey)==true) {
+                    if (searchinarray(marked_questions_jsoned, buttonDataKey) == true) {
                         element_for_saved.classList.add("saved");
                     }
                 }
@@ -422,7 +424,7 @@
         }
 
         function getquestion(id) {
-            try{
+            try {
                 showLoader();
                 var activecontentquestions = document.getElementsByClassName("content_exam");
                 showfinishmodal('hide');
@@ -434,9 +436,9 @@
                 selected.classList.add("show");
                 document.getElementById("current_question").value = id;
                 hideLoader();
-            }catch(error){
+            } catch (error) {
                 hideLoader();
-                toast(error,'error');
+                toast(error, 'error');
             }
         }
 
@@ -453,7 +455,7 @@
         }
 
         var countDownDate = new Date(Date.now() + ({{ $exam->duration }} * 60 * 1000)).getTime();
-        var time_range_sections=document.getElementById("time_range_sections");
+        var time_range_sections = document.getElementById("time_range_sections");
 
         function pad_new(val) {
             return val > 9 ? val : "0" + val;
@@ -475,7 +477,7 @@
 
             if (loader_for_sections.classList.contains('active') && section_start_time.value > 0) {
                 var qalan_vaxt = time_range_sections.value - section_start_time.value;
-                console.log(qalan_vaxt,time_range_sections,section_start_time.value);
+                console.log(qalan_vaxt, time_range_sections, section_start_time.value);
                 section_start_time.value = parseInt(section_start_time.value) + 1;
                 if (document.getElementById('seconds_start_time')) {
                     document.getElementById('seconds_start_time').innerHTML = pad(qalan_vaxt % 60);
@@ -555,6 +557,33 @@
 
     {{-- Exam Functions --}}
     <script defer>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [{
+                        left: '$$',
+                        right: '$$',
+                        display: true
+                    },
+                    {
+                        left: '$',
+                        right: '$',
+                        display: false
+                    },
+                    {
+                        left: '\\(',
+                        right: '\\)',
+                        display: true
+                    },
+                    {
+                        left: '\\[',
+                        right: '\\]',
+                        display: true
+                    }
+                ],
+                throwOnError: false
+            });
+        });
+
         function increase_decrease_font(type) {
             var elements = document.getElementsByClassName('content_exam_info');
 
@@ -572,7 +601,7 @@
         function remove_button_toggler() {
             var elements = document.getElementsByClassName('remove_button');
             var btn_question_container_undo_or_redo = document.getElementsByClassName(
-            'btn-question_container_undo_or_redo');
+                'btn-question_container_undo_or_redo');
             var question_answer_one_element_container = document.getElementsByClassName(`question_answer_one`);
             var question_container_undo_or_redo = document.getElementsByClassName(`btn-question_container_undo_or_redo`);
 
@@ -641,14 +670,23 @@
             var text_box = document.getElementById(`question_answer_one_${question_id}_${type}`).value;
             var answer_footer_buttons = document.getElementById(`question_row_button_${question_id}`);
             var question_textbox_text_span = document.getElementById(`question_textbox_text_span_${question_id}`);
+
             if (question_textbox_text_span !== null) {
                 question_textbox_text_span.innerHTML = '';
             }
+
             if (text_box.length > 0 && text_box != null && $.trim(text_box) != '' && $.trim(text_box) != null && $.trim(
                     text_box) != ' ') {
+                var parts = text_box.split('/');
                 answer_footer_buttons.classList.add('answered');
-                if (text_box == '1/2') {
-                    question_textbox_text_span.innerHTML = `÷`;
+                if (parts.length === 2) {
+                    var x = parts[0];
+                    var y = parts[1];
+                    var rendered = katex.renderToString(`\\frac{${x}}{${y}}`, {
+                        throwOnError: false,
+                        displayMode: true
+                    });
+                    question_textbox_text_span.innerHTML = `<span>${rendered}</span>`;
                 } else {
                     question_textbox_text_span.innerHTML = `${text_box}`;
                 }
@@ -707,29 +745,38 @@
 
         const leftCol = document.getElementsByClassName('left_col');
         const resizer = document.getElementsByClassName('resizer');
+        let isResizing = false;
+        let offsetX = 0;
 
         function draggingleftandrightcolumns() {
             for (let index = 0; index < resizer.length; index++) {
                 const element = resizer[index];
                 element.addEventListener("mousedown", (e) => {
                     e.preventDefault();
+                    isResizing = true;
+                    offsetX = element.clientWidth / 2;
                     document.addEventListener("mousemove", resize);
                     document.addEventListener("mouseup", () => {
+                        isResizing = false;
                         document.removeEventListener("mousemove", resize);
                     });
                 });
                 element.addEventListener("mouseover", (e) => {
-                    element.style.opacity = 1;
+                    if (!isResizing) {
+                        element.style.opacity = 1;
+                    }
                 });
                 element.addEventListener("mouseleave", (e) => {
-                    element.style.opacity = 0.5;
+                    if (!isResizing) {
+                        element.style.opacity = 0.5;
+                    }
                 });
             }
-
         }
 
         function resize(e) {
-            const size = `${e.clientX}px`;
+            if (!isResizing) return;
+            const size = `${e.clientX - 72}px`;
             for (let index = 0; index < leftCol.length; index++) {
                 const element = leftCol[index];
                 element.style.width = size;
@@ -750,9 +797,12 @@
                         start: function(event, ui) {
                             var questionelem = ui.item[0];
                             var questionId = questionelem.dataset.question_id;
+                            var sectionId = questionelem.dataset.section_id;
                             var answer_footer_buttons = document.getElementById(
                                 `question_row_button_${questionId}`);
                             answer_footer_buttons.classList.add('answered');
+                            var question_match_element= document.getElementById(`question_match_element_${sectionId}_${questionId}`);
+                            question_match_element.value=1;
                         }
                     });
                     $(`#${element.id}`).disableSelection();

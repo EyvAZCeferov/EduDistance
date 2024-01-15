@@ -229,7 +229,6 @@ class AuthController extends Controller
         dbdeactive();
         return redirect()->route('login');
     }
-
     public function profile(Request $request)
     {
         try {

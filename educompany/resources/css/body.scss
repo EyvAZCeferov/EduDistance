@@ -1223,6 +1223,9 @@ body {
                                 }
                             }
                         }
+                        *{
+                            user-select:none;
+                        }
                     }
 
                     .question_header {
@@ -1321,9 +1324,10 @@ body {
                             margin-top: 50px;
 
                             textarea{
-                                height:30px;
+                                margin-left:10px;
+                                height:45px;
                                 margin-bottom:10px;
-                                width:40%;
+                                width:70px;
                             }
 
                             .question_textbox_text{
@@ -1332,9 +1336,14 @@ body {
                                 text-align:left;
                                 margin-left:20px;
                                 margin-bottom:5px;
+                                min-width:65%;
+                                max-width:90%;
                                 span{
                                     font-size:$heading_size;
                                     color:#000;
+                                    .katex-display{
+                                        display:inline-block;
+                                    }
                                 }
                             }
                             .question_answer_one_element_container{
@@ -1572,7 +1581,8 @@ body {
                     }
                 }
 
-                #resizer {
+                #resizer,
+                .resizer {
                     width: 4px;
                     cursor: col-resize;
                     background-color: $primary-color;
@@ -1580,6 +1590,11 @@ body {
                     z-index: 2;
                     margin-left: auto;
                     height: 100%;
+                    &:hover,
+                    &:focus,
+                    &:active{
+                        cursor: col-resize;
+                    }
                 }
 
                 &.show {
@@ -1731,7 +1746,7 @@ body {
                             background-color: $primary-color;
                             color: #fff;
 
-                            &:before {
+                            &:after {
                                 content: ' ';
                                 background-image: url("../images/mappinned.svg");
                                 position: absolute;

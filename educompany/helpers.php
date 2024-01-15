@@ -321,7 +321,7 @@ if (!function_exists('exams')) {
                 $user = users(session()->get("subdomain"), 'subdomain');
                 $model = $model->where("user_id", $user->id);
             }
-            $model = $model->get();
+            $model = $model->orderBy("id", 'DESC')->get();
         } else if (empty($key) && $type == "most_used_tests") {
             $model = Exam::with([
                 'results' => function ($query) {
@@ -332,9 +332,9 @@ if (!function_exists('exams')) {
                 $user = users(session()->get("subdomain"), 'subdomain');
                 $model = $model->where("user_id", $user->id);
             }
-            $model = $model->get();
+            $model = $model->orderBy("id", 'DESC')->get();
         } else {
-            $model = Exam::where('status', true)->orderBy("order_number", 'ASC');
+            $model = Exam::where('status', true)->orderBy("id", 'DESC')->orderBy("order_number", 'ASC');
         }
 
         return Cache::rememberForever("exams" . $key . $type, fn () => $model);

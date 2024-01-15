@@ -33,9 +33,6 @@ class CommonController extends Controller
     public function examFinish(Request $request)
     {
         try {
-            if (!$request->answers || count($request->answers) === 0) {
-                return response()->json(['status' => 'eror', 'message' => trans("additional.messages.answersnotfound", [], $request->language ?? 'az')]);
-            }
             $result = collect();
             $nextsection=false;
             DB::transaction(function () use ($request, &$result,&$nextsection) {
@@ -84,27 +81,29 @@ class CommonController extends Controller
                                 }
                                 $resultAnswer->save();
                             } else if ($question->type == 4) {
-                                if (!empty($answer['questions']) && !empty($answer['answers'])) {
-                                    $newArray = array_combine($answer['questions'], $answer['answers']);
-                                    $newArrayEncoded = [];
-                                    foreach ($newArray as $key => $value) {
-                                        $newArrayEncoded[strip_tags_with_whitespace($key)] = strip_tags_with_whitespace($value);
-                                    }
-                                    $array2 = $question->answers->pluck('answer')->toArray();
-                                    $newArray2 = [];
-                                    foreach ($array2 as $value) {
-                                        $decodedValue = json_decode($value, true);
-                                        $newArray2[strip_tags_with_whitespace($decodedValue['question_content'])] = strip_tags_with_whitespace($decodedValue['answer_content']);
-                                    }
+                                if($answer['answered']==1){
+                                    if (!empty($answer['questions']) && !empty($answer['answers'])) {
+                                        $newArray = array_combine($answer['questions'], $answer['answers']);
+                                        $newArrayEncoded = [];
+                                        foreach ($newArray as $key => $value) {
+                                            $newArrayEncoded[strip_tags_with_whitespace($key)] = strip_tags_with_whitespace($value);
+                                        }
+                                        $array2 = $question->answers->pluck('answer')->toArray();
+                                        $newArray2 = [];
+                                        foreach ($array2 as $value) {
+                                            $decodedValue = json_decode($value, true);
+                                            $newArray2[strip_tags_with_whitespace($decodedValue['question_content'])] = strip_tags_with_whitespace($decodedValue['answer_content']);
+                                        }
 
-                                    $difference = ($newArrayEncoded === $newArray2) ? true : false;
-                                    $resultAnswer = new ExamResultAnswer();
-                                    $resultAnswer->result_id = $result->id;
-                                    $resultAnswer->section_id = $section_id;
-                                    $resultAnswer->question_id = $question->id;
-                                    $resultAnswer->value = json_encode($newArray);
-                                    $resultAnswer->result = $difference;
-                                    $resultAnswer->save();
+                                        $difference = ($newArrayEncoded === $newArray2) ? true : false;
+                                        $resultAnswer = new ExamResultAnswer();
+                                        $resultAnswer->result_id = $result->id;
+                                        $resultAnswer->section_id = $section_id;
+                                        $resultAnswer->question_id = $question->id;
+                                        $resultAnswer->value = json_encode($newArray);
+                                        $resultAnswer->result = $difference;
+                                        $resultAnswer->save();
+                                    }
                                 }
                             }
                         }

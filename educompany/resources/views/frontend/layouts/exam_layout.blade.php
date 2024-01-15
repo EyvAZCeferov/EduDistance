@@ -56,6 +56,7 @@
     @stack('css')
 
     @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
     <script language='javascript' type='text/javascript'>
         function DisableBackButton() {
             window.history.forward()
@@ -84,6 +85,22 @@
     <script type="text/javascript" src="{{ asset('front/assets/js/jquery.min.js') }}"></script>
     <script type="text/javascript" defer src="{{ asset("front/assets/js/eyvaz/vendor/jquery-ui/jquery-ui.min.js") }}"></script>
     <script type="text/javascript" src="{{ asset('front/assets/js/eyvaz/base.js') }}"></script>
+    {{-- Katex --}}
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.js" integrity="sha256-4O4pS1SH31ZqrSO2A/2QJTVjTPqVe+jnYgOWUVr7EEc=" crossorigin="anonymous"></script>
+    <script>
+        window.WebFontConfig = {
+            custom: {
+            families: ['KaTeX_AMS', 'KaTeX_Caligraphic:n4,n7', 'KaTeX_Fraktur:n4,n7',
+                'KaTeX_Main:n4,n7,i4,i7', 'KaTeX_Math:i4,i7', 'KaTeX_Script',
+                'KaTeX_SansSerif:n4,n7,i4', 'KaTeX_Size1', 'KaTeX_Size2', 'KaTeX_Size3',
+                'KaTeX_Size4', 'KaTeX_Typewriter'],
+            },
+        };
+    </script>
+    {{-- Katex --}}
+
     <script async crossorigin defer>
         $(function() {
             @if (session()->has('message'))
