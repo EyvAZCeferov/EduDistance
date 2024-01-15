@@ -210,6 +210,7 @@
     <script defer>
         let finishmodalshowed = false;
         let redirect_url = null;
+        let allowReload = false;
 
         function toback() {
             try {
@@ -288,6 +289,7 @@
                                 }
 
                                 if (data.nextsection == false) {
+                                    allowReload=true;
                                     window.location.href = data.url;
                                 }
                             })
@@ -896,19 +898,26 @@
 
     {{-- Disable F5 --}}
     <script type="text/javascript">
-        // function disableF5(e) {
-        //     if ((e.which || e.keyCode) == 116 || (e.which || e.keyCode) == 82) e.preventDefault();
-        // };
+        function disableF5(e) {
+            if ((e.which || e.keyCode) == 116 || (e.which || e.keyCode) == 82) {
+                e.preventDefault();
+                if (allowReload) {
+                    window.location.href = redirect_url;
+                }
+            }
+        }
 
-        // $(document).ready(function() {
-        //     $(document).on("keydown", disableF5);
-        //     document.addEventListener('contextmenu', event => event.preventDefault());
-        // });
+        $(document).ready(function() {
+            $(document).on("keydown", disableF5);
+            document.addEventListener('contextmenu', event => event.preventDefault());
+        });
 
-        // window.addEventListener('beforeunload', function (e) {
-        //     e.preventDefault();
-        //     e.returnValue = '';
-        // });
+        window.addEventListener('beforeunload', function(e) {
+            if (!allowReload) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
     </script>
     {{-- Disable F5 --}}
 

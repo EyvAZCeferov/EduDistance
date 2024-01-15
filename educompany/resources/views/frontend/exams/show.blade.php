@@ -62,16 +62,49 @@
                                 @lang('additional.pages.exams.endirim_with_faiz', ['count' => count_endirim_faiz($data->price, $data->endirim_price)])
                             </div>
                         </div>
+                    @else
+                        <div class="exam_info_list_item right">
+                            <div class="bold_text">@lang('additional.forms.exam_duration'):</div>
+                            <div class="normal_text">
+                                {{ $data->duration }}
+                            </div>
+                        </div>
+                    @endif
+                    @if ($data->endirim_price > 0)
+                        <div class="exam_info_list_item left">
+                            <div class="bold_text">@lang('additional.forms.exam_duration'):</div>
+                            <div class="normal_text">
+                                {{ $data->duration }}
+                            </div>
+                        </div>
                     @endif
                 </div>
                 <div class="exam_description">{!! $data->content[app()->getLocale() . '_description'] !!}</div>
 
                 <div class="my-2">
-                    @if (auth('users')->check()==true && !empty(auth('users')->user()) && auth('users')->user()!=null)
-                        <a href="{{ route('user.exams.redirect_exam', ['exam_id' => $data->id]) }}"
-                            class="btn btn-block btn-imtahanver">@lang('additional.buttons.imtahanver')</a>
+                    @if (auth('users')->check() == true && !empty(auth('users')->user()) && auth('users')->user() != null)
+                        @if (!empty(exam_result($data->id, auth('users')->id())))
+                            @if($data->show_result_user==true)
+                                @php
+                                    $resultId = exam_result($data->id, auth('users')->id());
+                                    $routeName = session()->has('subdomain') ? 'user.exam.resultpage.subdomain' : 'user.exam.resultpage';
+                                    $routeParams = ['result_id' => $resultId];
+                                    if (session()->has('subdomain')) {
+                                        $routeParams['subdomain'] = session()->get('subdomain');
+                                    }
+                                    $url = route($routeName, $routeParams);
+                                @endphp
+                                    <a href="{{ $url }}"
+                                        class="btn btn-block btn-imtahanver">@lang('additional.buttons.result')</a>
+                            @endif
+                        @else
+                            <a href="{{ route('user.exams.redirect_exam', ['exam_id' => $data->id]) }}"
+                                class="btn btn-block btn-imtahanver">@lang('additional.buttons.imtahanver')</a>
+                        @endif
                     @else
-                        @if(!auth('users')->check() || (auth('users')->check() && isset(auth('users')->user()->user_type) && auth('users')->user()->user_type==1))
+                        @if (
+                            !auth('users')->check() ||
+                                (auth('users')->check() && isset(auth('users')->user()->user_type) && auth('users')->user()->user_type == 1))
                             <a href="{{ route('login', ['savethisurl' => url()->current()]) }}"
                                 class="btn btn-block btn-loginandredirect">@lang('additional.headers.login') / @lang('additional.headers.register') </a>
                         @endif

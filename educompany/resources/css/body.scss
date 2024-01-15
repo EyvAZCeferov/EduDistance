@@ -1325,9 +1325,17 @@ body {
 
                             textarea{
                                 margin-left:10px;
-                                height:45px;
+                                height:40px;
                                 margin-bottom:10px;
-                                width:70px;
+                                width:73px;
+                                border-bottom:5px solid #000;
+                                resize:none;
+                                &.true{
+                                    border-color:$success-color;
+                                }
+                                &.false{
+                                    border-color:$error-color;
+                                }
                             }
 
                             .question_textbox_text{

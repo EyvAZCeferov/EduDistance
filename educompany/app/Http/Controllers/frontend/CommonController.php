@@ -216,27 +216,35 @@ class CommonController extends Controller
                         ->whereNull("point")
                         ->first();
                     if (empty($exam_result) && !isset($exam_result->id)) {
-                        if (!empty($exam->start_pages)) {
-                            $default = exam_start_page();
-                            foreach ($exam->start_pages as $page) {
-                                if (!empty($page->start_page)) {
-                                    $exam_start_pages->push($page->start_page);
+                        $exam_result2 = ExamResult::where("exam_id", $request->exam_id)
+                        ->where('user_id', Auth::guard('users')->id())
+                        ->whereNotNull("point")
+                        ->where('payed',true)
+                        ->first();
+                        if(!empty($exam_result2)){
+                            $this->examResult_nosubdomain($exam_result2->id);
+                        }else{
+                            if (!empty($exam->start_pages)) {
+                                $default = exam_start_page();
+                                foreach ($exam->start_pages as $page) {
+                                    if (!empty($page->start_page)) {
+                                        $exam_start_pages->push($page->start_page);
+                                    }
                                 }
+                                $exam_start_pages->push($default);
+                                $exam_start_pages = $exam_start_pages->sortBy('order_number')->values();
+                            } else {
+                                $exam_start_pages = exam_start_page();
                             }
-                            $exam_start_pages->push($default);
-                            $exam_start_pages = $exam_start_pages->sortBy('order_number')->values();
-                        } else {
-                            $exam_start_pages = exam_start_page();
-                        }
-
-                        if (empty($exam_start_pages)) {
-                            return view("frontend.exams.exam_main_process.index", compact("exam", 'exam_result'));
-                        } else {
-                            return view("frontend.exams.exam_main_process.start_page", compact("exam", 'exam_start_pages'));
+                            if (empty($exam_start_pages)) {
+                                return view("frontend.exams.exam_main_process.index", compact("exam", 'exam_result'));
+                            } else {
+                                return view("frontend.exams.exam_main_process.start_page", compact("exam", 'exam_start_pages'));
+                            }
                         }
                     } else {
                         if ($exam_result->payed == true) {
-                            return view("frontend.exams.exam_main_process.index", compact('exam', 'exam_result')); // imtahan
+                            return view("frontend.exams.exam_main_process.index", compact('exam', 'exam_result'));
                         } else {
                             $payment = payments(Auth::guard("users")->id(), $exam->id, $exam_result->id, null, null, null);
                             if (!empty($payment) && isset($payment->id)) {

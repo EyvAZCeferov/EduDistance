@@ -533,7 +533,17 @@ if (!function_exists('answer_result_true_or_false')) {
                     $model = false;
                 }
             } else if ($question->type == 2) {
-            } else if ($question->type == 3) {
+                if (!empty($question->correctAnswer()->where('id',$value)->first())) {
+                    $model = true;
+                } else {
+                    $model = false;
+                }
+            } else if($question->type==3){
+                if (strip_tags_with_whitespace($question->correctAnswer()->answer) == strip_tags_with_whitespace($value)) {
+                    $model = true;
+                } else {
+                    $model = false;
+                }
             } else if ($question->type == 4) {
             }
         }
@@ -549,10 +559,24 @@ if (!function_exists('your_answer_result_true_or_false')) {
             ->where('result_id', $result_id)
             ->first();
         if (!empty($question_result)) {
-            if ($question_result->answer_id == $value) {
-                $model = true;
-            } else {
-                $model = false;
+            if($question_result->question->type==1){
+                if ($question_result->answer_id == $value) {
+                    $model = true;
+                } else {
+                    $model = false;
+                }
+            }else if($question_result->question->type==2){
+                if (in_array($value,$question_result->answers)) {
+                    $model = true;
+                } else {
+                    $model = false;
+                }
+            }else if($question_result->question->type==3){
+                if (isset($question_result->value) && !empty($question_result->value)) {
+                    $model = $question_result->value;
+                } else {
+                    $model = null;
+                }
             }
         }
         return Cache::rememberForever("your_answer_result_true_or_false" . $question_id . $result_id . $value, fn () => $model);

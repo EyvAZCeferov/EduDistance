@@ -23,6 +23,7 @@
                 (auth('users')->check() && auth('users')->user()->user_type == 2) ||
                     (auth('users')->check() &&
                         auth('users')->user()->user_type == 1 &&
+                        $product->show_result_user==true &&
                         !empty(exam_result($product->id, auth('users')->id()))))
                 <span
                     class="product_section_element_result result_element @if (auth('users')->user()->user_type == 1 ||
@@ -91,6 +92,7 @@
                 (auth('users')->check() && auth('users')->user()->user_type == 2) ||
                     (auth('users')->check() &&
                         auth('users')->user()->user_type == 1 &&
+                        $product->show_result_user==true &&
                         !empty(exam_result($product->id, auth('users')->id()))
                     ))
                 <span

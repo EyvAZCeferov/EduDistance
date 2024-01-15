@@ -111,7 +111,7 @@ return [
             'coupon_code'=>"Kupon kodu yazın",
             "new_price"=>"Yeni məbləğ",
             'coupon_info'=>'Kupon məlumatları'
-        ],
+        ],d
     ],
     "buttons" => [
         "gotohomepage" => "Əsas səhifəyə keçin",
