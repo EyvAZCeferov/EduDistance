@@ -33,6 +33,7 @@
 
                     </div>
                 @endif
+                
                 @if ($value->type != 5)
                     <div class="buttons_top_aplusandminus">
                         <div></div>

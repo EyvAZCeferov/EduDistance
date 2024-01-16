@@ -114,19 +114,13 @@
             var marked_questions = document.getElementById('marked_questions').value;
 
             for (var i = 0; i < footer_question_buttons.length; i++) {
-                footer_question_buttons[i].classList.remove("current");
-                if (marked_questions!=null && marked_questions.length > 0) {
+                const element_for_saved = footer_question_buttons[i];
+                element_for_saved.classList.remove("current");
+                if (marked_questions != null && marked_questions.length > 0) {
                     marked_questions_jsoned = JSON.parse(marked_questions);
-                    var buttonDataKey = footer_question_buttons[i].getAttribute('data-key');
-                    var found = false;
-                    for (var j = 0; j < marked_questions_jsoned.length; j++) {
-                        if (marked_questions_jsoned[j] === buttonDataKey.toString()) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found) {
-                        footer_question_buttons[i].classList.add("saved");
+                    var buttonDataKey = element_for_saved.getAttribute('data-key');
+                    if (searchinarray(marked_questions_jsoned, buttonDataKey) == true) {
+                        element_for_saved.classList.add("saved");
                     }
                 }
             }
@@ -154,11 +148,11 @@
                             `@lang('additional.buttons.nextsection') @if ($exam->layout_type == 'standart')<i class="fa fa-angle-right"></i>@endif`;
                     } else {
                         next_button.innerHTML =
-                            `@lang('additional.buttons.finished')`;
+                            `@lang('additional.buttons.finish') @if ($exam->layout_type == 'standart')<i class="fa fa-check"></i>@endif`;
                     }
                 } else {
                     next_button.innerHTML =
-                        `@lang('additional.buttons.finished')`;
+                        `@lang('additional.buttons.finish') @if ($exam->layout_type == 'standart')<i class="fa fa-check"></i>@endif`;
                 }
             } else {
                 next_button.classList.add("btn-secondary");
@@ -182,6 +176,18 @@
 
         }
 
+        function searchinarray(obj, searchVal) {
+            var result = false;
+            for (var i = 0; i < obj.length; i++) {
+                if (obj[i] == searchVal) {
+                    result = true;
+                    break;
+                }
+            }
+
+            return result;
+        }
+
         function getquestion(id) {
             var activecontentquestions = document.getElementsByClassName("content_exam");
             for (var i = 0; i < activecontentquestions.length; i++) {
@@ -191,7 +197,7 @@
             var selected = document.getElementById(`content_exam_${id}`);
             selected.classList.add("show");
             document.getElementById("current_question").value = id;
-
+            togglequestions();
         }
 
         setInterval(updatepad, 500);
@@ -200,29 +206,38 @@
     <script defer>
         const leftCol = document.getElementsByClassName('left_col');
         const resizer = document.getElementsByClassName('resizer');
+        let isResizing = false;
+        let offsetX = 0;
 
         function draggingleftandrightcolumns() {
             for (let index = 0; index < resizer.length; index++) {
                 const element = resizer[index];
                 element.addEventListener("mousedown", (e) => {
                     e.preventDefault();
+                    isResizing = true;
+                    offsetX = element.clientWidth / 2;
                     document.addEventListener("mousemove", resize);
                     document.addEventListener("mouseup", () => {
+                        isResizing = false;
                         document.removeEventListener("mousemove", resize);
                     });
                 });
                 element.addEventListener("mouseover", (e) => {
-                    element.style.opacity = 1;
+                    if (!isResizing) {
+                        element.style.opacity = 1;
+                    }
                 });
                 element.addEventListener("mouseleave", (e) => {
-                    element.style.opacity = 0.5;
+                    if (!isResizing) {
+                        element.style.opacity = 0.5;
+                    }
                 });
             }
-
         }
 
         function resize(e) {
-            const size = `${e.clientX}px`;
+            if (!isResizing) return;
+            const size = `${e.clientX - 72}px`;
             for (let index = 0; index < leftCol.length; index++) {
                 const element = leftCol[index];
                 element.style.width = size;

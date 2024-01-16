@@ -85,7 +85,8 @@ return [
             "timespent"=>"Xərclədiyi vaxd",
             "forviewselected"=>"Baxış üçün işarələnmişlər",
             "answered_students"=>"Cavab vermiş şəxslər",
-            "youranswer"=>"Sizin cavab"
+            "youranswer"=>"Sizin cavab",
+            "trueanswer"=>"Doğru cavab",
         ],
         'blogs'=>[
             'blogs'=>"Bloqlar"
@@ -111,7 +112,7 @@ return [
             'coupon_code'=>"Kupon kodu yazın",
             "new_price"=>"Yeni məbləğ",
             'coupon_info'=>'Kupon məlumatları'
-        ],d
+        ],
     ],
     "buttons" => [
         "gotohomepage" => "Əsas səhifəyə keçin",

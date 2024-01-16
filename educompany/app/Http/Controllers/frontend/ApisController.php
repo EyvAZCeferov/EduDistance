@@ -426,7 +426,7 @@ class ApisController extends Controller
             $markedQuestionUsers = MarkQuestions::where('question_id', $request->input('question_id'))
                 ->where("exam_id", $request->input('exam_id'))->whereNotNull('user_id')->whereHas('result', function ($query) {
                     $query->whereNotNull('point');
-                })->with('user')->get();
+                })->with(['user','result','exam'])->get();
             return response()->json(['status' => 'success', 'data' => $markedQuestionUsers]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);

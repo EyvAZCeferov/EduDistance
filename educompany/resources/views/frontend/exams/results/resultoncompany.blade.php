@@ -139,6 +139,7 @@
             var first_question = document.getElementById("first_question").value;
 
             var footer_question_buttons = document.getElementsByClassName('footer_question_buttons');
+
             if (current_question == first_question) {
                 document.getElementById("to_back").classList.add('hide');
             } else {
@@ -162,11 +163,11 @@
                             `@lang('additional.buttons.nextsection') @if ($exam->layout_type == 'standart')<i class="fa fa-angle-right"></i>@endif`;
                     } else {
                         next_button.innerHTML =
-                            `@lang('additional.buttons.finished')`;
+                            `@lang('additional.buttons.finish') @if ($exam->layout_type == 'standart')<i class="fa fa-check"></i>@endif`;
                     }
                 } else {
                     next_button.innerHTML =
-                        `@lang('additional.buttons.finished')`;
+                        `@lang('additional.buttons.finish') @if ($exam->layout_type == 'standart')<i class="fa fa-check"></i>@endif`;
                 }
             } else {
                 next_button.classList.add("btn-secondary");
@@ -199,7 +200,7 @@
             var selected = document.getElementById(`content_exam_${id}`);
             selected.classList.add("show");
             document.getElementById("current_question").value = id;
-
+            togglequestions();
         }
 
         setInterval(updatepad, 500);
@@ -207,29 +208,38 @@
     <script defer>
         const leftCol = document.getElementsByClassName('left_col');
         const resizer = document.getElementsByClassName('resizer');
+        let isResizing = false;
+        let offsetX = 0;
 
         function draggingleftandrightcolumns() {
             for (let index = 0; index < resizer.length; index++) {
                 const element = resizer[index];
                 element.addEventListener("mousedown", (e) => {
                     e.preventDefault();
+                    isResizing = true;
+                    offsetX = element.clientWidth / 2;
                     document.addEventListener("mousemove", resize);
                     document.addEventListener("mouseup", () => {
+                        isResizing = false;
                         document.removeEventListener("mousemove", resize);
                     });
                 });
                 element.addEventListener("mouseover", (e) => {
-                    element.style.opacity = 1;
+                    if (!isResizing) {
+                        element.style.opacity = 1;
+                    }
                 });
                 element.addEventListener("mouseleave", (e) => {
-                    element.style.opacity = 0.5;
+                    if (!isResizing) {
+                        element.style.opacity = 0.5;
+                    }
                 });
             }
-
         }
 
         function resize(e) {
-            const size = `${e.clientX}px`;
+            if (!isResizing) return;
+            const size = `${e.clientX - 72}px`;
             for (let index = 0; index < leftCol.length; index++) {
                 const element = leftCol[index];
                 element.style.width = size;
@@ -253,13 +263,23 @@
                                 toast(n.message, n.status);
 
                             if (n.data != null && n.data.length > 0) {
-                                var elements;
+                                var elementsel='';
                                 for (var i = 0; i < n.data.length; i++) {
-
-                                    var element = `<div class="my-1 mb-2 p-1 row">
-                                        <h6>${n.data[i].name} / ${n.data[i].email}</h6
-                                        </div>`;
-                                    elements += element;
+                                    if(n.data[i]!=null && n.data[i].user!=null && n.data[i].user.name!=null){
+                                        var element_for = `<div class="my-1 mb-2 p-1 row">
+                                                <h6>${n.data[i].user.name} / ${n.data[i].user.email}</h6>
+                                                <div class='text text-dark'>
+                                                    @lang('additional.pages.exams.earned_point'): ${roundToDecimal(n.data[i].result.point,2)} / <span
+                                                        class="text-success">${n.data[i].exam.point}</span>
+                                                    &nbsp;&nbsp;@lang('additional.pages.exams.timespent'):
+                                                    <div class="hour_area d-inline-block text text-info">
+                                                        <span id="minutes">${formattedTime(n.data[i].result.time_reply,'minute')}</span>:<span
+                                                            id="seconds">${formattedTime(n.data[i].result.time_reply,'seconds')}</span>
+                                                    </div>
+                                                </div>
+                                            </div>`;
+                                        elementsel += element_for;
+                                    }
                                 }
 
                                 var modalmarks=`<div id="modalmarks" class="modal custom-modal show" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -274,7 +294,7 @@
                                             </div>
 
                                             <div class="modal-body overflow-scroll max-h-32">
-                                                ${elements}
+                                                ${elementsel}
                                             </div>
 
                                         </div>
@@ -315,6 +335,18 @@
             }
         }
 
+        function formattedTime(seconds,type='minute') {
+            if(type=='minute')
+                return `${String(Math.floor(seconds / 60)).padStart(2, '0')}`;
+            else
+                return `${String(seconds % 60).padStart(2, '0')}`
+        }
+
+        function roundToDecimal(number, decimalPlaces) {
+            const factor = 10 ** decimalPlaces;
+            return Math.round(number * factor) / factor;
+        }
+
         function showuserswhichanswered(object,type){
             try{
                 showLoader();
@@ -325,13 +357,25 @@
                 }
 
                 if(object!=null && object.length>0){
-                    var elementsanswers;
+                    var elementsanswers='';
                     for (var i = 0; i < object.length; i++) {
                         if(object[i]!=null && object[i]!=undefined && object[i].result_model!=null && object[i].result_model!=undefined && object[i].result_model.user!=null && object[i].result_model.user!=undefined && object[i].result_model.user.name!=null && object[i].result_model.user.name!=undefined && object[i].result_model.user.name!='' && object[i].result_model.user.name!=' '){
-                            var element = `<div class="my-1 mb-2 p-1 row">
+                            var element = `<div class="my-1 mb-2 p-1 row" style='border-bottom:1px solid #000;'>
                                 <h6>${object[i].result_model.user.name} / ${object[i].result_model.user.email}</h6
                                 </div>`;
-                            elementsanswers += element;
+                                var element_for = `<div class="my-1 mb-2 p-1 row">
+                                    <h6>${object[i].result_model.user.name} / ${object[i].result_model.user.email}</h6>
+                                    <div class='text text-dark'>
+                                        @lang('additional.pages.exams.earned_point'): ${roundToDecimal(object[i].result_model.point,2)} / <span
+                                            class="text-success">${object[i].result_model.exam.point}</span>
+                                        &nbsp;&nbsp;@lang('additional.pages.exams.timespent'):
+                                        <div class="hour_area d-inline-block text text-info">
+                                            <span id="minutes">${formattedTime(object[i].result_model.time_reply,'minute')}</span>:<span
+                                                id="seconds">${formattedTime(object[i].result_model.time_reply,'seconds')}</span>
+                                        </div> ${type==3 ? `&nbsp;&nbsp;<span>@lang("additional.pages.exams.youranswer"): ${object[i].value}</span>` : ''}
+                                    </div>
+                                </div>`;
+                            elementsanswers += element_for;
                         }
                     }
 

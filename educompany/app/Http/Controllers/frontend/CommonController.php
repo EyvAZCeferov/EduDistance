@@ -47,7 +47,7 @@ class CommonController extends Controller
                         $section = $exam->sections->find($section_id);
                         $question = ExamQuestion::where("id", $question_id)->first();
                         if (!empty($question) && !empty($section)) {
-                            if ($question->type === 1) {
+                            if ($question->type === 1 || $question->type==5) {
                                 $resultAnswer = new ExamResultAnswer();
                                 $resultAnswer->result_id = $result->id;
                                 $resultAnswer->section_id = $section_id;

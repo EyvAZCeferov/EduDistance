@@ -66,7 +66,8 @@ class ExamQuestion extends Model implements HasMedia
         } else if ($this->type == 3) {
             return $this->answers?->where('correct', true)->first();
         } else if ($this->type == 4) {
-            return $this->answers?->where('correct', true);
+            $answers= $this->answers?->where('correct', true)->pluck('answer');
+            return $answers;
         } else {
             return $this->answers?->where('correct', true)?->first();
         }

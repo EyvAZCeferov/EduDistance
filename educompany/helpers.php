@@ -258,8 +258,8 @@ if (!function_exists('sections')) {
         if ($type == "exammed") {
             $model = Section::whereHas('questions')->select('name', DB::raw('MAX(id) as id'))
                 ->groupBy('name')->get();
-        }else if ($type == "id") {
-            $model = Section::where('id',$key)->first();
+        } else if ($type == "id") {
+            $model = Section::where('id', $key)->first();
         } else {
             $model = Section::select('name', DB::raw('MAX(id) as id'))
                 ->groupBy('name')
@@ -526,25 +526,45 @@ if (!function_exists('answer_result_true_or_false')) {
         if ($value != null) {
             $question = ExamQuestion::where("id", $question_id)->first();
 
-            if ($question->type == 1) {
+            if ($question->type == 1 || $question->type == 5) {
                 if ($question->correctAnswer()->id == $value) {
                     $model = true;
                 } else {
                     $model = false;
                 }
             } else if ($question->type == 2) {
-                if (!empty($question->correctAnswer()->where('id',$value)->first())) {
+                if (!empty($question->correctAnswer()->where('id', $value)->first())) {
                     $model = true;
                 } else {
                     $model = false;
                 }
-            } else if($question->type==3){
+            } else if ($question->type == 3) {
                 if (strip_tags_with_whitespace($question->correctAnswer()->answer) == strip_tags_with_whitespace($value)) {
                     $model = true;
                 } else {
                     $model = false;
                 }
             } else if ($question->type == 4) {
+                $questions = [];
+                $answers = [];
+                foreach ($question->correctAnswer() as $key => $val) {
+                    $json_answers = json_decode($val, true);
+                    $questions[] = ['content' => $json_answers['question_content']];
+                    $answers[] = ['content' => $json_answers['answer_content']];
+                }
+                $newArray = array_combine(
+                    array_column($questions, 'content'),
+                    array_column($answers, 'content')
+                );
+                $newArrayEncoded = [];
+                foreach ($newArray as $key => $val) {
+                    $newArrayEncoded[strip_tags_with_whitespace($key)] = strip_tags_with_whitespace($val);
+                }
+                $newArray2 = [];
+                foreach (json_decode($value,true) as $key=> $value) {
+                    $newArray2[strip_tags_with_whitespace($key)] = strip_tags_with_whitespace($value);
+                }
+                $model = ($newArrayEncoded === $newArray2) ? true : false;
             }
         }
         return Cache::rememberForever("answer_result_true_or_false" . $question_id . $value, fn () => $model);
@@ -559,19 +579,19 @@ if (!function_exists('your_answer_result_true_or_false')) {
             ->where('result_id', $result_id)
             ->first();
         if (!empty($question_result)) {
-            if($question_result->question->type==1){
+            if ($question_result->question->type == 1 || $question_result->question->type == 5) {
                 if ($question_result->answer_id == $value) {
                     $model = true;
                 } else {
                     $model = false;
                 }
-            }else if($question_result->question->type==2){
-                if (in_array($value,$question_result->answers)) {
+            } else if ($question_result->question->type == 2) {
+                if (in_array($value, $question_result->answers)) {
                     $model = true;
                 } else {
                     $model = false;
                 }
-            }else if($question_result->question->type==3){
+            } else if ($question_result->question->type == 3) {
                 if (isset($question_result->value) && !empty($question_result->value)) {
                     $model = $question_result->value;
                 } else {
@@ -766,7 +786,7 @@ if (!function_exists('exam_result')) {
 
         $model = $model->first();
 
-        if ($user->user_type == 2 && $model->user_id==$user->id) {
+        if ($user->user_type == 2 && $model->user_id == $user->id) {
             $model = !empty($model) && isset($model->slug) ? $model->slug : null;
         } else {
             $model = !empty($model) && isset($model->id) ? $model->id : null;
@@ -777,27 +797,29 @@ if (!function_exists('exam_result')) {
 }
 
 if (!function_exists('get_answer_choised')) {
-    function get_answer_choised($exam_results_ids,$question_id,$question_type,$value_id=null)
+    function get_answer_choised($exam_results_ids, $question_id, $question_type, $value_id = null)
     {
         $model = ExamResultAnswer::orderBy('id', 'DESC')
-        ->whereIn('result_id',$exam_results_ids)
-        ->where('question_id',$question_id);
+            ->whereIn('result_id', $exam_results_ids)
+            ->where('question_id', $question_id);
 
-        if($question_type==1){
-            $model=$model->where('answer_id',$value_id)
-            ->whereNotNull("answer_id")
-            ->whereNull('value');
-        }else if($question_type==2){
-            $model = $model->where(function ($query) use ($value_id) {
-                $query->whereIn('answers', [$value_id])
+        if ($question_type == 1) {
+            $model = $model->where('answer_id', $value_id)
+                ->whereNotNull("answer_id")
+                ->whereNull('value');
+        } else if ($question_type == 2) {
+            $model = $model->whereJsonContains('answers', $value_id)
                     ->whereNotNull("answers")
                     ->whereNull("answer_id")
                     ->whereNull('value');
-            });
+        } else if ($question_type == 3) {
+            $model = $model->whereNull("answers")
+                    ->whereNull("answer_id")
+                    ->whereNotNull('value');
         }
 
-        $model=$model->with('result_model')->get();
+        $model = $model->with('result_model')->get();
 
-        return Cache::rememberForever("get_answer_choised"  . $exam_results_ids .$question_id.$question_type.$value_id, fn () => $model);
+        return Cache::rememberForever("get_answer_choised"  . $exam_results_ids . $question_id . $question_type . $value_id, fn () => $model);
     }
 }

@@ -10,4 +10,10 @@
         </div>
     </div>
 
+    <div class="right_section">
+        <a class="section calculator d-flex" href="javascript:void(0)">
+            @lang('additional.pages.exams.earned_point'): <span class="d-inline-block font-weight-bold">{{ $exam_result->point }}</span>
+        </a>
+    </div>
+
 </div>
