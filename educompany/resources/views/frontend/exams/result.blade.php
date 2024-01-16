@@ -59,7 +59,7 @@
             var first_question = document.getElementsByClassName('content_exam')[0];
             var currentDivQuestion = document.getElementById(`content_exam_${current_question}`);
             if (current_question == first_question.dataset.id) {
-                window.location.href = '/exams';
+                return;
             } else {
                 currentDivQuestion.classList.remove("show");
                 var new_key = parseInt(currentDivQuestion.dataset.key) - 1;

@@ -1,3 +1,4 @@
+<p class="text-muted text-small my-2 text-center">@lang('additional.pages.exams.trueanswer')</p>
 <div class="match_questions_one">
     @php($questions = [])
     @php($answers = [])
@@ -17,7 +18,6 @@
         @endforeach
     </div>
     @php($shuffledAnswers = $answers)
-    @php(shuffle($shuffledAnswers))
 
     <div class="column answers_match_area" id="question_match_area_answer_{{ $question->id }}">
         @foreach ($shuffledAnswers as $key => $value)
@@ -30,5 +30,15 @@
         @endforeach
     </div>
 </div>
+@php($answerData = json_encode(get_answer_choised($exam_results->pluck('id'), $question->id, 4, null), JSON_HEX_QUOT))
+<p id="answerData-{{ $question->id }}" data-answer="{{ $answerData }}" class="text-small my-2 text-center"
+    onclick="handleAnswerClick({{ $question->id }},4)">
+    @lang('additional.pages.exams.youranswer'): {{ count(get_answer_choised($exam_results->pluck('id'), $question->id, 4, null)) }}
+</p>
 
-<p class="text-muted text-small my-2 text-center">@lang('additional.pages.exams.sort_right_tab_elements')</p>
+<script>
+    function handleAnswerClick(question_id, questionType) {
+        var answerData = document.getElementById('answerData-' + question_id).dataset.answer;
+        showuserswhichanswered(JSON.parse(answerData), questionType);
+    }
+</script>

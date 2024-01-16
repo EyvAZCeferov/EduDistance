@@ -561,7 +561,7 @@ if (!function_exists('answer_result_true_or_false')) {
                     $newArrayEncoded[strip_tags_with_whitespace($key)] = strip_tags_with_whitespace($val);
                 }
                 $newArray2 = [];
-                foreach (json_decode($value,true) as $key=> $value) {
+                foreach (json_decode($value, true) as $key => $value) {
                     $newArray2[strip_tags_with_whitespace($key)] = strip_tags_with_whitespace($value);
                 }
                 $model = ($newArrayEncoded === $newArray2) ? true : false;
@@ -803,19 +803,23 @@ if (!function_exists('get_answer_choised')) {
             ->whereIn('result_id', $exam_results_ids)
             ->where('question_id', $question_id);
 
-        if ($question_type == 1) {
+        if ($question_type == 1 || $question_type == 5) {
             $model = $model->where('answer_id', $value_id)
                 ->whereNotNull("answer_id")
                 ->whereNull('value');
         } else if ($question_type == 2) {
             $model = $model->whereJsonContains('answers', $value_id)
-                    ->whereNotNull("answers")
-                    ->whereNull("answer_id")
-                    ->whereNull('value');
+                ->whereNotNull("answers")
+                ->whereNull("answer_id")
+                ->whereNull('value');
         } else if ($question_type == 3) {
             $model = $model->whereNull("answers")
-                    ->whereNull("answer_id")
-                    ->whereNotNull('value');
+                ->whereNull("answer_id")
+                ->whereNotNull('value');
+        } else if ($question_type == 4) {
+            $model = $model->whereNull("answers")
+                ->whereNull("answer_id")
+                ->whereNotNull('value');
         }
 
         $model = $model->with('result_model')->get();

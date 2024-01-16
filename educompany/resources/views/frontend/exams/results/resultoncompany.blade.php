@@ -87,7 +87,7 @@
             var first_question = document.getElementsByClassName('content_exam')[0];
             var currentDivQuestion = document.getElementById(`content_exam_${current_question}`);
             if (current_question == first_question.dataset.id) {
-                window.location.href = '/exams';
+                return;
             } else {
                 currentDivQuestion.classList.remove("show");
                 var new_key = parseInt(currentDivQuestion.dataset.key) - 1;
@@ -139,6 +139,10 @@
             var first_question = document.getElementById("first_question").value;
 
             var footer_question_buttons = document.getElementsByClassName('footer_question_buttons');
+            for (var i = 0; i < footer_question_buttons.length; i++) {
+                const element_for_saved = footer_question_buttons[i];
+                element_for_saved.classList.remove("current");
+            }
 
             if (current_question == first_question) {
                 document.getElementById("to_back").classList.add('hide');
@@ -263,9 +267,9 @@
                                 toast(n.message, n.status);
 
                             if (n.data != null && n.data.length > 0) {
-                                var elementsel='';
+                                var elementsel = '';
                                 for (var i = 0; i < n.data.length; i++) {
-                                    if(n.data[i]!=null && n.data[i].user!=null && n.data[i].user.name!=null){
+                                    if (n.data[i] != null && n.data[i].user != null && n.data[i].user.name != null) {
                                         var element_for = `<div class="my-1 mb-2 p-1 row">
                                                 <h6>${n.data[i].user.name} / ${n.data[i].user.email}</h6>
                                                 <div class='text text-dark'>
@@ -282,7 +286,7 @@
                                     }
                                 }
 
-                                var modalmarks=`<div id="modalmarks" class="modal custom-modal show" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                var modalmarks = `<div id="modalmarks" class="modal custom-modal show" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                                     <div class="modal-dialog modal-dialog-centered" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header bg-secondary">
@@ -302,10 +306,10 @@
                                     <br>
                                 </div>`;
 
-                                document.body.innerHTML+=modalmarks;
+                                document.body.innerHTML += modalmarks;
                                 toggleModalnow('modalmarks', 'open');
-                            }else{
-                                var modalmarks=`<div id="modalmarks" class="modal custom-modal show" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                            } else {
+                                var modalmarks = `<div id="modalmarks" class="modal custom-modal show" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                                     <div class="modal-dialog modal-dialog-centered" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header bg-secondary">
@@ -324,7 +328,7 @@
                                     </div>
                                     <br>
                                 </div>`;
-                                document.body.innerHTML+=modalmarks;
+                                document.body.innerHTML += modalmarks;
                                 toggleModalnow('modalmarks', 'open');
                             }
                         }
@@ -335,8 +339,8 @@
             }
         }
 
-        function formattedTime(seconds,type='minute') {
-            if(type=='minute')
+        function formattedTime(seconds, type = 'minute') {
+            if (type == 'minute')
                 return `${String(Math.floor(seconds / 60)).padStart(2, '0')}`;
             else
                 return `${String(seconds % 60).padStart(2, '0')}`
@@ -347,8 +351,8 @@
             return Math.round(number * factor) / factor;
         }
 
-        function showuserswhichanswered(object,type){
-            try{
+        function showuserswhichanswered(object, type) {
+            try {
                 showLoader();
 
                 var showuseranswersmodal = document.getElementById('showuseranswers');
@@ -356,14 +360,37 @@
                     showuseranswersmodal.remove();
                 }
 
-                if(object!=null && object.length>0){
-                    var elementsanswers='';
+                if (object != null && object.length > 0) {
+                    var elementsanswers = '';
                     for (var i = 0; i < object.length; i++) {
-                        if(object[i]!=null && object[i]!=undefined && object[i].result_model!=null && object[i].result_model!=undefined && object[i].result_model.user!=null && object[i].result_model.user!=undefined && object[i].result_model.user.name!=null && object[i].result_model.user.name!=undefined && object[i].result_model.user.name!='' && object[i].result_model.user.name!=' '){
+                        if (object[i] != null && object[i] != undefined && object[i].result_model != null && object[i]
+                            .result_model != undefined && object[i].result_model.user != null && object[i].result_model
+                            .user != undefined && object[i].result_model.user.name != null && object[i].result_model.user
+                            .name != undefined && object[i].result_model.user.name != '' && object[i].result_model.user
+                            .name != ' ') {
+                            let questionContainer = document.createElement('div');
+                            let answerContainer = document.createElement('div');
+                            if (type == 4) {
+                                var jsoned = JSON.parse(object[i].value);
+
+                                questionContainer.classList.add('column', 'question_match_area');
+                                answerContainer.classList.add('column', 'answers_match_area');
+
+                                for (const [question, answer] of Object.entries(jsoned)) {
+                                    const questionDiv = document.createElement('div');
+                                    questionDiv.classList.add('column_element', 'question_match_element');
+                                    questionDiv.innerHTML = question;
+                                    const answerDiv = document.createElement('div');
+                                    answerDiv.classList.add('column_element', 'answer_match_element');
+                                    answerDiv.innerHTML = answer;
+                                    questionContainer.appendChild(questionDiv);
+                                    answerContainer.appendChild(answerDiv);
+                                }
+                            }
                             var element = `<div class="my-1 mb-2 p-1 row" style='border-bottom:1px solid #000;'>
                                 <h6>${object[i].result_model.user.name} / ${object[i].result_model.user.email}</h6
                                 </div>`;
-                                var element_for = `<div class="my-1 mb-2 p-1 row">
+                            var element_for = `<div class="my-1 mb-2 p-1 row">
                                     <h6>${object[i].result_model.user.name} / ${object[i].result_model.user.email}</h6>
                                     <div class='text text-dark'>
                                         @lang('additional.pages.exams.earned_point'): ${roundToDecimal(object[i].result_model.point,2)} / <span
@@ -372,14 +399,23 @@
                                         <div class="hour_area d-inline-block text text-info">
                                             <span id="minutes">${formattedTime(object[i].result_model.time_reply,'minute')}</span>:<span
                                                 id="seconds">${formattedTime(object[i].result_model.time_reply,'seconds')}</span>
-                                        </div> ${type==3 ? `&nbsp;&nbsp;<span>@lang("additional.pages.exams.youranswer"): ${object[i].value}</span>` : ''}
+                                        </div>
+                                        ${type==3 ? `&nbsp;&nbsp;<span class="${object[i].result==true ? 'text-success' : 'text-danger'}">@lang('additional.pages.exams.youranswer'): ${object[i].value}</span>` : ''}
+                                        ${type==4 ? `&nbsp;&nbsp;<span class="${object[i].result==true ? 'text-success' : 'text-danger'}">@lang('additional.pages.exams.youranswer'): <br/>
+                                            <div class='question_content'>
+                                                <div class="match_questions_one mt-2">
+                                                    ${questionContainer.outerHTML}
+                                                    ${answerContainer.outerHTML}
+                                                </div>
+                                            </div>
+                                            </span>` : ''}
                                     </div>
                                 </div>`;
                             elementsanswers += element_for;
                         }
                     }
 
-                    var showuseranswers=`<div id="showuseranswers" class="modal custom-modal show" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    var showuseranswers = `<div id="showuseranswers" class="modal custom-modal show" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                         <div class="modal-dialog modal-dialog-centered" role="document">
                             <div class="modal-content">
                                 <div class="modal-header bg-secondary">
@@ -399,15 +435,15 @@
                         <br>
                     </div>`;
 
-                    document.body.innerHTML+=showuseranswers;
+                    document.body.innerHTML += showuseranswers;
                     toggleModalnow('showuseranswers', 'open');
-                }else{
+                } else {
                     hideLoader();
-                    toast("@lang('additional.pages.exams.notfound')",'warning');
+                    toast("@lang('additional.pages.exams.notfound')", 'warning');
                 }
 
                 hideLoader();
-            }catch(error){
+            } catch (error) {
                 hideLoader();
                 toast(error, 'error');
             }

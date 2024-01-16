@@ -163,7 +163,11 @@ class CommonController extends Controller
             $exam_results = ExamResult::where('exam_id', $exam->id)
                 ->with('answers.answer')
                 ->orderByDesc('id')->get();
-            return view('frontend.exams.results.resultoncompany', compact('exam_results','exam'));
+            if(!empty($exam_results) && count($exam_results)>0){
+                return view('frontend.exams.results.resultoncompany', compact('exam_results','exam'));
+            }else{
+                return redirect()->back()->with('info',trans("additional.pages.exams.notfound"));
+            }
         }else{
             $exam_result = ExamResult::where('user_id', auth('users')->user()->id)
                 ->with('answers.answer')
