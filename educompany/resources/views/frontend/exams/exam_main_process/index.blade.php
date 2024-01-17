@@ -690,6 +690,10 @@
 
         function changeTextBox(question_id, type) {
             var text_box = document.getElementById(`question_answer_one_${question_id}_${type}`).value;
+            document.getElementById(`question_answer_one_${question_id}_${type}`).value=text_box.replace(/[^0-9/\\]/g, '');
+            if (text_box.length > 5) {
+                document.getElementById(`question_answer_one_${question_id}_${type}`).value = text_box.substring(0, 5);
+            }
             var answer_footer_buttons = document.getElementById(`question_row_button_${question_id}`);
             var question_textbox_text_span = document.getElementById(`question_textbox_text_span_${question_id}`);
 

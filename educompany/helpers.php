@@ -525,46 +525,47 @@ if (!function_exists('answer_result_true_or_false')) {
         $model = null;
         if ($value != null) {
             $question = ExamQuestion::where("id", $question_id)->first();
-
-            if ($question->type == 1 || $question->type == 5) {
-                if ($question->correctAnswer()->id == $value) {
-                    $model = true;
-                } else {
-                    $model = false;
+            if(!empty($question->correctAnswer())){
+                if ($question->type == 1 || $question->type == 5) {
+                    if ($question->correctAnswer()->id == $value) {
+                        $model = true;
+                    } else {
+                        $model = false;
+                    }
+                } else if ($question->type == 2) {
+                    if (!empty($question->correctAnswer()->where('id', $value)->first())) {
+                        $model = true;
+                    } else {
+                        $model = false;
+                    }
+                } else if ($question->type == 3) {
+                    if (strip_tags_with_whitespace($question->correctAnswer()->answer) == strip_tags_with_whitespace($value)) {
+                        $model = true;
+                    } else {
+                        $model = false;
+                    }
+                } else if ($question->type == 4) {
+                    $questions = [];
+                    $answers = [];
+                    foreach ($question->correctAnswer() as $key => $val) {
+                        $json_answers = json_decode($val, true);
+                        $questions[] = ['content' => $json_answers['question_content']];
+                        $answers[] = ['content' => $json_answers['answer_content']];
+                    }
+                    $newArray = array_combine(
+                        array_column($questions, 'content'),
+                        array_column($answers, 'content')
+                    );
+                    $newArrayEncoded = [];
+                    foreach ($newArray as $key => $val) {
+                        $newArrayEncoded[strip_tags_with_whitespace($key)] = strip_tags_with_whitespace($val);
+                    }
+                    $newArray2 = [];
+                    foreach (json_decode($value, true) as $key => $value) {
+                        $newArray2[strip_tags_with_whitespace($key)] = strip_tags_with_whitespace($value);
+                    }
+                    $model = ($newArrayEncoded === $newArray2) ? true : false;
                 }
-            } else if ($question->type == 2) {
-                if (!empty($question->correctAnswer()->where('id', $value)->first())) {
-                    $model = true;
-                } else {
-                    $model = false;
-                }
-            } else if ($question->type == 3) {
-                if (strip_tags_with_whitespace($question->correctAnswer()->answer) == strip_tags_with_whitespace($value)) {
-                    $model = true;
-                } else {
-                    $model = false;
-                }
-            } else if ($question->type == 4) {
-                $questions = [];
-                $answers = [];
-                foreach ($question->correctAnswer() as $key => $val) {
-                    $json_answers = json_decode($val, true);
-                    $questions[] = ['content' => $json_answers['question_content']];
-                    $answers[] = ['content' => $json_answers['answer_content']];
-                }
-                $newArray = array_combine(
-                    array_column($questions, 'content'),
-                    array_column($answers, 'content')
-                );
-                $newArrayEncoded = [];
-                foreach ($newArray as $key => $val) {
-                    $newArrayEncoded[strip_tags_with_whitespace($key)] = strip_tags_with_whitespace($val);
-                }
-                $newArray2 = [];
-                foreach (json_decode($value, true) as $key => $value) {
-                    $newArray2[strip_tags_with_whitespace($key)] = strip_tags_with_whitespace($value);
-                }
-                $model = ($newArrayEncoded === $newArray2) ? true : false;
             }
         }
         return Cache::rememberForever("answer_result_true_or_false" . $question_id . $value, fn () => $model);
@@ -771,7 +772,7 @@ if (!function_exists('exam_result')) {
             $model = Exam::orderBy('id', 'DESC');
         } else {
             $model = $model->where('user_id', $auth_id);
-            $model = $model->where("point", '>', 0);
+            $model = $model->whereNotNull("point");
             $model = $model->where("time_reply", '>', 0);
             $model = $model->where("payed", 1);
         }

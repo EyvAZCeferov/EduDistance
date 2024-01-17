@@ -34,7 +34,7 @@ class CommonController extends Controller
         try {
             $result = collect();
             $nextsection=false;
-            DB::transaction(function () use ($request, &$result,&$nextsection) {
+            // DB::transaction(function () use ($request, &$result,&$nextsection) {
                 $exam = Exam::findOrFail($request->exam_id);
                 $examsection=Section::where("id",$request->current_section)->first();
                 $result = ExamResult::where("id", $request->exam_result_id)->first();
@@ -133,7 +133,8 @@ class CommonController extends Controller
                     session()->forget('time_reply');
                     session()->forget('selected_section');
                 }
-            });
+
+            // });
 
             return response()->json([
                 'status' => 'success',
@@ -296,6 +297,9 @@ class CommonController extends Controller
     public function set_exam(Request $request)
     {
         try {
+            session()->forget('point');
+            session()->forget('time_reply');
+            session()->forget('selected_section');
             $exam_result = ExamResult::where("exam_id", $request->get("exam_id"))
                 ->where('user_id', Auth::guard('users')->id())
                 ->whereNull("point")
