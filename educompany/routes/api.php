@@ -20,3 +20,4 @@ Route::post('getsectioninformation',[ApisController::class,'getsectioninformatio
 Route::post('setsectiondata',[ApisController::class,'setsectiondata'])->name("api.setsectiondata");
 Route::post('getexamsections',[ApisController::class,'getexamsections'])->name("api.getexamsections");
 Route::post('get_markedquestions_users',[ApisController::class,'get_markedquestions_users'])->name("api.get_markedquestions_users");
+Route::post('get_show_user_which_answered',[ApisController::class,'get_show_user_which_answered'])->name('api.get_show_user_which_answered');

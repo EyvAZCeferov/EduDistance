@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\frontend;
 
 use App\Models\Exam;
+use App\Models\ExamResult;
 use App\Models\User;
 use App\Helpers\Epoint;
 use App\Models\Category;
@@ -349,12 +350,13 @@ class ApisController extends Controller
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
-    public function getsectioninformation(Request $request){
-        try{
-            $data=sections($request->input('section_id'),'id');
-            return response()->json(['status'=>'success','data'=>$data]);
-        }catch(\Exception $e){
-            return response()->json(['status'=>'error','message'=>$e->getMessage()]);
+    public function getsectioninformation(Request $request)
+    {
+        try {
+            $data = sections($request->input('section_id'), 'id');
+            return response()->json(['status' => 'success', 'data' => $data]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
     public function remove_questionorsection_data(Request $request)
@@ -396,9 +398,9 @@ class ApisController extends Controller
     {
         try {
             DB::transaction(function () use ($request) {
-                if(isset($request->selected_section_id) && !empty($request->input('selected_section_id'))){
-                    $model = Section::where('id',$request->input('selected_section_id'))->first();
-                }else{
+                if (isset($request->selected_section_id) && !empty($request->input('selected_section_id'))) {
+                    $model = Section::where('id', $request->input('selected_section_id'))->first();
+                } else {
                     $model = new Section();
                 }
                 $model->exam_id = $request->input('exam_id');
@@ -426,10 +428,50 @@ class ApisController extends Controller
             $markedQuestionUsers = MarkQuestions::where('question_id', $request->input('question_id'))
                 ->where("exam_id", $request->input('exam_id'))->whereNotNull('user_id')->whereHas('result', function ($query) {
                     $query->whereNotNull('point');
-                })->with(['user','result','exam'])->get();
+                })->with(['user', 'result', 'exam'])->get();
             return response()->json(['status' => 'success', 'data' => $markedQuestionUsers]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+    public function get_show_user_which_answered(Request $request)
+    {
+        try {
+            $exam_results = ExamResult::where('exam_id', $request->ids)
+                ->with('answers.answer')
+                ->orderByDesc('id')->get();
+            if (!empty($exam_results)) {
+                $datas = get_answer_choised($exam_results->pluck('id'), $request->question_id, $request->type_req, $request->value);
+                if(!empty($datas) && count($datas)>0){
+                    $data='';
+                    foreach($datas as $dat){
+                        $data.="<div class='my-1 mb-2 p-1 row' style='border-bottom:1px solid #000;'> <h6>".$dat->result_model->user->name. " / ". $dat->result_model->user->email."</h6>";
+                            $data.="<div class='text text-dark'>".trans('additional.pages.exams.earned_point').": ".number_format($dat->result_model->point, 2)." <span class='text-success'>".$dat->result_model->exam->point."</span> &nbsp;&nbsp;".trans('additional.pages.exams.timespent').": <div class='hour_area d-inline-block text text-info'><span id='minutes'>".formattedTime ($dat->result_model->time_reply, 'minute')."</span>:<span id='seconds'>".formattedTime ($dat->result_model->time_reply, 'seconds')."</span></div>";
+                            if($request->type_req==3){
+                                $data .= "&nbsp;&nbsp;<span class='" . ($dat->result == true ? 'text-success' : 'text-danger') . "'>" . trans('additional.pages.exams.youranswer') . ": " . htmlspecialchars($dat->value) . "</span>";
+                            }
+                            if($request->type_req==4){
+                                $leftside='';
+                                $rightside='';
+                                
+                                foreach(json_decode($dat->value,true) as $key=> $val){
+                                    $leftside.="<div class='column_element question_match_element'>".$key."</div>";
+                                    $rightside.="<div class='column_element answer_match_element'>".$val."</div>";
+                                }
+
+                                $data.="&nbsp;&nbsp;<span class='" . ($dat->result == true ? 'text-success' : 'text-danger') . "'>" . trans('additional.pages.exams.youranswer') . ": <br/> <div class='question_content'>  <div class='match_questions_one'> <div class='column question_match_area' >".$leftside."</div><div class='column answer_match_area' >".$rightside."</div></span></div></div>";
+                            }
+                            $data.="</div>";
+                    }
+                    return response()->json(['status' => 'success', 'data' => $data]);
+                }else{
+                    return response()->json(['status' => 'warning', 'message' => trans('additional.pages.exams.notfound')]);
+                }
+            } else {
+                return response()->json(['status' => 'warning', 'message' => trans('additional.pages.exams.notfound')]);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage(), 'line' => $e->getLine()]);
         }
     }
 }

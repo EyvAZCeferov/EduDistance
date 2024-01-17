@@ -65,7 +65,7 @@ class AuthController extends Controller
 
                 if (isset($userwith_subdomain) && !empty($userwith_subdomain)){
                     Session::put('subdomain', $userwith_subdomain ?? null);
-                    create_dns_record($userwith_subdomain);
+                    // create_dns_record($userwith_subdomain);
                 }
 
                 if (Session::has("savethisurl") && !empty(Session::get("savethisurl"))) {

@@ -827,3 +827,16 @@ if (!function_exists('get_answer_choised')) {
         return Cache::rememberForever("get_answer_choised"  . $exam_results_ids . $question_id . $question_type . $value_id, fn () => $model);
     }
 }
+
+if (!function_exists('formattedTime')) {
+    function formattedTime($seconds, $type = 'minute')
+    {
+        $model = null;
+        if ($type == 'minute') {
+            $model = str_pad(floor($seconds / 60), 2, '0', STR_PAD_LEFT);
+        } else {
+            $model = str_pad($seconds % 60, 2, '0', STR_PAD_LEFT);
+        }
+        return Cache::rememberForever("formattedTime"  . $seconds . $type, fn () => $model);
+    }
+}

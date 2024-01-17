@@ -30,8 +30,7 @@
         @endforeach
     </div>
 </div>
-@php($answerData = json_encode(get_answer_choised($exam_results->pluck('id'), $question->id, 4, null), JSON_HEX_QUOT))
-<p id="answerData-{{ $question->id }}" data-answer="{{ $answerData }}" class="text-small my-2 text-center"
+<p id="answerData-{{ $question->id }}" class="text-small my-2 text-center"
     onclick="handleAnswerClick({{ $question->id }},4)">
     @lang('additional.pages.exams.youranswer'): {{ count(get_answer_choised($exam_results->pluck('id'), $question->id, 4, null)) }}
 </p>
@@ -39,6 +38,7 @@
 <script>
     function handleAnswerClick(question_id, questionType) {
         var answerData = document.getElementById('answerData-' + question_id).dataset.answer;
-        showuserswhichanswered(JSON.parse(answerData), questionType);
+        // showuserswhichanswered(JSON.parse(answerData), questionType);
+        showuserswhichanswered({{ $exam->id }}, {{ $question->id }}, 4,null);
     }
 </script>

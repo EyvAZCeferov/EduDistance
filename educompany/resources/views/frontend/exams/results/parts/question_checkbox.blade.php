@@ -3,10 +3,9 @@
         id="question_answer_one_element_container_{{ $question->id }}_{{ $value->id }}">
         <div id="question_answer_one_{{ $question->id }}_{{ $value->id }}_checkbox"
             class="question_answer_one answers_{{ $question->id }}
-            @if (answer_result_true_or_false($question->id, $value->id) == true) true @else false @endif
-
-            "
-            onclick="showuserswhichanswered(JSON.parse(`{{ json_encode(get_answer_choised($exam_results->pluck('id'), $question->id, 2, $value->id)) }}`),1)">
+            @if (answer_result_true_or_false($question->id, $value->id) == true) true @else false @endif"
+            onclick="showuserswhichanswered({{ $exam->id }}, {{ $question->id }}, 2,{{ $value->id }})"
+            >
             <input type="checkbox" name="answers[{{ $value->question->section_id }}][{{ $question->id }}][]"
                 value="{{ $value->id }}">
             <div class="text text-muted sizing_counters_forquestion_value">

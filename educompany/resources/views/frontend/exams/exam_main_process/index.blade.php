@@ -10,12 +10,24 @@
         #print_error {
             display: block;
         }
+
+        #notes_area{
+            width: 100%;
+            position: fixed;
+            top:0;
+            z-index:100000000;
+            left:0;
+            background: #0000;
+            color:#fff;
+            right:0;
+            height:auto;
+        }
     </style>
 @endpush
 @section('content')
     @php
         $questions = collect();
-        if ($exam->time_range_sections > 0) {
+        if (session()->get('selected_section') > 0) {
             $qesutions = $exam->sections[session()->get('selected_section')]->questions;
             foreach ($qesutions as $qesution) {
                 $questions[] = $qesution;
@@ -29,7 +41,9 @@
             }
         }
     @endphp
-
+    @if(auth('users')->user()->email=="eyvaz@globalmart.az")
+        <div id="notes_area"></div>
+    @endif
     <form action="" id="exam" class="d-block" method="POST">
         @csrf
         <input type="hidden" name="first_question" id="first_question" value="{{ $questions[0]->id }}">
@@ -42,7 +56,7 @@
         <input type="hidden" name="time_range_sections" id="time_range_sections"
             value="{{ $questions[0]->section->time_range_sections }}">
         <input type="hidden" name="next_section" id="next_section"
-            value="{{ !empty($exam->sections[session()->get('selected_section')]) ? true : false }}">
+            value="{{ !empty($exam->sections[session()->get('selected_section')+1]) ? true : false }}">
         <input type="hidden" name="all_questions" id="all_questions" value="{{ count($questions) }}">
         <input type="hidden" name="show_time" id="show_time" value="true">
         <input type="hidden" name="time_exam" id="time_exam" value="0">
@@ -455,6 +469,7 @@
     {{-- Create Timer --}}
     <script defer>
         let sec = 0;
+        let qalan_vaxt;
 
         function pad(val) {
             return val.toString().padStart(2, '0');
@@ -473,6 +488,7 @@
             sec++;
             var inputtimeinput = document.getElementById("time_exam");
             var section_start_time = document.getElementById("section_start_time");
+            var time_exam = document.getElementById("time_exam");
             var loader_for_sections = document.getElementById("loader_for_sections");
             var form = document.getElementById("exam");
             const now = new Date();
@@ -480,23 +496,23 @@
             const minutesDifference = Math.floor(difference / (1000 * 60));
             const secondsDifference = Math.floor((difference % (1000 * 60)) / 1000);
             inputtimeinput.value = sec;
-
             if (loader_for_sections.classList.contains('active') && section_start_time.value > 0) {
-                var qalan_vaxt = time_range_sections.value - section_start_time.value;
-                console.log(qalan_vaxt, time_range_sections, section_start_time.value);
-                section_start_time.value = parseInt(section_start_time.value) + 1;
+                qalan_vaxt = (parseInt(section_start_time.value) + parseInt(time_range_sections.value)) - parseInt(time_exam.value);
+                const minutesQalanVaxtDifference =  Math.floor(qalan_vaxt / 60);
+                const secondsQalanVaxtDifference = qalan_vaxt % 60;
                 if (document.getElementById('seconds_start_time')) {
-                    document.getElementById('seconds_start_time').innerHTML = pad(qalan_vaxt % 60);
+                    document.getElementById('seconds_start_time').innerHTML = pad_new(secondsQalanVaxtDifference);
                 }
 
                 if (document.getElementById('minutes_start_time')) {
-                    document.getElementById('minutes_start_time').innerHTML = pad(parseInt(qalan_vaxt / 60, 10) % 60);
+                    document.getElementById('minutes_start_time').innerHTML = pad_new(minutesQalanVaxtDifference);
                 }
 
                 if (qalan_vaxt == 0) {
-                    section_start_time.value = 0;
                     loader_for_sections.classList.remove('active');
                     form.classList.add('d-block');
+                    allowReload=true;
+                    window.location.href=redirect_url;
                 }
             } else {
                 section_start_time.value = 0;
@@ -782,7 +798,15 @@
 
         function resize(e) {
             if (!isResizing) return;
-            const size = `${e.clientX - 72}px`;
+            var notes_area=document.getElementById('notes_area');
+            notes_area.innerHTML=`<p>Client X: ${e.clientX}, Layer X: ${e.layerX}, SrcElement Client Width: ${e.srcElement.clientWidth}, SrcElement Client Offset X: ${e.srcElement.offsetLeft} </p>`;
+            var minusable=0;
+            if(e.layerX>0){
+                minusable=e.clientX - (e.layerX+e.srcElement.offsetLeft);
+            }else{
+                minusable=e.clientX-e.srcElement.offsetLeft;
+            }
+            const size = `${e.clientX - minusable}px`;
             for (let index = 0; index < leftCol.length; index++) {
                 const element = leftCol[index];
                 element.style.width = size;
@@ -903,6 +927,8 @@
                 e.preventDefault();
                 if (allowReload) {
                     window.location.href = redirect_url;
+                }else{
+                    tonext(true);
                 }
             }
         }
@@ -915,6 +941,7 @@
         window.addEventListener('beforeunload', function(e) {
             if (!allowReload) {
                 e.preventDefault();
+                tonext(true);
                 e.returnValue = '';
             }
         });

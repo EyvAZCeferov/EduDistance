@@ -237,7 +237,13 @@
 
         function resize(e) {
             if (!isResizing) return;
-            const size = `${e.clientX - 72}px`;
+            var minusable=0;
+            if(e.layerX>0){
+                minusable=e.clientX - (e.layerX+e.srcElement.offsetLeft);
+            }else{
+                minusable=e.clientX-e.srcElement.offsetLeft;
+            }
+            const size = `${e.clientX - minusable}px`;
             for (let index = 0; index < leftCol.length; index++) {
                 const element = leftCol[index];
                 element.style.width = size;

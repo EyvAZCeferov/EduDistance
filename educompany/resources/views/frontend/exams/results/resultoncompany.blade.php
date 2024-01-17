@@ -243,7 +243,13 @@
 
         function resize(e) {
             if (!isResizing) return;
-            const size = `${e.clientX - 72}px`;
+            var minusable = 0;
+            if (e.layerX > 0) {
+                minusable = e.clientX - (e.layerX + e.srcElement.offsetLeft);
+            } else {
+                minusable = e.clientX - e.srcElement.offsetLeft;
+            }
+            const size = `${e.clientX - minusable}px`;
             for (let index = 0; index < leftCol.length; index++) {
                 const element = leftCol[index];
                 element.style.width = size;
@@ -351,7 +357,7 @@
             return Math.round(number * factor) / factor;
         }
 
-        function showuserswhichanswered(object, type) {
+        function showuserswhichanswered(ids, question_id, type, value = null) {
             try {
                 showLoader();
 
@@ -359,88 +365,52 @@
                 if (showuseranswersmodal != null) {
                     showuseranswersmodal.remove();
                 }
-
-                if (object != null && object.length > 0) {
-                    var elementsanswers = '';
-                    for (var i = 0; i < object.length; i++) {
-                        if (object[i] != null && object[i] != undefined && object[i].result_model != null && object[i]
-                            .result_model != undefined && object[i].result_model.user != null && object[i].result_model
-                            .user != undefined && object[i].result_model.user.name != null && object[i].result_model.user
-                            .name != undefined && object[i].result_model.user.name != '' && object[i].result_model.user
-                            .name != ' ') {
-                            let questionContainer = document.createElement('div');
-                            let answerContainer = document.createElement('div');
-                            if (type == 4) {
-                                var jsoned = JSON.parse(object[i].value);
-
-                                questionContainer.classList.add('column', 'question_match_area');
-                                answerContainer.classList.add('column', 'answers_match_area');
-
-                                for (const [question, answer] of Object.entries(jsoned)) {
-                                    const questionDiv = document.createElement('div');
-                                    questionDiv.classList.add('column_element', 'question_match_element');
-                                    questionDiv.innerHTML = question;
-                                    const answerDiv = document.createElement('div');
-                                    answerDiv.classList.add('column_element', 'answer_match_element');
-                                    answerDiv.innerHTML = answer;
-                                    questionContainer.appendChild(questionDiv);
-                                    answerContainer.appendChild(answerDiv);
-                                }
+                sendAjaxRequestOLD(`{{ route('api.get_show_user_which_answered') }}`, "post", {
+                        ids: ids,
+                        question_id: question_id,
+                        type_req: type,
+                        value: value,
+                    },
+                    function(e,
+                        t) {
+                        if (e) toast(e, "error");
+                        else {
+                            let n = JSON.parse(t);
+                            if(n.message!=null){
+                                hideLoader();
+                                toast(n.status,n.message);
                             }
-                            var element = `<div class="my-1 mb-2 p-1 row" style='border-bottom:1px solid #000;'>
-                                <h6>${object[i].result_model.user.name} / ${object[i].result_model.user.email}</h6
-                                </div>`;
-                            var element_for = `<div class="my-1 mb-2 p-1 row">
-                                    <h6>${object[i].result_model.user.name} / ${object[i].result_model.user.email}</h6>
-                                    <div class='text text-dark'>
-                                        @lang('additional.pages.exams.earned_point'): ${roundToDecimal(object[i].result_model.point,2)} / <span
-                                            class="text-success">${object[i].result_model.exam.point}</span>
-                                        &nbsp;&nbsp;@lang('additional.pages.exams.timespent'):
-                                        <div class="hour_area d-inline-block text text-info">
-                                            <span id="minutes">${formattedTime(object[i].result_model.time_reply,'minute')}</span>:<span
-                                                id="seconds">${formattedTime(object[i].result_model.time_reply,'seconds')}</span>
-                                        </div>
-                                        ${type==3 ? `&nbsp;&nbsp;<span class="${object[i].result==true ? 'text-success' : 'text-danger'}">@lang('additional.pages.exams.youranswer'): ${object[i].value}</span>` : ''}
-                                        ${type==4 ? `&nbsp;&nbsp;<span class="${object[i].result==true ? 'text-success' : 'text-danger'}">@lang('additional.pages.exams.youranswer'): <br/>
-                                            <div class='question_content'>
-                                                <div class="match_questions_one mt-2">
-                                                    ${questionContainer.outerHTML}
-                                                    ${answerContainer.outerHTML}
-                                                </div>
+
+                            if(n.data==null){
+                                hideLoader();
+                                toast("@lang('additional.pages.exams.notfound')", 'warning');
+                            }else{
+                                var showuseranswers = `<div id="showuseranswers" class="modal custom-modal show" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-secondary">
+                                                <h3 class="text-white">@lang('additional.pages.exams.answered_students')</h3>
+                                                <button type="button" class="close text-white" onclick="toggleModalnow('showuseranswers', 'hide')"
+                                                    data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
                                             </div>
-                                            </span>` : ''}
+
+                                            <div class="modal-body overflow-scroll max-h-32">
+                                                ${n.data}
+                                            </div>
+
+                                        </div>
                                     </div>
+                                    <br>
                                 </div>`;
-                            elementsanswers += element_for;
+
+                                document.body.innerHTML += showuseranswers;
+                                toggleModalnow ('showuseranswers', 'open');
+                                hideLoader();
+                            }
                         }
-                    }
-
-                    var showuseranswers = `<div id="showuseranswers" class="modal custom-modal show" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header bg-secondary">
-                                    <h3 class="text-white">@lang('additional.pages.exams.answered_students')</h3>
-                                    <button type="button" class="close text-white" onclick="toggleModalnow('showuseranswers', 'hide')"
-                                        data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-
-                                <div class="modal-body overflow-scroll max-h-32">
-                                    ${elementsanswers}
-                                </div>
-
-                            </div>
-                        </div>
-                        <br>
-                    </div>`;
-
-                    document.body.innerHTML += showuseranswers;
-                    toggleModalnow('showuseranswers', 'open');
-                } else {
-                    hideLoader();
-                    toast("@lang('additional.pages.exams.notfound')", 'warning');
-                }
+                    });
 
                 hideLoader();
             } catch (error) {
@@ -448,6 +418,7 @@
                 toast(error, 'error');
             }
         }
+
 
         window.addEventListener('load', function() {
             draggingleftandrightcolumns();
