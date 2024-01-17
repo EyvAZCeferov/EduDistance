@@ -10,18 +10,6 @@
         #print_error {
             display: block;
         }
-
-        #notes_area{
-            width: 100%;
-            position: fixed;
-            top:0;
-            z-index:100000000;
-            left:0;
-            background: #0000;
-            color:#fff;
-            right:0;
-            height:auto;
-        }
     </style>
 @endpush
 @section('content')
@@ -41,9 +29,6 @@
             }
         }
     @endphp
-    @if(auth('users')->user()->email=="eyvaz@globalmart.az")
-        <div id="notes_area"></div>
-    @endif
     <form action="" id="exam" class="d-block" method="POST">
         @csrf
         <input type="hidden" name="first_question" id="first_question" value="{{ $questions[0]->id }}">
@@ -802,8 +787,6 @@
 
         function resize(e) {
             if (!isResizing) return;
-            var notes_area=document.getElementById('notes_area');
-            notes_area.innerHTML=`<p>Client X: ${e.clientX}, Layer X: ${e.layerX}, SrcElement Client Width: ${e.srcElement.clientWidth}, SrcElement Client Offset X: ${e.srcElement.offsetLeft} </p>`;
             var minusable=0;
             if(e.layerX>0){
                 minusable=e.clientX - (e.layerX+e.srcElement.offsetLeft);
