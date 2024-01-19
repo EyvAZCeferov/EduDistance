@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class SetSubdomain
 {
@@ -33,13 +34,22 @@ class SetSubdomain
         if($subdomain==null && Auth::guard('users')->check() && isset(Auth::guard('users')->user()->subdomain) && !empty(Auth::guard('users')->user()->subdomain)){
             $subdomain = Auth::guard('users')->user()->subdomain;
         }else{
+            if(!Session::has("subdomain"))
+                Session::put('subdomain',$subdomain);
+
+            if(Auth::guard('users')->check() && empty(Auth::guard('users')->user()->subdomain) && Session::has("subdomain"))
+                User::where('id',Auth::guard('users')->id())->update(['subdomain'=>Session::get("subdomain")]);
+
+
             $subdomain = Session::get('subdomain')??null;
         }
+
         if($subdomain!=env('APP_DOMAIN')){
             Session::put('subdomain', $subdomain??null);
         }else{
             Session::put('subdomain', null);
         }
+
         return $next($request);
     }
 }

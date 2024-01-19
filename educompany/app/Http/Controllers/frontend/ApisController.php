@@ -268,6 +268,8 @@ class ApisController extends Controller
                 $model = new ExamQuestion();
 
             $model->question = modifyRelativeUrlsToAbsolute($request->input('question_input'));
+            if($request->input("question_type")==3)
+                $model->description = modifyRelativeUrlsToAbsolute($request->input('question_input2'));
             if ($request->input('question_type') == 5 || $request->input('question_type') == '5') {
                 if ($request->hasFile('question_audio')) {
                     $audio_file = file_upload($request->file("question_audio"), 'exam_questions');
@@ -453,7 +455,7 @@ class ApisController extends Controller
                             if($request->type_req==4){
                                 $leftside='';
                                 $rightside='';
-                                
+
                                 foreach(json_decode($dat->value,true) as $key=> $val){
                                     $leftside.="<div class='column_element question_match_element'>".$key."</div>";
                                     $rightside.="<div class='column_element answer_match_element'>".$val."</div>";

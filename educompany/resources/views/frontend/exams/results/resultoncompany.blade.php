@@ -58,19 +58,28 @@
                 </div>
 
                 <div class="modal-body overflow-scroll max-h-32">
-                    @foreach ($exam_results->whereNotNull('point') as $result)
-                        <div class="row mb-1 p-1 pb-2" style="border-bottom:1px solid #ccc;">
-                            <h6>{{ $result->user->name }} / {{ $result->user->email }}</h6>
-                            <div class='text text-dark'>
-                                @lang('additional.pages.exams.earned_point'): {{ round($result->point, 2) }} / <span
-                                    class="text-success">{{ $exam->point }}</span>
-                                &nbsp;&nbsp;@lang('additional.pages.exams.timespent'):
-                                <div class="hour_area d-inline-block text text-info">
-                                    <span id="minutes">{{ floor($result->time_reply / 60) % 60 }}</span>:<span
-                                        id="seconds">{{ $result->time_reply % 60 }}</span>
+                    @php($resultsByDay = $exam_results->whereNotNull('point')->groupBy(function ($result) {
+                        return $result->created_at->format('Y-m-d');
+                    }))
+                    @foreach ($resultsByDay as $day => $results)
+                        <div class="text-center text-muted my-1 text-small">
+                            @php($formattedDay = \Carbon\Carbon::createFromFormat('Y-m-d', $day)->format('F j, Y'))
+                            {{ $formattedDay }}
+                        </div>
+                        @foreach($results as $result)
+                            <div class="row mb-1 p-1 pb-2" style="border-bottom:1px solid #ccc;">
+                                <h6>{{ $result->user->name }} / {{ $result->user->email }}</h6>
+                                <div class='text text-dark'>
+                                    @lang('additional.pages.exams.earned_point'): {{ round($result->point, 2) }} / <span
+                                        class="text-success">{{ $exam->point }}</span>
+                                    &nbsp;&nbsp;@lang('additional.pages.exams.timespent'):
+                                    <div class="hour_area d-inline-block text text-info">
+                                        <span id="minutes">{{ floor($result->time_reply / 60) % 60 }}</span>:<span
+                                            id="seconds">{{ $result->time_reply % 60 }}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endforeach
                     @endforeach
                 </div>
 
@@ -418,7 +427,6 @@
                 toast(error, 'error');
             }
         }
-
 
         window.addEventListener('load', function() {
             draggingleftandrightcolumns();

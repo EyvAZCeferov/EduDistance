@@ -1080,6 +1080,17 @@ body {
                         }
                     }
                 }
+
+                &.sticky{
+                    width:100%;
+                    position: fixed;
+                    top: 0;
+                    z-index:3500;
+                    background-color:#fff;
+                    right:50px;
+                    left:20px;
+                    padding-right:50px;
+                }
             }
 
             .conlol {
@@ -1123,6 +1134,36 @@ body {
                     padding: 10px 15px;
                     padding-top: 0;
 
+                    div.content_exam_info {
+                        text-align: left;
+                        font-family: $secondary-font;
+                        word-break: break-word;
+                        flex-wrap:wrap;
+                        display:flex;
+
+                        p{
+                            max-width:100%;
+                            max-height:100%;
+                            word-break: break-word;
+                            flex-wrap:wrap;
+                            display:flex;
+                        }
+                        img{
+                            object-fit:contain !important;
+                            height:100%;
+                            width:100%;
+                        }
+
+                        .audio_tag_text{
+                            width:100%;
+                        }
+
+                        audio {
+                            width: 100%;
+                            margin-top: 10px;
+                        }
+                    }
+
                     &.left_col {
                         overflow-x: hidden;
                         overflow-y: auto;
@@ -1155,35 +1196,7 @@ body {
                             cursor: pointer;
                         }
 
-                        div.content_exam_info {
-                            text-align: left;
-                            font-family: $secondary-font;
-                            word-break: break-word;
-                            flex-wrap:wrap;
-                            display:flex;
 
-                            p{
-                                max-width:100%;
-                                max-height:100%;
-                                word-break: break-word;
-                                flex-wrap:wrap;
-                                display:flex;
-                            }
-                            img{
-                                object-fit:contain !important;
-                                height:100%;
-                                width:100%;
-                            }
-
-                            .audio_tag_text{
-                                width:100%;
-                            }
-
-                            audio {
-                                width: 100%;
-                                margin-top: 10px;
-                            }
-                        }
 
                         .buttons_top_aplusandminus {
                             @extend .classjustifybetween;
@@ -1325,9 +1338,9 @@ body {
 
                             textarea{
                                 margin-left:10px;
-                                height:40px;
+                                height:42px;
                                 margin-bottom:10px;
-                                width:73px;
+                                width:100%;
                                 border-bottom:5px solid #000;
                                 resize:none;
                                 &.true{
@@ -1336,16 +1349,20 @@ body {
                                 &.false{
                                     border-color:$error-color;
                                 }
+                                &.sat{
+                                    width:73px !important;
+                                }
                             }
 
                             .question_textbox_text{
                                 font-size:$heading_size;
                                 color:#000;
                                 text-align:left;
-                                margin-left:20px;
+                                margin-left:2px;
                                 margin-bottom:5px;
-                                min-width:65%;
-                                max-width:90%;
+                                margin-top:5px;
+                                width:100%;
+                                display:block;
                                 span{
                                     font-size:$heading_size;
                                     color:#000;
@@ -1532,6 +1549,9 @@ body {
                                     span{
                                         font-size:$small_size;
                                         color:#000;
+                                    }
+                                    img{
+                                        width:32px;
                                     }
                                 }
                             }
@@ -1837,7 +1857,6 @@ body {
 
                         &:hover,
                         &:focus,
-                        &:active,
                         &.active {
                             background-color: $secondary-color;
                             border-color: $secondary-color;
@@ -1904,7 +1923,7 @@ body {
 
                     .references_top_buttons {
                         @extend .classjustifybetween;
-                        border-bottom: 2px solid #666;
+                        border-bottom: 2px solid #000;
 
                         a {
                             font-size: $page_size;

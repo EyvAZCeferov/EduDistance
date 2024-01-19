@@ -379,6 +379,15 @@
                         padding: 10px 15px;
                         padding-top: 0;
 
+                        div.content_exam_info {
+                            text-align: left;
+                            font-family: $secondary-font;
+
+                            audio {
+                                width: 100%;
+                            }
+                        }
+
                         &.left_col {
                             overflow-x: hidden;
                             overflow-y: auto;
@@ -411,14 +420,7 @@
                                 cursor: pointer;
                             }
 
-                            div.content_exam_info {
-                                text-align: left;
-                                font-family: $secondary-font;
 
-                                audio {
-                                    width: 100%;
-                                }
-                            }
 
                             .buttons_top_aplusandminus {
                                 margin-bottom: 5px;

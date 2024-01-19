@@ -76,7 +76,7 @@
                 aria-labelledby="myModalLabel">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
-                        <div class="modal-header">
+                        <div class="modal-header bg-dark">
                             <button type="button" class="close" onclick="toggleModalnow('desmoscalculator', 'hide')"
                                 data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
@@ -100,7 +100,7 @@
                 aria-labelledby="myModalLabel">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
-                        <div class="modal-header bg-secondary">
+                        <div class="modal-header bg-dark">
                             <h3 class="text-white">@lang('additional.pages.exams.referances')</h3>
                             <button type="button" class="close text-white"
                                 onclick="toggleModalnow('references', 'hide')" data-dismiss="modal" aria-label="Close">
@@ -109,40 +109,58 @@
                         </div>
 
                         <div class="modal-body">
-                            <div class="references_top_buttons">
-                                <div></div>
-                                <div>
-                                    <a href="javascript:void(0)"
-                                        onclick="toggle_references_modal_content('open')">@lang('additional.pages.exams.references_open')</a>
-                                    <a href="javascript:void(0)"
-                                        onclick="toggle_references_modal_content('hide')">@lang('additional.pages.exams.references_hide')</a>
-                                </div>
-                            </div>
-
-                            @foreach ($exam->references as $key => $value)
-                                <div class="reference" id="reference_{{ $key }}">
-                                    <div class="referance_title">
-                                        <h4>{{ $value->reference->name[app()->getLocale() . '_name'] }}</h4>
-                                        <a href="javascript:void(0)" id="toggler_button_reference_{{ $key }}"
-                                            class="referance_toggle_button"
-                                            onclick="toggle_references_modal_content_element({{ $key }})"><i
-                                                class="fa fa-plus"></i></a>
+                            @if(count($exam->references)>1)
+                                <div class="references_top_buttons">
+                                    <div></div>
+                                    <div>
+                                        <a href="javascript:void(0)"
+                                            onclick="toggle_references_modal_content('open')">@lang('additional.pages.exams.references_open')</a>
+                                        <a href="javascript:void(0)"
+                                            onclick="toggle_references_modal_content('hide')">@lang('additional.pages.exams.references_hide')</a>
                                     </div>
-                                    <div class="referance_body hide" id="body_reference_{{ $key }}">
-                                        @if (isset($value->reference->image) && !empty($value->reference->image))
-                                            <div class="col-sm-12 col-md-6 col-lg-8 img_area">
-                                                <img src="{{ getImageUrl($value->reference->image, 'exams') }}"
+                                </div>
+
+                                @foreach ($exam->references as $key => $value)
+                                    <div class="reference" id="reference_{{ $key }}">
+                                        <div class="referance_title">
+                                            <h4>{{ $value->reference->name[app()->getLocale() . '_name'] }}</h4>
+                                            <a href="javascript:void(0)" id="toggler_button_reference_{{ $key }}"
+                                                class="referance_toggle_button"
+                                                onclick="toggle_references_modal_content_element({{ $key }})"><i
+                                                    class="fa fa-plus"></i></a>
+                                        </div>
+                                        <div class="referance_body hide" id="body_reference_{{ $key }}">
+                                            @if (isset($value->reference->image) && !empty($value->reference->image))
+                                                <div class="col-sm-12 col-md-6 col-lg-8 img_area">
+                                                    <img src="{{ getImageUrl($value->reference->image, 'exams') }}"
+                                                        class="img-fluid img-responsive"
+                                                        alt="{{ $value->reference->image }}">
+                                                </div>
+                                            @endif
+                                            <div
+                                                class="@if (isset($value->reference->image) && !empty($value->reference->image)) col-sm-12 col-md-6 col-lg-4 @else col-sm-12 col-md-12 col-lg-12 @endif">
+                                                {!! $value->reference->description[app()->getLocale() . '_description'] !!}
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @elseif(count($exam->references)==1)
+                                  <div class="reference" style="border:none;">
+                                    <div class="referance_body d-block">
+                                        @if (isset($exam->references[0]->reference->image) && !empty($exam->references[0]->reference->image))
+                                            <div class="col-sm-12 col-md-12 col-lg-12 img_area">
+                                                <img src="{{ getImageUrl($exam->references[0]->reference->image, 'exams') }}"
                                                     class="img-fluid img-responsive"
-                                                    alt="{{ $value->reference->image }}">
+                                                    alt="{{ $exam->references[0]->reference->image }}">
                                             </div>
                                         @endif
                                         <div
-                                            class="@if (isset($value->reference->image) && !empty($value->reference->image)) col-sm-12 col-md-6 col-lg-4 @else col-sm-12 col-md-12 col-lg-12 @endif">
-                                            {!! $value->reference->description[app()->getLocale() . '_description'] !!}
+                                            class="col-sm-12 col-md-12 col-lg-12">
+                                            {!! $exam->references[0]->reference->description[app()->getLocale() . '_description'] !!}
                                         </div>
                                     </div>
-                                </div>
-                            @endforeach
+                                  </div>
+                            @endif
                         </div>
 
                     </div>
@@ -203,6 +221,21 @@
             $('#references').toggle();
             $('#references').draggable();
         }
+
+        function addStickyClass() {
+            var header = document.getElementById("header_columns");
+            var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            if (scrollTop > 100) {
+                header.classList.add("sticky");
+            } else {
+                header.classList.remove("sticky");
+            }
+        }
+
+        window.onscroll = function() {
+            addStickyClass();
+        };
     </script>
     {{-- Header Buttons --}}
     {{-- Footer Buttons --}}
@@ -622,7 +655,7 @@
                     }
                     for (let index3 = 0; index3 < question_container_undo_or_redo.length; index3++) {
                         const element3 = question_container_undo_or_redo[index];
-                        element3.innerHTML = '<i class="fa fa-plus-circle"></i>';
+                        element3.innerHTML = `<img src="{{ asset('front/assets/img/bg_images/a+icon.png') }}" class="img-fluid img-responsive" />`;
                     }
 
                 } else {
@@ -685,7 +718,7 @@
             if (question_textbox_text_span !== null) {
                 question_textbox_text_span.innerHTML = '';
             }
-
+            text_box=document.getElementById(`question_answer_one_${question_id}_${type}`).value;
             if (text_box.length > 0 && text_box != null && $.trim(text_box) != '' && $.trim(text_box) != null && $.trim(
                     text_box) != ' ') {
                 var parts = text_box.split('/');
@@ -837,7 +870,7 @@
             if (question_answer_one_element_container_radio != null) {
                 if (question_answer_one_element_container_radio.classList.contains("removable")) {
                     question_answer_one_element_container_radio.classList.remove('removable');
-                    question_container_undo_or_redo.innerHTML = '<i class="fa fa-plus-circle"></i>';
+                    question_container_undo_or_redo.innerHTML = `<img src="{{ asset('front/assets/img/bg_images/a+icon.png') }}" class="img-fluid img-responsive" />`;
                 } else {
                     question_answer_one_element_container_radio.classList.add('removable');
                     question_container_undo_or_redo.innerHTML = '<span>@lang('additional.buttons.undo')</span>';
@@ -847,7 +880,7 @@
             if (question_answer_one_element_container_checkbox != null) {
                 if (question_answer_one_element_container_checkbox.classList.contains("removable")) {
                     question_answer_one_element_container_checkbox.classList.remove('removable');
-                    question_container_undo_or_redo.innerHTML = '<i class="fa fa-plus-circle"></i>';
+                    question_container_undo_or_redo.innerHTML = `<img src="{{ asset('front/assets/img/bg_images/a+icon.png') }}" class="img-fluid img-responsive" />`;
                 } else {
                     question_answer_one_element_container_checkbox.classList.add('removable');
                     question_container_undo_or_redo.innerHTML = '<span>@lang('additional.buttons.undo')</span>';

@@ -7,8 +7,20 @@
 @section('content')
     @include('frontend.light_parts.sliders')
     @include('frontend.light_parts.categories')
-    @if(!session()->has('subdomain'))
+    @if (!session()->has('subdomain'))
         @include('frontend.light_parts.about')
+    @else
+        <section class="profile_page_header my-3">
+            <div class="my-4 py-2">
+                @include('frontend.light_parts.section_title', [
+                    'title' => trans('additional.pages.exams.favoritedexams'),
+                    'url' => session()->has('subdomain') ? route('category_exam.subdomain', ['category' => null,'subdomain'=>session()->get("subdomain")]) : route('category_exam', ['category' => null]),
+                ])
+                @include('frontend.light_parts.products.products_grid', [
+                    'products' => exams(null, 'most_used_tests')->take(4),
+                ])
+            </div>
+        </section>
     @endif
 @endsection
 @push('js')

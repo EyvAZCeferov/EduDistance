@@ -157,6 +157,7 @@ return [
         "user_type_2"=>"Şirkət",
         "searchkeyword"=>"Açar sözü axtar",
         'exam_name'=>"İmtahan adı",
+        "description"=>"Açıqlama",
         'exam_description'=>"İmtahan açıqlaması",
         'exam_duration'=>"İmtahan vaxtı (dəqiqə)",
         'exam_point'=>"İmtahan balı",

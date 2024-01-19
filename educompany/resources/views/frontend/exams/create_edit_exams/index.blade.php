@@ -144,7 +144,7 @@
                         class="form-control {{ $errors->first('layout_type') ? 'is-invalid' : '' }}">
                         @foreach (\App\Models\Exam::LAYOUTS as $key => $type)
                             <option
-                                {{ old('layout_type', isset($data) && !empty($data) && isset($data->id) ? $data->layout_type : null) == $type ? 'selected' : '' }}
+                                @if(isset($data) && !empty($data) && isset($data->id) && $data->layout_type ==$type) selected @endif
                                 value="{{ $key }}">{{ $type }}</option>
                         @endforeach
                     </select>
@@ -460,6 +460,12 @@
                                     class="form-control question_input"
                                     contenteditable="true" placeholder="@lang('additional.forms.your_question')"></div>
                             </div>
+                            <div class="my-2">
+                                <div name="question2_input_${question_input_code}"
+                                    id="question2_input_${question_input_code}"
+                                    class="form-control question_input2"
+                                    contenteditable="true" placeholder="@lang('additional.forms.description')"></div>
+                            </div>
                         </div>
                         <div class="col-sm-12 col-md-12 col-lg-12 my-3 d-none" id="question_content_audio">
                             <div class="form-group">
@@ -528,6 +534,7 @@
                     var formData = new FormData(form[0]);
                     var question_input_id = $(".question_input").attr('id');
                     var question_input = getcontenteditor(question_input_id);
+                    var question_input2;
                     formData.append("question_input", question_input);
                     var answers = document.getElementsByClassName('text-input');
                     var current_section_id = document.getElementById('current_section_id').value;
@@ -538,8 +545,11 @@
                         formData.append("answerres_" + i, answer_content);
                     }
 
-                    if (question_type == 3)
+                    if (question_type == 3){
                         formData.append('textbox_0', getcontenteditor('textbox_0'));
+                        question_input2=getcontenteditor($(".question_input2").attr('id'))
+                        formData.append("question_input2",question_input2);
+                    }
 
                     formData.append("exam_id", '{{ $data->id }}');
                     formData.append("language", '{{ app()->getLocale() }}');
@@ -729,6 +739,13 @@
                                                                 class="form-control question_input"
                                                                 contenteditable="true" placeholder="@lang('additional.forms.your_question')">${n.data.question}</div>
                                                         </div>
+
+                                                        ${n.data.type==3 ? `<div class='my-2'>
+                                                            <div name="question2_input_${question_input_code}"
+                                                                id="question2_input_${question_input_code}"
+                                                                class="form-control question_input2"
+                                                                contenteditable="true" placeholder="@lang('additional.forms.description')">${n.data.description}</div>
+                                                        </div>` : ''}
                                                     </div>
                                                     <div class="col-sm-12 col-md-12 col-lg-12 my-1 d-none" id="question_content_audio">
                                                         <div class="form-group">
@@ -794,6 +811,12 @@
                                 set_type(n.data.type);
                                 var question_input_id = $(".question_input").prop('id');
                                 createeditor(question_input_id);
+                                var question_input2_id;
+
+                                if(n.data.type==3){
+                                    question_input2_id = $(".question_input2").prop('id');
+                                    createeditor(question_input2_id);
+                                }
 
                                 for (var i = 0; i < idscontenteditable.length; i++) {
                                     createeditor('answer__input_' + idscontenteditable[i]);
@@ -908,9 +931,11 @@
 
                 var question_input_id = $(".question_input").prop('id');
                 createeditor(question_input_id);
+                var question_input2_id;
                 if (type == 3) {
                     var textbox_0_id = $(".textbox_0").prop('id');
                     var textbox_0 = createeditor(textbox_0_id);
+                    var question_input2 = createeditor($(".question_input2").prop('id'));
                 }
 
                 question_footer_buttons.classList.remove("hide");

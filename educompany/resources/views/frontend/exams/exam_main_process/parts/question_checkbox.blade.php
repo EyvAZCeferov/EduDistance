@@ -13,7 +13,7 @@
         </div>
     </div>
     <button type="button" class="btn btn-sm btn-question_container_undo_or_redo" id='question_container_undo_or_redo_{{ $question->id }}_{{ $value->id }}' onclick="toggleabcline({{ $question->id }},{{ $value->id }})">
-        <i class="fa fa-plus-circle"></i>
+        <img src="{{ asset('front/assets/img/bg_images/a+icon.png') }}" class="img-fluid img-responsive" />
     </button>
 </div>
 @endforeach

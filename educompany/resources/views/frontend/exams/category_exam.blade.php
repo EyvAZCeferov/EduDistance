@@ -21,7 +21,11 @@
         <div class="category_body">
             @foreach ($categories as $key => $value)
                 <div class="category_body_item" id="category_body_{{ $value->id }}">
-                    @php($exams = \App\Models\Exam::where('category_id', $value->id)->get())
+                    @if(empty($value->parent_id))
+                        @php($exams = \App\Models\Exam::whereIn('category_id', [$value->id,$value->sub->pluck('id')])->get())
+                    @else
+                        @php($exams = \App\Models\Exam::where('category_id', $value->id)->get())
+                    @endif
                     @if (!empty($exams) && count($exams) > 0)
                         @include('frontend.light_parts.products.products_grid', [
                             'products' => $exams,

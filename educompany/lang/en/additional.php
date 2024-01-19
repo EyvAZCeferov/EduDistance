@@ -157,6 +157,7 @@ return [
         "user_type_2" => "Company",
         "searchkeyword" => "Search for keywords",
         'exam_name' => "Exam Name",
+        "description"=>"Description",
         'exam_description' => "Exam Description",
         'exam_duration' => "Exam Duration (minutes)",
         'exam_point' => "Exam Points",

@@ -33,7 +33,7 @@
 
                     </div>
                 @endif
-                
+
                 @if ($value->type != 5)
                     <div class="buttons_top_aplusandminus">
                         <div></div>
@@ -52,6 +52,8 @@
                         </div>
                         <br />
                         <audio @if ($exam->repeat_sound == false) class="only1time" @endif id="audio_{{ $value->id }}" controlsList="nodownload" controls><source src="{{ getImageUrl($value->file, 'exam_questions') }}" type="audio/mpeg">Your browser does not support the audio element.</audio>
+                    @elseif($value->type==3 && !empty($value->description))
+                            {!! $value->description !!}
                     @else
                         {!! $value->question !!}
                     @endif
@@ -86,6 +88,11 @@
 
                     </div>
                 @endif
+                @if($value->type==3 && !empty($value->description))
+                    <div class="content_exam_info mt-3 @if($value->type==3) classcenter @endif" id="content_exam_info" style="flex-direction: column">
+                        {!! $value->question !!}
+                    </div>
+                @endif
                 <div class="question_content">
                     @if ($value->type == 1 || $value->type == 5)
                         @include('frontend.exams.exam_main_process.parts.question_radio', [
@@ -101,6 +108,7 @@
                         @include('frontend.exams.exam_main_process.parts.question_textbox', [
                             'question' => $value,
                             'exam_result' => $exam_result,
+                            'exam'=>$exam_result->exam
                         ])
                     @elseif($value->type == 4)
                         @include('frontend.exams.exam_main_process.parts.question_match', [
