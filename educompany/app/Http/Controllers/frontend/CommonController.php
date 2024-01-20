@@ -405,6 +405,12 @@ class CommonController extends Controller
                 $data = new Exam();
             }
 
+            if(!(isset($request->exam_name) && !empty($request->exam_name)))
+                return redirect()->back()->with('error','Məlumatları tam doldurun');
+
+            if(!((isset($request->description) && !empty($request->description)) || (isset($request->mce_0) && !empty($request->mce_0))))
+                return redirect()->back()->with('error','Məlumatları tam doldurun');
+
             if ($request->hasFile('image')) {
                 $image = image_upload($request->file("image"), 'exams');
             }
@@ -489,6 +495,14 @@ class CommonController extends Controller
         try {
             $data = collect();
             // DB::transaction(function () use (&$data, $request) {
+
+            if(!(isset($request->exam_name) && !empty($request->exam_name)))
+                return redirect()->back()->with('error','Məlumatları tam doldurun');
+
+            if(!((isset($request->description) && !empty($request->description)) || (isset($request->mce_0) && !empty($request->mce_0))))
+                return redirect()->back()->with('error','Məlumatları tam doldurun');
+
+                
             if (isset($request->top_id) && !empty($request->top_id)) {
                 $data = Exam::where("id", $request->top_id)->first();
             } else {

@@ -1,5 +1,8 @@
 @extends('frontend.layouts.app')
 @section('title', trans('additional.pages.exams.exams'))
+@if(!empty($category) && isset($category->description[app()->getLocale().'_description']) && !empty($category->description[app()->getLocale().'_description']))
+    @section('description', $category->description[app()->getLocale().'_description'])
+@endif
 @section('content')
     <section class="exams">
         @include('frontend.exams.search_filter', ['type' => 'exams','value'=>$search])
