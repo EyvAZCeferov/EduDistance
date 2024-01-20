@@ -31,6 +31,7 @@ class CommonController extends Controller
     }
     public function examFinish(Request $request)
     {
+        // dd($request->all()); 
         try {
             $result = collect();
             $nextsection=false;

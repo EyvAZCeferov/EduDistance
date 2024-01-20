@@ -50,11 +50,14 @@
                             <source src="{{ getImageUrl($value->file, 'exam_questions') }}" type="audio/mpeg">Your
                             browser does not support the audio element.
                         </audio>
+                    @elseif($value->type==3 && !empty($value->description))
+                        {!! $value->description !!}
                     @else
                         {!! $value->question !!}
                     @endif
                 </div>
             </div>
+
             @if ($value->layout != 'onepage')
                 <div id="resizer" class="resizer"></div>
             @endif
@@ -76,6 +79,11 @@
                             @endif
                         </div>
 
+                    </div>
+                @endif
+                @if($value->type==3 && !empty($value->description))
+                    <div class="content_exam_info mt-3 @if($value->type==3) classcenter @endif" id="content_exam_info" style="flex-direction: column">
+                        {!! $value->question !!}
                     </div>
                 @endif
                 <div class="question_content">

@@ -55,6 +55,13 @@
         <input type="hidden" name="exam_id" id="exam_id" value="{{ $exam->id }}">
         <input type="hidden" name="exam_result_id" id="exam_result_id" value="{{ $exam_result->id }}">
         <input type="hidden" name="language" id="language" value="{{ app()->getLocale() }}">
+
+        {{-- Question Time replies --}}
+        @foreach ($questions as $key => $value)
+            <input type="hidden" name="question_time_replies[{{ $value->id }}]" id="question_time_replies_{{ $value->id }}" value="0">
+        @endforeach
+        {{-- Question Time replies --}}
+
         <section class="exam_page {{ $exam->layout_type }}">
             @include('frontend.exams.exam_main_process.parts.header', [
                 'exam' => $exam,
@@ -72,8 +79,7 @@
             ])
 
             {{-- Desmos Calculator --}}
-            <div id="desmoscalculator" class="modal custom-modal show" tabindex="-1" role="dialog"
-                aria-labelledby="myModalLabel">
+            <div id="desmoscalculator" class="modal custom-modal show" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header bg-dark">
@@ -82,9 +88,9 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-
+                        <button class="btn btn-dark btn-sm desmos_expandable" id='desmos_expandable' type="button" onclick="toggledesmosmodal('desmoscalculator')"><i class="fa fa-expand-alt"></i></button>
                         <div class="modal-body">
-                            <iframe src="https://www.desmos.com/calculator/nqvcxb50ap"
+                            <iframe src="https://www.desmos.com/calculator/ddqtfqccg0"
                                 style="border:0px #ffffff none;width:100%;height:100%;" name="myiFrame" scrolling="no"
                                 frameborder="0" marginheight="0px" marginwidth="0px" allowfullscreen></iframe>
                         </div>
@@ -198,6 +204,8 @@
     {{-- Header Buttons --}}
     <script defer>
         let intervalTimerID;
+        let question_time_reply=0;
+
 
         function togglehours() {
             var clock_area = document.getElementById("timer_section");
@@ -265,6 +273,8 @@
                     });
                     hideLoader();
                 }
+
+                question_time_reply=0;
             } catch (error) {
                 hideLoader();
                 toast(error, 'error');
@@ -296,6 +306,7 @@
                 var section_start_time = document.getElementById("section_start_time");
                 var loader_for_sections = document.getElementById("loader_for_sections");
                 var form = document.getElementById("exam");
+                question_time_reply=0;
                 if (all_questions == currentDivQuestion.dataset.key || tolast == true) {
                     if (finishmodalshowed == false && tolast == false) {
                         hideLoader();
@@ -472,6 +483,7 @@
                 var selected = document.getElementById(`content_exam_${id}`);
                 selected.classList.add("show");
                 document.getElementById("current_question").value = id;
+                question_time_reply=0;
                 togglequestions();
                 hideLoader();
             } catch (error) {
@@ -504,6 +516,7 @@
 
         function updateClock() {
             sec++;
+            question_time_reply++;
             var inputtimeinput = document.getElementById("time_exam");
             var section_start_time = document.getElementById("section_start_time");
             var time_exam = document.getElementById("time_exam");
@@ -553,9 +566,109 @@
             if (document.getElementById('minutes')) {
                 document.getElementById('minutes').innerHTML = pad_new(minutesDifference);
             }
+
+            settimerforcurrentquestion();
+        }
+
+        function settimerforcurrentquestion(){
+            var current_question=document.getElementById('current_question').value;
+            var question_time_replies_currentval=document.getElementById(`question_time_replies_${current_question}`).value;
+            var result = parseInt(question_time_reply)<parseInt(question_time_replies_currentval) ? parseInt(question_time_reply) :  (parseInt(question_time_reply) - parseInt(question_time_replies_currentval));
+            document.getElementById(`question_time_replies_${current_question}`).value =parseInt(question_time_replies_currentval) + parseInt(result);
         }
     </script>
     {{-- Create Timer --}}
+
+    {{-- onchange tab --}}
+    <script>
+        // let onchangecountdown;
+        // let loaderVisibleonchange = false;
+        // let secondsLeftcountdown = 5;
+
+        // function onchangeShowLoader() {
+        //     loaderVisibleonchange = true;
+        //     var modalshowcountdown = `<div id="modalshowcountdown" class="modal custom-modal show" tabindex="-1" role="dialog"
+        //         aria-labelledby="myModalLabel">
+        //         <div class="modal-dialog modal-dialog-centered" role="document">
+        //             <div class="modal-content">
+        //                 <div class="modal-body text-muted text-large my-1">
+        //                     <div class='my-1 d-flex '>
+        //                         <span class='d-inline-block' id='minutescountdown'>00</span><span class='d-inline-block'>:</span><span
+        //                             id='secondscountdown' class='d-inline-block'>05</span>
+        //                     </div>
+        //                     <div class='text-center text-warning'>
+        //                         @lang("additional.messages.ifchangewindowtab")
+        //                     </div>
+        //                 </div>
+        //             </div>
+        //         </div>
+        //         <br>
+        //     </div>`;
+        //     console.log(modalshowcountdown);
+        //     document.body.innerHTML += modalshowcountdown;
+        //     toggleModalnow('modalshowcountdown', 'open');
+        //     onchangeStartCountdown();
+        // }
+
+        // function onchangeStartCountdown() {
+        //     console.log(secondsLeftcountdown);
+        //     onchangecountdown = setInterval(function () {
+        //         if (secondsLeftcountdown == 0) {
+        //             clearInterval(onchangecountdown);
+        //             clearInterval(intervalTimerID);
+        //             loaderVisibleonchange = false;
+        //             var modalshowcountdown = document.getElementById('modalshowcountdown');
+        //             if (modalshowcountdown != null) {
+        //                 toggleModalnow('modalshowcountdown', 'hide');
+        //                 modalshowcountdown.remove();
+        //             }
+        //             tonext(true);
+        //         }
+
+        //         if (document.getElementById('secondscountdown') != null)
+        //             document.getElementById('secondscountdown').innerHTML = `0${secondsLeftcountdown}`;
+
+        //         secondsLeftcountdown--;
+        //     }, 1000);
+        // }
+
+        // function checkPageFocus() {
+        //     if (document.hasFocus() || document.hidden) {
+        //         console.log("Document Focused");
+        //         clearInterval(onchangecountdown);
+        //         setTimeout(() => {
+        //             loaderVisibleonchange = !loaderVisibleonchange;
+        //             if (loaderVisibleonchange==false) {
+        //                 var modalshowcountdown = document.getElementById('modalshowcountdown');
+        //                 if (modalshowcountdown != null)
+        //                     modalshowcountdown.remove();
+        //             }
+        //         }, 400);
+        //     } else {
+        //         console.log("Document UnFocused");
+        //         loaderVisibleonchange = true;
+        //         onchangeStartCountdown();
+        //     }
+        // }
+
+        // document.addEventListener("visibilitychange", function () {
+        //     checkPageFocus();
+        // });
+
+        // window.addEventListener("blur", function () {
+        //     checkPageFocus();
+        // });
+
+        // window.addEventListener("focus", function () {
+        //     checkPageFocus();
+        // });
+
+        // checkPageFocus();
+
+        // setInterval(checkPageFocus, 300);
+
+    </script>
+    {{-- onchange tab --}}
 
     {{-- Content Functions --}}
     {{-- References Functions --}}
@@ -591,6 +704,20 @@
                     referance_bodyes[i].classList.add('hide');
                 }
             }
+        }
+
+        function toggledesmosmodal(desmosid){
+            showLoader();
+            var desmoscalc=document.getElementById(desmosid);
+            var desmos_expandable=document.getElementById('desmos_expandable');
+            if(desmoscalc.classList.contains('modal-lg')){
+                desmoscalc.classList.remove("modal-lg");
+                desmos_expandable.innerHTML='<i class="fa fa-expand-alt"></i>';
+            }else{
+                desmoscalc.classList.add("modal-lg");
+                desmos_expandable.innerHTML='<i class="fa fa-compress-alt"></i>';
+            }
+            hideLoader();
         }
     </script>
     {{-- References Functions --}}

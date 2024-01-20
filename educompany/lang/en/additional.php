@@ -194,6 +194,7 @@ return [
         "suredelete" => "Are you sure you want to delete?",
         "dontrestore" => "The data you delete cannot be restored!!!",
         "email_or_phone_mathced" => "The entered email/phone number is already associated with an account.",
+        'ifchangewindowtab'=>'If you leave the tab for more than 5 seconds, the exam will be automatically terminated.'
     ],
 
 ];

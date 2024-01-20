@@ -194,5 +194,6 @@ return [
         "suredelete"=>"Silmək istədiyinizdən əminsiniz?",
         "dontrestore"=>"Siləcəyiniz məlumat geri qaytarılmır!!!",
         "email_or_phone_mathced"=>"Daxil etdiyiniz email/telefon nömrəsi ilə hesab mövcuddur.",
+        'ifchangewindowtab'=>'Əgər tabı 5 saniyədən çox tərk etsəniz imtahan avtomatik olaraq sonlandırılacaq.'
     ],
 ];

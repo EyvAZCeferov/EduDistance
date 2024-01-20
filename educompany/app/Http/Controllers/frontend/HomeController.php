@@ -52,6 +52,12 @@ class HomeController extends Controller
                         ->orWhereRaw('LOWER(JSON_EXTRACT(`content`, "$.ru_description")) like ?', ['%' . $search . '%'])
                         ->orWhereRaw('LOWER(JSON_EXTRACT(`content`, "$.en_description")) like ?', ['%' . $search . '%']);
                 }
+
+                if (session()->has("subdomain")) {
+                    $user = users(session()->get("subdomain"), 'subdomain');
+                    $exams = $exams->where("user_id", $user->id);
+                }
+
                 $exams = $exams->orderBy("order_number", 'ASC')
                     ->get();
             });
@@ -96,6 +102,12 @@ class HomeController extends Controller
                         ->orWhereRaw('LOWER(JSON_EXTRACT(`content`, "$.ru_description")) like ?', ['%' . $search . '%'])
                         ->orWhereRaw('LOWER(JSON_EXTRACT(`content`, "$.en_description")) like ?', ['%' . $search . '%']);
                 }
+
+                if (session()->has("subdomain")) {
+                    $user = users(session()->get("subdomain"), 'subdomain');
+                    $exams = $exams->where("user_id", $user->id);
+                }
+                
                 $exams = $exams->orderBy("order_number", 'ASC')
                     ->get();
             });
