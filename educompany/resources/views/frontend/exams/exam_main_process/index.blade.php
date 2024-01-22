@@ -234,7 +234,7 @@
             var header = document.getElementById("header_columns");
             var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-            if (scrollTop > 100) {
+            if (scrollTop > 150) {
                 header.classList.add("sticky");
             } else {
                 header.classList.remove("sticky");

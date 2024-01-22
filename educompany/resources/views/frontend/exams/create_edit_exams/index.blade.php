@@ -390,6 +390,10 @@
                                             var maxLength = 32;
                                             var questionContent = n.data[i].question;
                                             var contentWithoutImages = questionContent.replace(/<img.*?>/g, '');
+                                            contentWithoutImages = contentWithoutImages.replace(/<span.*?>/g, '');
+                                            contentWithoutImages = contentWithoutImages.replace(/<p.*?>/g, '');
+                                            contentWithoutImages = contentWithoutImages.replace(/<div.*?>/g, '');
+                                            contentWithoutImages = contentWithoutImages.replace(/<a.*?>/g, '');
                                             if (contentWithoutImages.length > maxLength) {
                                                 contentWithoutImages = truncateString(contentWithoutImages, maxLength);
                                             }

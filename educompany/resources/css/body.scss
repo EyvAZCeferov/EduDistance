@@ -1338,7 +1338,7 @@ body {
 
                             textarea{
                                 margin-left:10px;
-                                height:42px;
+                                height:45px;
                                 margin-bottom:10px;
                                 width:100%;
                                 border-bottom:5px solid #000;
@@ -1350,7 +1350,7 @@ body {
                                     border-color:$error-color;
                                 }
                                 &.sat{
-                                    width:73px !important;
+                                    width:76px !important;
                                 }
                             }
 
@@ -1628,11 +1628,14 @@ body {
                 &.show {
                     display: grid;
                     grid-template-columns: auto auto 1fr;
+                    min-height:100%;
+                    height:auto;
 
                     &.onepage {
                         display: block;
                         flex-direction: column;
-                        height:100%;
+                        height:auto;
+                        min-height:100%;
 
                         .col {
                             width: 100%;
@@ -1641,6 +1644,7 @@ body {
                             margin-bottom: 20px;
                             width:65%;
                             margin:10px auto;
+                            min-height:100%;
 
                             &.left_col {
                                 border-right: 0;
@@ -1651,6 +1655,9 @@ body {
                                 .content_exam_info {
                                     width:96.5%;
                                     margin:5px auto;
+                                    height:auto;
+                                    min-height:100%;
+                                    overflow-y:auto;
                                 }
                             }
                         }
@@ -1920,8 +1927,8 @@ body {
                         position:relative;
                         .desmos_expandable{
                             position:absolute;
-                            top:50px;
-                            right:10px;
+                            top:15px;
+                            right:40px;
                             border-radius:10px;
                         }
                     }
