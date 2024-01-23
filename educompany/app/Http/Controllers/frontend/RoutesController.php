@@ -109,9 +109,9 @@ class RoutesController extends Controller
     {
         try {
             $key = $request->input("search");
-            $data = Exam::whereRaw('name like ?', ['%' . $key . '%'])->orWhereRaw('content like ?', ['%' . $key . '%'])->orderBy("order_number", 'ASC')->get();
+            $exams = Exam::whereRaw('name like ?', ['%' . $key . '%'])->orWhereRaw('content like ?', ['%' . $key . '%'])->orderBy("order_number", 'ASC')->get();
 
-            return view("frontend.exams.search", compact("data"));
+            return view('frontend.exams.index', compact('exams', 'sub_categories', 'category', 'filters', 'search'));
         } catch (\Exception $e) {
             dd($e->getMessage());
             return redirect('/notfound')->with("error", $e->getMessage());

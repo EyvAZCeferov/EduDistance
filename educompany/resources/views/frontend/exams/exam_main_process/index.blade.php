@@ -11,6 +11,12 @@
             display: block;
         }
     </style>
+    {{-- <style>
+        body{
+            transform: scale(0.9);
+            transform-origin: top center;
+        }
+    </style> --}}
 @endpush
 @section('content')
     @php
@@ -230,20 +236,19 @@
             $('#references').draggable();
         }
 
-        function addStickyClass() {
-            var header = document.getElementById("header_columns");
-            var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        // function addStickyClass() {
+        //     var header = document.getElementById("header_columns");
+        //     var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        //     if (scrollTop > header.offsetHeight*1.8) {
+        //         header.classList.add("sticky");
+        //     } else {
+        //         header.classList.remove("sticky");
+        //     }
+        // }
 
-            if (scrollTop > 150) {
-                header.classList.add("sticky");
-            } else {
-                header.classList.remove("sticky");
-            }
-        }
-
-        window.onscroll = function() {
-            addStickyClass();
-        };
+        // window.onscroll = function() {
+        //     addStickyClass();
+        // };
     </script>
     {{-- Header Buttons --}}
     {{-- Footer Buttons --}}
@@ -572,88 +577,98 @@
 
         function settimerforcurrentquestion(){
             var current_question=document.getElementById('current_question').value;
-            var question_time_replies_currentval=document.getElementById(`question_time_replies_${current_question}`).value;
-            var result = parseInt(question_time_reply)<parseInt(question_time_replies_currentval) ? parseInt(question_time_reply) :  (parseInt(question_time_reply) - parseInt(question_time_replies_currentval));
-            document.getElementById(`question_time_replies_${current_question}`).value =parseInt(question_time_replies_currentval) + parseInt(result);
+            var question_time_replies_currentval=document.getElementById(`question_time_replies_${current_question}`).value??0;
+            // var result = parseInt(question_time_reply)<parseInt(question_time_replies_currentval) ? parseInt(question_time_reply) :  (parseInt(question_time_reply) - parseInt(question_time_replies_currentval));
+            document.getElementById(`question_time_replies_${current_question}`).value =parseInt(question_time_replies_currentval)+1;
         }
     </script>
     {{-- Create Timer --}}
 
     {{-- onchange tab --}}
     <script>
-        // let onchangecountdown;
-        // let loaderVisibleonchange = false;
-        // let secondsLeftcountdown = 5;
+        let onchangecountdown;
+        let loaderVisibleonchange = false;
+        let secondsLeftcountdown = 5;
+        let show1time=true;
 
-        // function onchangeShowLoader() {
-        //     loaderVisibleonchange = true;
-        //     var modalshowcountdown = `<div id="modalshowcountdown" class="modal custom-modal show" tabindex="-1" role="dialog"
-        //         aria-labelledby="myModalLabel">
-        //         <div class="modal-dialog modal-dialog-centered" role="document">
-        //             <div class="modal-content">
-        //                 <div class="modal-body text-muted text-large my-1">
-        //                     <div class='my-1 d-flex '>
-        //                         <span class='d-inline-block' id='minutescountdown'>00</span><span class='d-inline-block'>:</span><span
-        //                             id='secondscountdown' class='d-inline-block'>05</span>
-        //                     </div>
-        //                     <div class='text-center text-warning'>
-        //                         @lang("additional.messages.ifchangewindowtab")
-        //                     </div>
-        //                 </div>
-        //             </div>
-        //         </div>
-        //         <br>
-        //     </div>`;
-        //     console.log(modalshowcountdown);
-        //     document.body.innerHTML += modalshowcountdown;
-        //     toggleModalnow('modalshowcountdown', 'open');
-        //     onchangeStartCountdown();
-        // }
+        function onchangeShowLoader() {
+            loaderVisibleonchange = true;
+            if(show1time==true){
+                alert('@lang("additional.messages.ifchangewindowtab")');
+                show1time=false;
+            }else{
+                var modalshowcountdown = `<div id="modalshowcountdown" class="modal custom-modal show" tabindex="-1" role="dialog"
+                    aria-labelledby="myModalLabel">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-body text-muted text-large my-1">
+                                <div class='my-1 d-flex '>
+                                    <span class='d-inline-block' id='minutescountdown'>00</span><span class='d-inline-block'>:</span><span
+                                        id='secondscountdown' class='d-inline-block'>05</span>
+                                </div>
+                                <div class='text-center text-danger'>
+                                    @lang("additional.messages.ifchangewindowtab")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                </div>`;
+                document.body.innerHTML += modalshowcountdown;
+                toggleModalnow('modalshowcountdown', 'open');
+            }
 
-        // function onchangeStartCountdown() {
-        //     console.log(secondsLeftcountdown);
-        //     onchangecountdown = setInterval(function () {
-        //         if (secondsLeftcountdown == 0) {
-        //             clearInterval(onchangecountdown);
-        //             clearInterval(intervalTimerID);
-        //             loaderVisibleonchange = false;
-        //             var modalshowcountdown = document.getElementById('modalshowcountdown');
-        //             if (modalshowcountdown != null) {
-        //                 toggleModalnow('modalshowcountdown', 'hide');
-        //                 modalshowcountdown.remove();
-        //             }
-        //             tonext(true);
-        //         }
+            onchangeStartCountdown();
+        }
 
-        //         if (document.getElementById('secondscountdown') != null)
-        //             document.getElementById('secondscountdown').innerHTML = `0${secondsLeftcountdown}`;
+        function onchangeStartCountdown() {
+            onchangecountdown = setInterval(function () {
+                if (secondsLeftcountdown == 0) {
+                    clearInterval(onchangecountdown);
+                    clearInterval(intervalTimerID);
+                    loaderVisibleonchange = false;
+                    var modalshowcountdown = document.getElementById('modalshowcountdown');
 
-        //         secondsLeftcountdown--;
-        //     }, 1000);
-        // }
+                    if (modalshowcountdown != null) {
+                        setTimeout(() => {
+                            toggleModalnow('modalshowcountdown', 'hide');
+                            modalshowcountdown.remove();
+                        }, 1000);
+                    }
 
-        // function checkPageFocus() {
-        //     if (document.hasFocus() || document.hidden) {
-        //         console.log("Document Focused");
-        //         clearInterval(onchangecountdown);
-        //         setTimeout(() => {
-        //             loaderVisibleonchange = !loaderVisibleonchange;
-        //             if (loaderVisibleonchange==false) {
-        //                 var modalshowcountdown = document.getElementById('modalshowcountdown');
-        //                 if (modalshowcountdown != null)
-        //                     modalshowcountdown.remove();
-        //             }
-        //         }, 400);
-        //     } else {
-        //         console.log("Document UnFocused");
-        //         loaderVisibleonchange = true;
-        //         onchangeStartCountdown();
-        //     }
-        // }
+                    tonext(true);
+                }
 
-        // document.addEventListener("visibilitychange", function () {
-        //     checkPageFocus();
-        // });
+                if (document.getElementById('secondscountdown') != null){
+                    document.getElementById('secondscountdown').innerHTML = `0${secondsLeftcountdown}`;
+                }
+
+                secondsLeftcountdown--;
+            }, 1000);
+        }
+
+        function checkPageFocus() {
+            if (document.hasFocus() || !document.hidden) {
+                clearInterval(onchangecountdown);
+                setTimeout(() => {
+                    loaderVisibleonchange = !loaderVisibleonchange;
+                    if (loaderVisibleonchange==false) {
+                        var modalshowcountdown = document.getElementById('modalshowcountdown');
+                        setTimeout(() => {
+                            if (modalshowcountdown != null){
+                                modalshowcountdown.remove();
+                            }
+                        }, 1000);
+                    }
+                }, 400);
+            } else {
+                onchangeShowLoader();
+            }
+        }
+
+        document.addEventListener("visibilitychange", function () {
+            checkPageFocus();
+        });
 
         // window.addEventListener("blur", function () {
         //     checkPageFocus();
@@ -663,7 +678,7 @@
         //     checkPageFocus();
         // });
 
-        // checkPageFocus();
+        checkPageFocus();
 
         // setInterval(checkPageFocus, 300);
 

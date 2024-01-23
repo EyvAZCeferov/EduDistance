@@ -4,7 +4,7 @@
         ? $categoryitem->name[app()->getLocale() . '_name']
         : trans('additional.footer.categories') }}
 @endsection
-@if (!empty($categoryitem))
+@if (!empty($categoryitem) && !empty($categoryitem->description) && isset($categoryitem->description[app()->getLocale().'_description']) && !empty($categoryitem->description[app()->getLocale().'_description']))
     @section('description', $categoryitem->description[app()->getLocale() . '_description'])
 @endif
 

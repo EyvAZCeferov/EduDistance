@@ -60,6 +60,10 @@ class HomeController extends Controller
 
                 $exams = $exams->orderBy("order_number", 'ASC')
                     ->get();
+
+                if(!empty($category) && isset($category->id) && !empty($category->id)){
+                    $category=null;
+                }
             });
             return view('frontend.exams.index', compact('exams', 'sub_categories', 'category', 'filters', 'search'));
         } catch (\Exception $e) {
@@ -107,9 +111,13 @@ class HomeController extends Controller
                     $user = users(session()->get("subdomain"), 'subdomain');
                     $exams = $exams->where("user_id", $user->id);
                 }
-                
+
                 $exams = $exams->orderBy("order_number", 'ASC')
                     ->get();
+
+                if(!empty($category) && isset($category->id) && !empty($category->id)){
+                    $category=null;
+                }
             });
             return view('frontend.exams.index', compact('exams', 'sub_categories', 'category', 'filters', 'search'));
         } catch (\Exception $e) {

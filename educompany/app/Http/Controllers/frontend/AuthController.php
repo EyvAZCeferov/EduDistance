@@ -246,8 +246,8 @@ class AuthController extends Controller
                 session()->put("user_mail",Auth::guard('users')->user()->email);
                 return redirect(env('HTTP_OR_HTTPS').Session::get("subdomain").'.'.env('APP_DOMAIN').'/az/profile?user_id='.Auth::guard('users')->id());
             }
-            return view('frontend.auth.profile');
 
+            return view('frontend.auth.profile');
         } catch (\Exception $e) {
             return redirect()->back()->with('error',$e->getMessage());
         }

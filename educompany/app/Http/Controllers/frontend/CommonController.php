@@ -31,7 +31,6 @@ class CommonController extends Controller
     }
     public function examFinish(Request $request)
     {
-        // dd($request->all()); 
         try {
             $result = collect();
             $nextsection=false;
@@ -48,6 +47,7 @@ class CommonController extends Controller
                         foreach ($answers as $question_id => $answer) {
                             $section = $exam->sections->find($section_id);
                             $question = ExamQuestion::where("id", $question_id)->first();
+                            $time_reply=$request->question_time_replies[$question_id]??0;
                             if (!empty($question) && !empty($section)) {
                                 if ($question->type === 1 || $question->type==5) {
                                     $resultAnswer = new ExamResultAnswer();
@@ -56,6 +56,7 @@ class CommonController extends Controller
                                     $resultAnswer->question_id = $question->id;
                                     $resultAnswer->answer_id = $answer;
                                     $resultAnswer->result = $answer == $question->correctAnswer()?->id ? 1 : 0;
+                                    $resultAnswer->time_reply=$time_reply==0?null:$time_reply;
                                     $resultAnswer->save();
                                 } else if ($question->type === 2) {
                                     $answer = array_map('intval', $answer);
@@ -67,6 +68,7 @@ class CommonController extends Controller
                                     $resultAnswer->question_id = $question->id;
                                     $resultAnswer->answers = $answer;
                                     $resultAnswer->result = $user_answer == $correct_answer ? 1 : 0;
+                                    $resultAnswer->time_reply=$time_reply==0?null:$time_reply;
                                     $resultAnswer->save();
                                 } else if ($question->type == 3) {
                                     $resultAnswer = new ExamResultAnswer();
@@ -81,6 +83,7 @@ class CommonController extends Controller
                                     } else {
                                         $resultAnswer->result = 0;
                                     }
+                                    $resultAnswer->time_reply=$time_reply==0?null:$time_reply;
                                     $resultAnswer->save();
                                 } else if ($question->type == 4) {
                                     if($answer['answered']==1){
@@ -104,6 +107,7 @@ class CommonController extends Controller
                                             $resultAnswer->question_id = $question->id;
                                             $resultAnswer->value = json_encode($newArray);
                                             $resultAnswer->result = $difference;
+                                            $resultAnswer->time_reply=$time_reply==0?null:$time_reply;
                                             $resultAnswer->save();
                                         }
                                     }
@@ -502,7 +506,7 @@ class CommonController extends Controller
             if(!((isset($request->description) && !empty($request->description)) || (isset($request->mce_0) && !empty($request->mce_0))))
                 return redirect()->back()->with('error','Məlumatları tam doldurun');
 
-                
+
             if (isset($request->top_id) && !empty($request->top_id)) {
                 $data = Exam::where("id", $request->top_id)->first();
             } else {

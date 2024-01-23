@@ -230,14 +230,11 @@ function setnewparametrandsearch (element, type, id) {
   let newFormDataForUrl = new FormData (
     document.getElementById ('filter_inputs')
   );
-  let newUrl = `/search?`;
+  let newUrl = `/exams?`;
   for (const [key, value] of newFormDataForUrl.entries ()) {
     formData.append (key, value);
     newUrl += `${key}=${encodeURIComponent (value)}&`;
   }
-
-  let oem = document.getElementById ('oem').value;
-  newUrl += `oem=${encodeURIComponent (oem)}`;
 
   window.location.href = newUrl;
 }

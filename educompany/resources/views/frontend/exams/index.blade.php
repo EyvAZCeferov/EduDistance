@@ -1,6 +1,6 @@
 @extends('frontend.layouts.app')
 @section('title', trans('additional.pages.exams.exams'))
-@if(!empty($category) && isset($category->description[app()->getLocale().'_description']) && !empty($category->description[app()->getLocale().'_description']))
+@if(!empty($category) && !empty($category->description) && isset($category->description[app()->getLocale().'_description']) && !empty($category->description[app()->getLocale().'_description']))
     @section('description', $category->description[app()->getLocale().'_description'])
 @endif
 @section('content')
