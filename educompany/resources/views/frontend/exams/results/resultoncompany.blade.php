@@ -374,6 +374,7 @@
                 if (showuseranswersmodal != null) {
                     showuseranswersmodal.remove();
                 }
+                
                 sendAjaxRequestOLD(`{{ route('api.get_show_user_which_answered') }}`, "post", {
                         ids: ids,
                         question_id: question_id,

@@ -450,10 +450,12 @@ class ApisController extends Controller
                     $data='';
                     foreach($datas as $dat){
                         $data.="<div class='my-1 mb-2 p-1 row' style='border-bottom:1px solid #000;'> <h6>".$dat->result_model->user->name. " / ". $dat->result_model->user->email."</h6>";
-                            $data.="<div class='text text-dark'>".trans('additional.pages.exams.earned_point').": ".number_format($dat->result_model->point, 2)." <span class='text-success'>".$dat->result_model->exam->point."</span> &nbsp;&nbsp;".trans('additional.pages.exams.timespent').": <div class='hour_area d-inline-block text text-info'><span id='minutes'>".formattedTime ($dat->time_reply, 'minute')."</span>:<span id='seconds'>".formattedTime ($dat->time_reply, 'seconds')."</span></div>";
+                            $data.="<div class='text text-dark'>".trans('additional.pages.exams.earned_point').": ".number_format($dat->result_model->point, 2)."/ <span class='text-success'>".$dat->result_model->exam->point."</span> &nbsp;&nbsp;".trans('additional.pages.exams.timespent').": <div class='hour_area d-inline-block text text-info'><span id='minutes'>".formattedTime ($dat->time_reply, 'minute')."</span>:<span id='seconds'>".formattedTime ($dat->time_reply, 'seconds')."</span></div>";
+
                             if($request->type_req==3){
                                 $data .= "&nbsp;&nbsp;<span class='" . ($dat->result == true ? 'text-success' : 'text-danger') . "'>" . trans('additional.pages.exams.youranswer') . ": " . htmlspecialchars($dat->value) . "</span>";
                             }
+
                             if($request->type_req==4){
                                 $leftside='';
                                 $rightside='';
@@ -465,7 +467,8 @@ class ApisController extends Controller
 
                                 $data.="&nbsp;&nbsp;<span class='" . ($dat->result == true ? 'text-success' : 'text-danger') . "'>" . trans('additional.pages.exams.youranswer') . ": <br/> <div class='question_content'>  <div class='match_questions_one'> <div class='column question_match_area' >".$leftside."</div><div class='column answer_match_area' >".$rightside."</div></span></div></div>";
                             }
-                            $data.="</div>";
+
+                            $data.="</div></div>";
                     }
                     return response()->json(['status' => 'success', 'data' => $data]);
                 }else{
