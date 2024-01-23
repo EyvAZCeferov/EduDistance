@@ -96,7 +96,7 @@
                         </div>
                         <button class="btn btn-dark btn-sm desmos_expandable" id='desmos_expandable' type="button" onclick="toggledesmosmodal('desmoscalculator')"><i class="fa fa-expand-alt"></i></button>
                         <div class="modal-body">
-                            <iframe src="https://www.desmos.com/calculator/ddqtfqccg0"
+                            <iframe src="https://www.desmos.com/calculator/cue41xrdi1"
                                 style="border:0px #ffffff none;width:100%;height:100%;" name="myiFrame" scrolling="no"
                                 frameborder="0" marginheight="0px" marginwidth="0px" allowfullscreen></iframe>
                         </div>
@@ -596,6 +596,7 @@
             if(show1time==true){
                 alert('@lang("additional.messages.ifchangewindowtab")');
                 show1time=false;
+                allowReload=true;
             }else{
                 var modalshowcountdown = `<div id="modalshowcountdown" class="modal custom-modal show" tabindex="-1" role="dialog"
                     aria-labelledby="myModalLabel">
