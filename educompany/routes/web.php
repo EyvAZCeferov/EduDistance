@@ -30,7 +30,7 @@ Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalizati
             Route::post('/register-save', [AuthController::class, 'registerSave'])->name('user.register');
             Route::get('/email', [AuthController::class, 'email'])->name('email');
             Route::post('/send-token', [AuthController::class, 'sendToken'])->name('send.token');
-            Route::get('/reset/{token}', [AuthController::class, 'reset'])->name('reset');
+            Route::get('/reset/{token}', [AuthController::class, 'reset_nosubdomain'])->name('reset');
             Route::post('/change-password', [AuthController::class, 'changePassword'])->name('change.password');
         });
 

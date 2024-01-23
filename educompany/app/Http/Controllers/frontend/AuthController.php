@@ -195,15 +195,31 @@ class AuthController extends Controller
         }
         return redirect()->route('login')->with(['success' => 'İsmarıc göndərildi.']);
     }
-    public function reset($token)
+    public function reset($subdomain,$token)
     {
-        $reset = DB::table('password_resets')->where('token', $token)->where('created_at', '>=', Carbon::now()->addHours(-1)->format('Y-m-d H:i:s'))->first();
+        try{
+            $reset = DB::table('password_resets')->where('token', $token)->whereBetween('created_at', [Carbon::now()->subHours(3), Carbon::now()])->first();
+            if (!$reset) {
+                return redirect()->route('login')->with(['error' => 'Link arıq keçərsizdir!']);
+            }
 
-        if (!$reset) {
-            return redirect()->route('login')->with(['error' => 'Xəta!']);
+            return view('frontend.auth.reset', compact('token', 'reset'));
+        }catch(\Exception $e){
+            dd($e->getMessage(),$e->getLine());
         }
+    }
+    public function reset_nosubdomain($token)
+    {
+        try{
+            $reset = DB::table('password_resets')->where('token', $token)->whereBetween('created_at', [Carbon::now()->subHours(3), Carbon::now()])->first();
+            if (!$reset) {
+                return redirect()->route('login')->with(['error' => 'Link arıq keçərsizdir!']);
+            }
 
-        return view('frontend.auth.reset', compact('token', 'reset'));
+            return view('frontend.auth.reset', compact('token', 'reset'));
+        }catch(\Exception $e){
+            dd($e->getMessage(),$e->getLine());
+        }
     }
     public function changePassword(Request $request)
     {
