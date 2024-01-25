@@ -791,6 +791,7 @@ if (!function_exists('exam_result')) {
             $model = !empty($model) && isset($model->slug) ? $model->slug : null;
         } else {
             $model = !empty($model) && isset($model->id) ? $model->id : null;
+            // $model = null; // heleki
         }
 
         return Cache::rememberForever("exam_result"  . $exam_id . $auth_id, fn () => $model);

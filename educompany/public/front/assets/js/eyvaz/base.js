@@ -361,8 +361,6 @@ function getFileUrl (file, clasore) {
   return url;
 }
 
-showLoader ();
-
 document.addEventListener ('DOMContentLoaded', function () {
   hideLoader ();
 });
