@@ -144,7 +144,7 @@
                         class="form-control {{ $errors->first('layout_type') ? 'is-invalid' : '' }}">
                         @foreach (\App\Models\Exam::LAYOUTS as $key => $type)
                             <option
-                                @if(isset($data) && !empty($data) && isset($data->id) && $data->layout_type ==$type) selected @endif
+                                @if(isset($data) && !empty($data) && isset($data->id) && $data->layout_type == $key) selected @endif
                                 value="{{ $key }}">{{ $type }}</option>
                         @endforeach
                     </select>
