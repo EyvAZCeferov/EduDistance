@@ -8,7 +8,7 @@
             data-key="{{ $key + 1 }}" data-id="{{ $value->id }}" id="content_exam_{{ $value->id }}"
             data-section_id="{{ $value->section_id }}" data-section_name="{{ $value->section->name }}">
             <div class="col left_col" id="left_col">
-                @if($value->layout=='onepage')
+                @if($value->layout=='onepage' || $value->type!=3)
                     <div class="question_header mb-2">
                         <div>
                             <span class="question_number">{{ $key + 1 }}</span>
@@ -63,7 +63,7 @@
                 <div id="resizer" class="resizer"></div>
             @endif
             <div class="col right_col" id="right_col">
-                @if($value->layout!='onepage')
+                @if($value->layout!='onepage' || $value->layout==3)
                     <div class="question_header">
                         <div>
                             <span class="question_number">{{ $key + 1 }}</span>
