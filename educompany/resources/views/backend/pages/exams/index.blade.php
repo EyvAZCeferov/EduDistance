@@ -53,7 +53,6 @@
                             <thead>
                             <tr>
                                 <th>Ad</th>
-                                <th>Vaxt</th>
                                 <th>Bal</th>
                                 <th>Kateqoriya</th>
                                 <th>Active</th>
@@ -65,7 +64,6 @@
                                 <tr class="gradeX">
 
                                     <td>{{ $data->name[app()->getLocale().'_name'] }}</td>
-                                    <td>{{ $data->duration }}</td>
                                     <td>{{ $data->point }}</td>
                                     <td>{{ $data->category?->name['az_name'] }}</td>
                                     <td>{{ $data->status ? 'Bəli' : 'Xeyr' }}</td>

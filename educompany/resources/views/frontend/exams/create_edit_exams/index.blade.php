@@ -53,13 +53,6 @@
                 </div>
 
                 <div class="col-sm-12 col-md-6 col-lg-3 my-1">
-                    <input type="number" required
-                        value="{{ old('duration', isset($data) && !empty($data) && !empty($data->duration) ? $data->duration : null) }}"
-                        name="duration" placeholder="@lang('additional.forms.exam_duration')"
-                        class="form-control {{ $errors->first('duration') ? 'is-invalid' : '' }}">
-                </div>
-
-                <div class="col-sm-12 col-md-6 col-lg-3 my-1">
                     @if (isset($data) && !empty($data) && !empty($data->image))
 
                         <img data-fancybox data-caption="{{ $data->name[app()->getLocale() . '_name'] }}"
@@ -206,6 +199,17 @@
                             </div>
 
                         </div>
+
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="duration">@lang('additional.forms.exam_duration')</label>
+                                <input type="number" value="{{ old('duration', 0) }}" name="duration"
+                                    id="duration"
+                                    class="form-control {{ $errors->first('duration') ? 'is-invalid' : '' }} w-100"
+                                    placeholder="@lang('additional.forms.exam_duration')">
+                            </div>
+
+                        </div>
                         <div class="col-md-5">
                             <div class="form-group">
                                 <label for="section_duration">@lang('additional.forms.field_duration')</label>
@@ -216,6 +220,8 @@
                             </div>
 
                         </div>
+
+
                     </div>
                     <div class="row mt-2">
                         <button type="button" onclick="create_edit_section(event)"
@@ -288,6 +294,7 @@
                     } else {
                         var section_name = document.getElementById('section_name').value.trim();
                         var section_duration = document.getElementById('section_duration').value.trim();
+                        var duration = document.getElementById('duration').value.trim();
 
                         if (section_name && section_duration) {
                             sendAjaxRequestOLD("{{ route('api.setsectiondata') }}", "post", {
@@ -296,6 +303,7 @@
                                 user_id: document.getElementById("auth_id").value,
                                 name: section_name,
                                 time_range_sections: section_duration,
+                                duration: duration,
                                 responseType: 'json',
                                 selected_section_id:selected_section_id.value,
                             }, function(e, t) {
@@ -305,6 +313,7 @@
                                     selected_section_id.value=null;
                                     document.getElementById('section_name').value = null;
                                     document.getElementById('section_duration').value = null;
+                                    document.getElementById('duration').value = null;
                                 }
                             });
                         } else {
@@ -431,9 +440,11 @@
                                 if (n.data != null) {
                                     var section_name=document.getElementById('section_name');
                                     var section_duration=document.getElementById('section_duration');
+                                    var duration=document.getElementById('duration');
                                     var selected_section_id=document.getElementById('selected_section_id');
                                     section_name.value=n.data.name;
                                     section_duration.value=n.data.time_range_sections;
+                                    duration.value=n.data.duration;
                                     selected_section_id.value=n.data.id;
                                     toggleModalnow('create_sections','open');
                                 }
@@ -464,7 +475,7 @@
                                     class="form-control question_input"
                                     contenteditable="true" placeholder="@lang('additional.forms.your_question')"></div>
                             </div>
-                            <div class="my-2">
+                            <div class="my-2 d-none" id="question2_input_area">
                                 <div name="question2_input_${question_input_code}"
                                     id="question2_input_${question_input_code}"
                                     class="form-control question_input2"
@@ -505,8 +516,8 @@
                             </div>
                             <button class='btn btn-primary btn-sm submit_answer' type="submit">Təsdiq et</button>
                         </div>
-                </form>
-                </div>`;
+                    </form>
+                    </div>`;
 
                     section_and_questions_right.innerHTML = element;
                     const dropdownButton = document.getElementById('customDropdownButton');
@@ -693,10 +704,10 @@
                                     `;
                                     } else if (n.data.type == 3) {
                                         elementContent = `
-                                    <div class='answer ${type}' id="${codeofelement}">
-                                        <div class="answer_content">
-                                            <div rows="5" name="textbox_0" class="text-input textbox_0" id="textbox_0" placeholder="@lang('additional.forms.answer')">${answer.answer}</div>
-                                        </div>
+                                        <div class='answer ${type}' id="${codeofelement}">
+                                            <div class="answer_content">
+                                                <div rows="5" name="textbox_0" class="text-input textbox_0" id="textbox_0" placeholder="@lang('additional.forms.answer')">${answer.answer}</div>
+                                            </div>
                                         </div>
                                     `;
                                     } else if (n.data.type == 4) {
@@ -744,12 +755,12 @@
                                                                 contenteditable="true" placeholder="@lang('additional.forms.your_question')">${n.data.question}</div>
                                                         </div>
 
-                                                        ${n.data.type==3 ? `<div class='my-2'>
+                                                        <div class='my-2 ${n.data.type!=3?`d-none`:''}' id="question2_input_area">
                                                             <div name="question2_input_${question_input_code}"
                                                                 id="question2_input_${question_input_code}"
                                                                 class="form-control question_input2"
                                                                 contenteditable="true" placeholder="@lang('additional.forms.description')">${n.data.description}</div>
-                                                        </div>` : ''}
+                                                        </div>
                                                     </div>
                                                     <div class="col-sm-12 col-md-12 col-lg-12 my-1 d-none" id="question_content_audio">
                                                         <div class="form-group">
@@ -940,6 +951,14 @@
                     var textbox_0_id = $(".textbox_0").prop('id');
                     var textbox_0 = createeditor(textbox_0_id);
                     var question_input2 = createeditor($(".question_input2").prop('id'));
+                    var question2_input_area=document.getElementById('question2_input_area');
+                    if(question2_input_area!=null)
+                        question2_input_area.classList.remove("d-none");
+
+                }else{
+                    var question2_input_area=document.getElementById('question2_input_area');
+                    if(question2_input_area!=null)
+                        question2_input_area.classList.add("d-none");
                 }
 
                 question_footer_buttons.classList.remove("hide");

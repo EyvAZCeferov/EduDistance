@@ -21,7 +21,7 @@
 @section('content')
     @php
         $questions = collect();
-        if (session()->get('selected_section') > 0) {
+        if (session()->has('selected_section')) {
             $qesutions = $exam->sections[session()->get('selected_section')]->questions;
             foreach ($qesutions as $qesution) {
                 $questions[] = $qesution;
@@ -51,7 +51,7 @@
         <input type="hidden" name="all_questions" id="all_questions" value="{{ count($questions) }}">
         <input type="hidden" name="show_time" id="show_time" value="true">
         <input type="hidden" name="time_exam" id="time_exam" value="0">
-        <input type="hidden" name="time_end_exam" id="time_end_exam" value="{{ $exam->duration }}">
+        <input type="hidden" name="time_end_exam" id="time_end_exam" value="{{ $exam->sections[session()->get('selected_section')]->duration }}">
         <input type="hidden" name="section_start_time" id="section_start_time" value="0">
         <input type="hidden" name="marked_questions[]" id="marked_questions"
             value="{{ $exam_result->marked->pluck('question_id') }}">
@@ -505,12 +505,13 @@
     <script defer>
         let sec = 0;
         let qalan_vaxt;
+        var time_end_exam=document.getElementById('time_end_exam').value;
 
         function pad(val) {
             return val.toString().padStart(2, '0');
         }
 
-        var countDownDate = new Date(Date.now() + ({{ $exam->duration }} * 60 * 1000)).getTime();
+        var countDownDate = new Date(Date.now() + (time_end_exam * 60 * 1000)).getTime();
         var time_range_sections = document.getElementById("time_range_sections");
 
         function pad_new(val) {

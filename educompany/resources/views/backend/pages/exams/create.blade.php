@@ -127,16 +127,7 @@
 
                             <div class="row">
 
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="">İmtahan vaxtı</label>
-                                        <input type="text"
-                                            value="{{ old('duration', isset($data) && !empty($data) && isset($data->duration) && !empty($data->duration) ? $data->duration : null) }}"
-                                            data-mask="99:99:99" name="duration"
-                                            class="form-control {{ $errors->first('duration') ? 'is-invalid' : '' }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
+                               <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="">Şəkil</label>
                                         @if (isset($data) && !empty($data) && isset($data->image) && !empty($data->image))

@@ -408,6 +408,7 @@ class ApisController extends Controller
                 $model->exam_id = $request->input('exam_id');
                 $model->name = $request->input('name');
                 $model->time_range_sections = intval($request->input('time_range_sections')) ?? 0;
+                $model->duration = intval($request->input('duration')) ?? 0;
                 $model->save();
             // });
             return response()->json(['status' => 'success', 'message' => 'Yaradıldı!']);

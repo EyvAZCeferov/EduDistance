@@ -121,7 +121,7 @@ class CommonController extends Controller
                     $point = calculate_exam_result($result->id);
                     session()->put('point', $point);
                     session()->put('time_reply', session()->get("time_reply")??0+$request->time_exam);
-                    session()->put('selected_section',session()->get('selected_section')??0+1);
+                    session()->put('selected_section',(session()->get('selected_section')??0)+1);
                     $nextsection=true;
                 } else {
                     $pointlast = session()->has('point') ? session()->get('point') : 0;
@@ -440,8 +440,7 @@ class CommonController extends Controller
             $data->category_id = intval($request->input('category_id'));
             $data->name = $name;
             $data->content = $description;
-            $data->slug = Str::slug($name['az_name']);
-            $data->duration = $request->input('duration') ?? 0;
+            $data->slug = Str::slug($name['az_name']).'-'.Str::uuid();
             $data->point = $request->input('point') ?? 0;
             $data->status = $request->input('exam_status') == "on" ? 1 : 0;
             $data->order_number = 1;
@@ -538,8 +537,7 @@ class CommonController extends Controller
             $data->category_id = intval($request->input('category_id'));
             $data->name = $name;
             $data->content = $description;
-            $data->slug = Str::slug($name['az_name']);
-            $data->duration = $request->input('duration') ?? 0;
+            $data->slug = Str::slug($name['az_name']).'-'.Str::uuid();
             $data->point = $request->input('point') ?? 0;
             $data->status = $request->input('exam_status') == "on" ? 1 : 0;
             $data->order_number = 1;

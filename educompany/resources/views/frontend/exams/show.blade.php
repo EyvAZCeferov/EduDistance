@@ -62,22 +62,8 @@
                                 @lang('additional.pages.exams.endirim_with_faiz', ['count' => count_endirim_faiz($data->price, $data->endirim_price)])
                             </div>
                         </div>
-                    @else
-                        <div class="exam_info_list_item right">
-                            <div class="bold_text">@lang('additional.forms.exam_duration'):</div>
-                            <div class="normal_text">
-                                {{ $data->duration }}
-                            </div>
-                        </div>
                     @endif
-                    @if ($data->endirim_price > 0)
-                        <div class="exam_info_list_item left">
-                            <div class="bold_text">@lang('additional.forms.exam_duration'):</div>
-                            <div class="normal_text">
-                                {{ $data->duration }}
-                            </div>
-                        </div>
-                    @endif
+                    
                 </div>
                 <div class="exam_description">{!! $data->content[app()->getLocale() . '_description'] !!}</div>
 

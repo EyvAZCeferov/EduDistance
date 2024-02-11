@@ -32,7 +32,6 @@ class Exam extends Model
         'name',
         'slug',
         'content',
-        'duration',
         'point',
         'image',
         'category_id',

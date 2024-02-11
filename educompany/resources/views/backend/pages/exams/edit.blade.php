@@ -69,12 +69,7 @@
                                                class="form-control {{ $errors->first('name') ? 'is-invalid' : '' }}">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="">İmtahan vaxtı</label>
-                                        <input type="text" value="{{ old('duration', $exam->duration) }}" data-mask="99:99:99" name="duration" class="form-control {{ $errors->first('duration') ? 'is-invalid' : '' }}">
-                                    </div>
-                                </div>
+                               
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="">Bal</label>

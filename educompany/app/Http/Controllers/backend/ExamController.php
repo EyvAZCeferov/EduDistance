@@ -76,7 +76,6 @@ class ExamController extends Controller
         $model->category_id = $request->input('category_id');
         $model->name = $name;
         $model->slug = Str::slug($name['az_name']);
-        $model->duration = $request->input('duration');
         $model->point = $request->input('point');
         $model->content = $description;
         $model->status = $request->input('status') ? 1 : 0;
@@ -139,7 +138,6 @@ class ExamController extends Controller
         $model->category_id = $request->input('category_id');
         $model->name = $name;
         $model->slug = Str::slug($name['az_name']);
-        $model->duration = $request->input('duration');
         $model->point = $request->input('point');
         $model->content = $description;
         $model->status = $request->input('status') ? 1 : 0;
