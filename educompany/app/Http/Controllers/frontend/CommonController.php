@@ -121,7 +121,7 @@ class CommonController extends Controller
                     $point = calculate_exam_result($result->id);
                     session()->put('point', $point);
                     session()->put('time_reply', session()->get("time_reply")??0+$request->time_exam);
-                    session()->put('selected_section',(session()->get('selected_section')??0)+1);
+                    session()->put('selected_section',$request->selected_section+1);
                     $nextsection=true;
                 } else {
                     $pointlast = session()->has('point') ? session()->get('point') : 0;

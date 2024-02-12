@@ -63,30 +63,32 @@
                 <div id="resizer" class="resizer"></div>
             @endif
             <div class="col right_col" id="right_col">
-                @if($value->layout!='onepage' || $value->layout==3)
-                    <div class="question_header">
-                        <div>
-                            <span class="question_number">{{ $key + 1 }}</span>
-                            <a href="javascript:void(0)" onclick="mark_unmark_question({{ $value->id }})"
-                                id="mark_question_button_{{ $value->id }}"
-                                class="mark_button @if (!empty(question_is_marked($value->id, $exam->id, $exam_result->id, auth('users')->id()))) active @endif">
-                                @if (!empty(question_is_marked($value->id, $exam->id, $exam_result->id, auth('users')->id())))
-                                    <i class="fa fa-bookmark"></i>
-                                @else
-                                    <i class="far fa-bookmark"></i>
-                                @endif
-                            </a>
-                            <span class="info_text">@lang('additional.pages.exams.question_info_text')</span>
-                        </div>
-                        <div>
-                            @if (($value->type!=4 && $value->type != 3 ) && !isset($hide_abc))
-                                <a href="javascript:void(0)" class="remove_button" onclick="remove_button_toggler()">
-                                    ABC
+                @if($value->layout!='onepage')
+                    @if($value->type==3)
+                        <div class="question_header">
+                            <div>
+                                <span class="question_number">{{ $key + 1 }}</span>
+                                <a href="javascript:void(0)" onclick="mark_unmark_question({{ $value->id }})"
+                                    id="mark_question_button_{{ $value->id }}"
+                                    class="mark_button @if (!empty(question_is_marked($value->id, $exam->id, $exam_result->id, auth('users')->id()))) active @endif">
+                                    @if (!empty(question_is_marked($value->id, $exam->id, $exam_result->id, auth('users')->id())))
+                                        <i class="fa fa-bookmark"></i>
+                                    @else
+                                        <i class="far fa-bookmark"></i>
+                                    @endif
                                 </a>
-                            @endif
-                        </div>
+                                <span class="info_text">@lang('additional.pages.exams.question_info_text')</span>
+                            </div>
+                            <div>
+                                @if (($value->type!=4 && $value->type != 3 ) && !isset($hide_abc))
+                                    <a href="javascript:void(0)" class="remove_button" onclick="remove_button_toggler()">
+                                        ABC
+                                    </a>
+                                @endif
+                            </div>
 
-                    </div>
+                        </div>
+                    @endif
                 @endif
                 @if($value->type==3 && !empty($value->description))
                     <div class="content_exam_info mt-3 @if($value->type==3) classcenter @endif" id="content_exam_info" style="flex-direction: column">
