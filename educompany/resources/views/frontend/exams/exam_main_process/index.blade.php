@@ -47,11 +47,12 @@
         <input type="hidden" name="time_range_sections" id="time_range_sections"
             value="{{ $questions[0]->section->time_range_sections }}">
         <input type="hidden" name="next_section" id="next_section"
-            value="{{ !empty($exam->sections[session()->get('selected_section')+1]) ? true : false }}">
+            value="{{ !empty($exam->sections[session()->get('selected_section') + 1]) ? true : false }}">
         <input type="hidden" name="all_questions" id="all_questions" value="{{ count($questions) }}">
         <input type="hidden" name="show_time" id="show_time" value="true">
         <input type="hidden" name="time_exam" id="time_exam" value="0">
-        <input type="hidden" name="time_end_exam" id="time_end_exam" value="{{ $exam->sections[session()->get('selected_section')]->duration }}">
+        <input type="hidden" name="time_end_exam" id="time_end_exam"
+            value="{{ $exam->sections[session()->get('selected_section')]->duration }}">
         <input type="hidden" name="section_start_time" id="section_start_time" value="0">
         <input type="hidden" name="marked_questions[]" id="marked_questions"
             value="{{ $exam_result->marked->pluck('question_id') }}">
@@ -64,7 +65,8 @@
 
         {{-- Question Time replies --}}
         @foreach ($questions as $key => $value)
-            <input type="hidden" name="question_time_replies[{{ $value->id }}]" id="question_time_replies_{{ $value->id }}" value="0">
+            <input type="hidden" name="question_time_replies[{{ $value->id }}]"
+                id="question_time_replies_{{ $value->id }}" value="0">
         @endforeach
         {{-- Question Time replies --}}
 
@@ -85,7 +87,8 @@
             ])
 
             {{-- Desmos Calculator --}}
-            <div id="desmoscalculator" class="modal custom-modal show" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div id="desmoscalculator" class="modal custom-modal show" tabindex="-1" role="dialog"
+                aria-labelledby="myModalLabel">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header bg-dark">
@@ -94,7 +97,8 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <button class="btn btn-dark btn-sm desmos_expandable" id='desmos_expandable' type="button" onclick="toggledesmosmodal('desmoscalculator')"><i class="fa fa-expand-alt"></i></button>
+                        <button class="btn btn-dark btn-sm desmos_expandable" id='desmos_expandable' type="button"
+                            onclick="toggledesmosmodal('desmoscalculator')"><i class="fa fa-expand-alt"></i></button>
                         <div class="modal-body">
                             <iframe src="https://www.desmos.com/calculator/cue41xrdi1"
                                 style="border:0px #ffffff none;width:100%;height:100%;" name="myiFrame" scrolling="no"
@@ -121,7 +125,7 @@
                         </div>
 
                         <div class="modal-body">
-                            @if(count($exam->references)>1)
+                            @if (count($exam->references) > 1)
                                 <div class="references_top_buttons">
                                     <div></div>
                                     <div>
@@ -136,7 +140,8 @@
                                     <div class="reference" id="reference_{{ $key }}">
                                         <div class="referance_title">
                                             <h4>{{ $value->reference->name[app()->getLocale() . '_name'] }}</h4>
-                                            <a href="javascript:void(0)" id="toggler_button_reference_{{ $key }}"
+                                            <a href="javascript:void(0)"
+                                                id="toggler_button_reference_{{ $key }}"
                                                 class="referance_toggle_button"
                                                 onclick="toggle_references_modal_content_element({{ $key }})"><i
                                                     class="fa fa-plus"></i></a>
@@ -156,8 +161,8 @@
                                         </div>
                                     </div>
                                 @endforeach
-                            @elseif(count($exam->references)==1)
-                                  <div class="reference" style="border:none;">
+                            @elseif(count($exam->references) == 1)
+                                <div class="reference" style="border:none;">
                                     <div class="referance_body d-block">
                                         @if (isset($exam->references[0]->reference->image) && !empty($exam->references[0]->reference->image))
                                             <div class="col-sm-12 col-md-12 col-lg-12 img_area">
@@ -166,12 +171,11 @@
                                                     alt="{{ $exam->references[0]->reference->image }}">
                                             </div>
                                         @endif
-                                        <div
-                                            class="col-sm-12 col-md-12 col-lg-12">
+                                        <div class="col-sm-12 col-md-12 col-lg-12">
                                             {!! $exam->references[0]->reference->description[app()->getLocale() . '_description'] !!}
                                         </div>
                                     </div>
-                                  </div>
+                                </div>
                             @endif
                         </div>
 
@@ -210,7 +214,7 @@
     {{-- Header Buttons --}}
     <script defer>
         let intervalTimerID;
-        let question_time_reply=0;
+        let question_time_reply = 0;
 
 
         function togglehours() {
@@ -235,20 +239,6 @@
             $('#references').toggle();
             $('#references').draggable();
         }
-
-        // function addStickyClass() {
-        //     var header = document.getElementById("header_columns");
-        //     var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        //     if (scrollTop > header.offsetHeight*1.8) {
-        //         header.classList.add("sticky");
-        //     } else {
-        //         header.classList.remove("sticky");
-        //     }
-        // }
-
-        // window.onscroll = function() {
-        //     addStickyClass();
-        // };
     </script>
     {{-- Header Buttons --}}
     {{-- Footer Buttons --}}
@@ -276,17 +266,19 @@
                         document.getElementById("current_section_name").value = element.dataset.section_name;
                         document.getElementById("current_section").value = element.dataset.section_id;
                     });
+
+                    stopaudios();
                     hideLoader();
                 }
 
-                question_time_reply=0;
+                question_time_reply = 0;
             } catch (error) {
                 hideLoader();
                 toast(error, 'error');
             }
         }
 
-        function togglequestions(modal=false) {
+        function togglequestions(modal = false) {
             var footer_questions = document.getElementById('footer_questions');
             showfinishmodal('hide');
             if (footer_questions.classList.contains('active')) {
@@ -295,7 +287,7 @@
                 footer_questions.classList.add("active");
             }
 
-            if(modal==true){
+            if (modal == true) {
                 showfinishmodal('open');
             }
         }
@@ -311,7 +303,8 @@
                 var section_start_time = document.getElementById("section_start_time");
                 var loader_for_sections = document.getElementById("loader_for_sections");
                 var form = document.getElementById("exam");
-                question_time_reply=0;
+                question_time_reply = 0;
+                stopaudios();
                 if (all_questions == currentDivQuestion.dataset.key || tolast == true) {
                     if (finishmodalshowed == false && tolast == false) {
                         hideLoader();
@@ -337,7 +330,7 @@
                                 }
 
                                 if (data.nextsection == false) {
-                                    allowReload=true;
+                                    allowReload = true;
                                     window.location.href = data.url;
                                 }
                             })
@@ -488,7 +481,7 @@
                 var selected = document.getElementById(`content_exam_${id}`);
                 selected.classList.add("show");
                 document.getElementById("current_question").value = id;
-                question_time_reply=0;
+                question_time_reply = 0;
                 togglequestions();
                 hideLoader();
             } catch (error) {
@@ -505,7 +498,7 @@
     <script defer>
         let sec = 0;
         let qalan_vaxt;
-        var time_end_exam=document.getElementById('time_end_exam').value;
+        var time_end_exam = document.getElementById('time_end_exam').value;
 
         function pad(val) {
             return val.toString().padStart(2, '0');
@@ -534,8 +527,9 @@
             const secondsDifference = Math.floor((difference % (1000 * 60)) / 1000);
             inputtimeinput.value = sec;
             if (loader_for_sections.classList.contains('active') && section_start_time.value > 0) {
-                qalan_vaxt = (parseInt(section_start_time.value) + parseInt(time_range_sections.value)) - parseInt(time_exam.value);
-                const minutesQalanVaxtDifference =  Math.floor(qalan_vaxt / 60);
+                qalan_vaxt = (parseInt(section_start_time.value) + parseInt(time_range_sections.value)) - parseInt(time_exam
+                    .value);
+                const minutesQalanVaxtDifference = Math.floor(qalan_vaxt / 60);
                 const secondsQalanVaxtDifference = qalan_vaxt % 60;
                 if (document.getElementById('seconds_start_time')) {
                     document.getElementById('seconds_start_time').innerHTML = pad_new(secondsQalanVaxtDifference);
@@ -546,15 +540,21 @@
                 }
 
                 if (qalan_vaxt == 0) {
-                    loader_for_sections.classList.remove('active');
-                    form.classList.add('d-block');
-                    allowReload=true;
-                    window.location.href=redirect_url;
+                    // loader_for_sections.classList.remove('active');
+                    // form.classList.add('d-block');
+                    clearInterval(intervalTimerID);
+                    if(onchangecountdown!=null)
+                        clearInterval(onchangecountdown);
+                    allowReload = true;
+                    window.location.href = redirect_url;
                 }
             } else {
                 section_start_time.value = 0;
-                loader_for_sections.classList.remove('active');
-                form.classList.add('d-block');
+                //loader_for_sections.classList.remove('active');
+                // form.classList.add('d-block');
+                clearInterval(intervalTimerID);
+                if(onchangecountdown!=null)
+                    clearInterval(onchangecountdown);
             }
 
             if (difference <= 0) {
@@ -576,11 +576,13 @@
             settimerforcurrentquestion();
         }
 
-        function settimerforcurrentquestion(){
-            var current_question=document.getElementById('current_question').value;
-            var question_time_replies_currentval=document.getElementById(`question_time_replies_${current_question}`).value??0;
+        function settimerforcurrentquestion() {
+            var current_question = document.getElementById('current_question').value;
+            var question_time_replies_currentval = document.getElementById(`question_time_replies_${current_question}`)
+                .value ?? 0;
             // var result = parseInt(question_time_reply)<parseInt(question_time_replies_currentval) ? parseInt(question_time_reply) :  (parseInt(question_time_reply) - parseInt(question_time_replies_currentval));
-            document.getElementById(`question_time_replies_${current_question}`).value =parseInt(question_time_replies_currentval)+1;
+            document.getElementById(`question_time_replies_${current_question}`).value = parseInt(
+                question_time_replies_currentval) + 1;
         }
     </script>
     {{-- Create Timer --}}
@@ -590,15 +592,15 @@
         let onchangecountdown;
         let loaderVisibleonchange = false;
         let secondsLeftcountdown = 5;
-        let show1time=true;
+        let show1time = true;
 
         function onchangeShowLoader() {
             loaderVisibleonchange = true;
-            if(show1time==true){
-                alert('@lang("additional.messages.ifchangewindowtab")');
-                show1time=false;
-                allowReload=true;
-            }else{
+            if (show1time == true) {
+                alert('@lang('additional.messages.ifchangewindowtab')');
+                show1time = false;
+                allowReload = true;
+            } else {
                 var modalshowcountdown = `<div id="modalshowcountdown" class="modal custom-modal show" tabindex="-1" role="dialog"
                     aria-labelledby="myModalLabel">
                     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -609,7 +611,7 @@
                                         id='secondscountdown' class='d-inline-block'>05</span>
                                 </div>
                                 <div class='text-center text-danger'>
-                                    @lang("additional.messages.ifchangewindowtab")
+                                    @lang('additional.messages.ifchangewindowtab')
                                 </div>
                             </div>
                         </div>
@@ -624,7 +626,7 @@
         }
 
         function onchangeStartCountdown() {
-            onchangecountdown = setInterval(function () {
+            onchangecountdown = setInterval(function() {
                 if (secondsLeftcountdown == 0) {
                     clearInterval(onchangecountdown);
                     clearInterval(intervalTimerID);
@@ -641,7 +643,7 @@
                     tonext(true);
                 }
 
-                if (document.getElementById('secondscountdown') != null){
+                if (document.getElementById('secondscountdown') != null) {
                     document.getElementById('secondscountdown').innerHTML = `0${secondsLeftcountdown}`;
                 }
 
@@ -654,10 +656,10 @@
                 clearInterval(onchangecountdown);
                 setTimeout(() => {
                     loaderVisibleonchange = !loaderVisibleonchange;
-                    if (loaderVisibleonchange==false) {
+                    if (loaderVisibleonchange == false) {
                         var modalshowcountdown = document.getElementById('modalshowcountdown');
                         setTimeout(() => {
-                            if (modalshowcountdown != null){
+                            if (modalshowcountdown != null) {
                                 modalshowcountdown.remove();
                             }
                         }, 1000);
@@ -668,7 +670,7 @@
             }
         }
 
-        document.addEventListener("visibilitychange", function () {
+        document.addEventListener("visibilitychange", function() {
             checkPageFocus();
         });
 
@@ -684,6 +686,17 @@
 
         // setInterval(checkPageFocus, 300);
 
+
+        function stopaudios() {
+            var oneTimeAudios = document.querySelectorAll('.only1time');
+            if (oneTimeAudios.length > 0) {
+                oneTimeAudios.forEach(function(audio) {
+                    if (!audio.paused && !audio.ended) {
+                        audio.pause();
+                    }
+                });
+            }
+        }
     </script>
     {{-- onchange tab --}}
 
@@ -723,16 +736,16 @@
             }
         }
 
-        function toggledesmosmodal(desmosid){
+        function toggledesmosmodal(desmosid) {
             showLoader();
-            var desmoscalc=document.getElementById(desmosid);
-            var desmos_expandable=document.getElementById('desmos_expandable');
-            if(desmoscalc.classList.contains('modal-lg')){
+            var desmoscalc = document.getElementById(desmosid);
+            var desmos_expandable = document.getElementById('desmos_expandable');
+            if (desmoscalc.classList.contains('modal-lg')) {
                 desmoscalc.classList.remove("modal-lg");
-                desmos_expandable.innerHTML='<i class="fa fa-expand-alt"></i>';
-            }else{
+                desmos_expandable.innerHTML = '<i class="fa fa-expand-alt"></i>';
+            } else {
                 desmoscalc.classList.add("modal-lg");
-                desmos_expandable.innerHTML='<i class="fa fa-compress-alt"></i>';
+                desmos_expandable.innerHTML = '<i class="fa fa-compress-alt"></i>';
             }
             hideLoader();
         }
@@ -799,7 +812,8 @@
                     }
                     for (let index3 = 0; index3 < question_container_undo_or_redo.length; index3++) {
                         const element3 = question_container_undo_or_redo[index];
-                        element3.innerHTML = `<img src="{{ asset('front/assets/img/bg_images/a+icon.png') }}" class="img-fluid img-responsive" />`;
+                        element3.innerHTML =
+                            `<img src="{{ asset('front/assets/img/bg_images/a+icon.png') }}" class="img-fluid img-responsive" />`;
                     }
 
                 } else {
@@ -852,7 +866,8 @@
 
         function changeTextBox(question_id, type) {
             var text_box = document.getElementById(`question_answer_one_${question_id}_${type}`).value;
-            document.getElementById(`question_answer_one_${question_id}_${type}`).value=text_box.replace(/[^0-9/\\]/g, '');
+            document.getElementById(`question_answer_one_${question_id}_${type}`).value = text_box.replace(/[^0-9/\\]/g,
+                '');
             if (text_box.length > 5) {
                 document.getElementById(`question_answer_one_${question_id}_${type}`).value = text_box.substring(0, 5);
             }
@@ -862,7 +877,7 @@
             if (question_textbox_text_span !== null) {
                 question_textbox_text_span.innerHTML = '';
             }
-            text_box=document.getElementById(`question_answer_one_${question_id}_${type}`).value;
+            text_box = document.getElementById(`question_answer_one_${question_id}_${type}`).value;
             if (text_box.length > 0 && text_box != null && $.trim(text_box) != '' && $.trim(text_box) != null && $.trim(
                     text_box) != ' ') {
                 var parts = text_box.split('/');
@@ -964,11 +979,11 @@
 
         function resize(e) {
             if (!isResizing) return;
-            var minusable=0;
-            if(e.layerX>0){
-                minusable=e.clientX - (e.layerX+e.srcElement.offsetLeft);
-            }else{
-                minusable=e.clientX-e.srcElement.offsetLeft;
+            var minusable = 0;
+            if (e.layerX > 0) {
+                minusable = e.clientX - (e.layerX + e.srcElement.offsetLeft);
+            } else {
+                minusable = e.clientX - e.srcElement.offsetLeft;
             }
             const size = `${e.clientX - minusable}px`;
             for (let index = 0; index < leftCol.length; index++) {
@@ -995,8 +1010,9 @@
                             var answer_footer_buttons = document.getElementById(
                                 `question_row_button_${questionId}`);
                             answer_footer_buttons.classList.add('answered');
-                            var question_match_element= document.getElementById(`question_match_element_${sectionId}_${questionId}`);
-                            question_match_element.value=1;
+                            var question_match_element = document.getElementById(
+                                `question_match_element_${sectionId}_${questionId}`);
+                            question_match_element.value = 1;
                         }
                     });
                     $(`#${element.id}`).disableSelection();
@@ -1014,7 +1030,8 @@
             if (question_answer_one_element_container_radio != null) {
                 if (question_answer_one_element_container_radio.classList.contains("removable")) {
                     question_answer_one_element_container_radio.classList.remove('removable');
-                    question_container_undo_or_redo.innerHTML = `<img src="{{ asset('front/assets/img/bg_images/a+icon.png') }}" class="img-fluid img-responsive" />`;
+                    question_container_undo_or_redo.innerHTML =
+                        `<img src="{{ asset('front/assets/img/bg_images/a+icon.png') }}" class="img-fluid img-responsive" />`;
                 } else {
                     question_answer_one_element_container_radio.classList.add('removable');
                     question_container_undo_or_redo.innerHTML = '<span>@lang('additional.buttons.undo')</span>';
@@ -1024,7 +1041,8 @@
             if (question_answer_one_element_container_checkbox != null) {
                 if (question_answer_one_element_container_checkbox.classList.contains("removable")) {
                     question_answer_one_element_container_checkbox.classList.remove('removable');
-                    question_container_undo_or_redo.innerHTML = `<img src="{{ asset('front/assets/img/bg_images/a+icon.png') }}" class="img-fluid img-responsive" />`;
+                    question_container_undo_or_redo.innerHTML =
+                        `<img src="{{ asset('front/assets/img/bg_images/a+icon.png') }}" class="img-fluid img-responsive" />`;
                 } else {
                     question_answer_one_element_container_checkbox.classList.add('removable');
                     question_container_undo_or_redo.innerHTML = '<span>@lang('additional.buttons.undo')</span>';
@@ -1091,7 +1109,7 @@
                 e.preventDefault();
                 if (allowReload) {
                     window.location.href = redirect_url;
-                }else{
+                } else {
                     tonext(true);
                 }
             }

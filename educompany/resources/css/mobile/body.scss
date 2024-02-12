@@ -366,7 +366,8 @@
                 }
 
                 .content_exam {
-                    height: 78vh;
+                    min-height:60vh!important;
+                    max-height: 78vh !important;
                     display: none;
                     border-bottom: 2px dashed $primary-color;
                     margin-bottom: 10px;
@@ -537,7 +538,7 @@
                                         border: 1px solid #666;
                                         color: #666;
                                         border-radius: 10px;
-                                        height: 45px;
+                                        height: auto;
                                         transition: all ease 0.8s;
                                         position: relative;
 
