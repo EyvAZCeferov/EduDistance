@@ -87,6 +87,7 @@ return [
             "answered_students"=>"Cavab vermiş şəxslər",
             "youranswer"=>"Sizin cavab",
             "trueanswer"=>"Doğru cavab",
+            "allquestions"=>"Bütün suallar"
         ],
         'blogs'=>[
             'blogs'=>"Bloqlar"

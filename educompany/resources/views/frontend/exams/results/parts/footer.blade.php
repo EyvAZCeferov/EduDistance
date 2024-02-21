@@ -29,7 +29,7 @@
 </div>
 <div class="footer_buttons">
     <a class="d-inline-block" href="javascript:void(0)" onclick="toggleModalnow('usersmodal', 'open')">
-        <i class="fa fa-users"></i> {{count($exam_results->whereNotNull("point"))}}
+        <i class="fa fa-users"></i> {{count($exam_results)}}
     </a>
     <button class="btn btn-primary question_button" type="button" onclick="togglequestions()">
         <i class="fa fa-circle-question"></i>

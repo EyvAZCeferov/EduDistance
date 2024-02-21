@@ -552,9 +552,6 @@
                 section_start_time.value = 0;
                 //loader_for_sections.classList.remove('active');
                 // form.classList.add('d-block');
-                clearInterval(intervalTimerID);
-                if(onchangecountdown!=null)
-                    clearInterval(onchangecountdown);
             }
 
             if (difference <= 0) {
@@ -628,8 +625,7 @@
         function onchangeStartCountdown() {
             onchangecountdown = setInterval(function() {
                 if (secondsLeftcountdown == 0) {
-                    clearInterval(onchangecountdown);
-                    clearInterval(intervalTimerID);
+
                     loaderVisibleonchange = false;
                     var modalshowcountdown = document.getElementById('modalshowcountdown');
 
@@ -638,6 +634,9 @@
                             toggleModalnow('modalshowcountdown', 'hide');
                             modalshowcountdown.remove();
                         }, 1000);
+                    }else{
+                        clearInterval(onchangecountdown);
+                        clearInterval(intervalTimerID);
                     }
 
                     tonext(true);
@@ -674,18 +673,7 @@
             checkPageFocus();
         });
 
-        // window.addEventListener("blur", function () {
-        //     checkPageFocus();
-        // });
-
-        // window.addEventListener("focus", function () {
-        //     checkPageFocus();
-        // });
-
         checkPageFocus();
-
-        // setInterval(checkPageFocus, 300);
-
 
         function stopaudios() {
             var oneTimeAudios = document.querySelectorAll('.only1time');
@@ -866,8 +854,8 @@
 
         function changeTextBox(question_id, type) {
             var text_box = document.getElementById(`question_answer_one_${question_id}_${type}`).value;
-            document.getElementById(`question_answer_one_${question_id}_${type}`).value = text_box.replace(/[^0-9/\\]/g,
-                '');
+            // document.getElementById(`question_answer_one_${question_id}_${type}`).value = text_box.replace(/[^0-9/\\]/g,
+            //     '');
             if (text_box.length > 5) {
                 document.getElementById(`question_answer_one_${question_id}_${type}`).value = text_box.substring(0, 5);
             }

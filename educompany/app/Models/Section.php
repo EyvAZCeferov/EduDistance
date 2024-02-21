@@ -19,5 +19,15 @@ class Section extends Model
     {
         return $this->hasMany(ExamQuestion::class, 'section_id', 'id')->whereHas('answers');
     }
+    public function correctAnswers($id): int
+    {
+        $exam_section_result_answer=ExamResultAnswer::where("result_id",$id)->where('section_id',$this->id);
+        return $exam_section_result_answer->where('result', 1)->count();
+    }
+    public function wrongAnswers($id): int
+    {
+        $exam_section_result_answer=ExamResultAnswer::where("result_id",$id)->where('section_id',$this->id);
+        return $exam_section_result_answer->where('result', 0)->count();
+    }
 
 }

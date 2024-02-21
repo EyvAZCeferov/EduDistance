@@ -58,7 +58,7 @@
                 </div>
 
                 <div class="modal-body overflow-scroll max-h-32">
-                    @php($resultsByDay = $exam_results->whereNotNull('point')->groupBy(function ($result) {
+                    @php($resultsByDay = $exam_results->groupBy(function ($result) {
                         return $result->created_at->format('Y-m-d');
                     }))
                     @foreach ($resultsByDay as $day => $results)
@@ -374,7 +374,7 @@
                 if (showuseranswersmodal != null) {
                     showuseranswersmodal.remove();
                 }
-                
+
                 sendAjaxRequestOLD(`{{ route('api.get_show_user_which_answered') }}`, "post", {
                         ids: ids,
                         question_id: question_id,

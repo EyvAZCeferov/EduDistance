@@ -87,6 +87,7 @@ return [
             "answered_students" => "Answered students",
             "youranswer" => "Your answer",
             "trueanswer" => "Correct answer",
+            "allquestions"=>"All questions"
         ],
         'blogs' => [
             'blogs' => "Blogs"
