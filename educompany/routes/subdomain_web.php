@@ -36,6 +36,7 @@ Route::group([
                 Route::post('add_edit_exam', [CommonController::class, 'add_edit_exam_subdomain'])->name("exam.add_edit_exam.subdomain");
                 Route::get('results', [CommonController::class, 'examResults'])->name('exam.results.subdomain');
                 Route::get('resultpage/{result_id}', [CommonController::class, 'examResultPage'])->name('exam.resultpage.subdomain');
+                Route::get('resultpageallstudents/{exam_id}', [CommonController::class, 'examResultPageStudentsWithSubdomain'])->name('exam.resultpagestudents.subdomain');
                 Route::get('results/{result_id}', [CommonController::class, 'examResult'])->name('exam.result.subdomain');
                 Route::get("exams/redirect_exam", [CommonController::class, 'redirect_exam'])->name("exams.redirect_exam.subdomain");
                 Route::any("exams/set_exam", [CommonController::class, 'set_exam'])->name("exams.set_exam.subdomain");

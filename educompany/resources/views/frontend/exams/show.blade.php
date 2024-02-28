@@ -63,14 +63,14 @@
                             </div>
                         </div>
                     @endif
-                    
+
                 </div>
                 <div class="exam_description">{!! $data->content[app()->getLocale() . '_description'] !!}</div>
 
                 <div class="my-2">
                     @if (auth('users')->check() == true && !empty(auth('users')->user()) && auth('users')->user() != null)
                         @if (!empty(exam_result($data->id, auth('users')->id())))
-                            @if($data->show_result_user==true)
+                            @if(($data->show_result_user==true && auth('users')->user()->user_type==1) || ($data->show_result_user==false && auth('users')->user()->user_type==2) || ($data->show_result_user==true && auth('users')->user()->user_type==2))
                                 @php
                                     $resultId = exam_result($data->id, auth('users')->id());
                                     $routeName = session()->has('subdomain') ? 'user.exam.resultpage.subdomain' : 'user.exam.resultpage';
@@ -82,6 +82,7 @@
                                 @endphp
                                     <a href="{{ $url }}"
                                         class="btn btn-block btn-imtahanver">@lang('additional.buttons.result')</a>
+
                             @endif
                         @else
                             <a href="{{ route('user.exams.redirect_exam', ['exam_id' => $data->id]) }}"

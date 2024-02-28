@@ -100,7 +100,7 @@
                         <button class="btn btn-dark btn-sm desmos_expandable" id='desmos_expandable' type="button"
                             onclick="toggledesmosmodal('desmoscalculator')"><i class="fa fa-expand-alt"></i></button>
                         <div class="modal-body">
-                            <iframe src="https://www.desmos.com/calculator/cue41xrdi1"
+                            <iframe src="https://www.desmos.com/calculator/c2hvdjfpmi"
                                 style="border:0px #ffffff none;width:100%;height:100%;" name="myiFrame" scrolling="no"
                                 frameborder="0" marginheight="0px" marginwidth="0px" allowfullscreen></iframe>
                         </div>
@@ -424,6 +424,7 @@
                 if (document.getElementById("to_back").classList.contains('hide'))
                     document.getElementById("to_back").classList.remove('hide');
             }
+
             var all_questions = document.getElementById("all_questions").value;
             var footer_active_button = document.getElementById(`question_row_button_${current_question}`);
             var buttons = document.getElementsByClassName("btn-question");
@@ -540,25 +541,26 @@
                 }
 
                 if (qalan_vaxt == 0) {
-                    // loader_for_sections.classList.remove('active');
-                    // form.classList.add('d-block');
                     clearInterval(intervalTimerID);
-                    if(onchangecountdown!=null)
+                    if(onchangecountdown!=null){
                         clearInterval(onchangecountdown);
+                    }
+
                     allowReload = true;
                     window.location.href = redirect_url;
                 }
             } else {
                 section_start_time.value = 0;
-                //loader_for_sections.classList.remove('active');
-                // form.classList.add('d-block');
+                allowReload = true;
             }
 
             if (difference <= 0) {
-                clearInterval(intervalTimerID);
+                allowReload = true;
                 document.getElementById('minutes').innerHTML = "00";
-                document.getElementById('seconds').innerHTML = "00";
+                document.getElementById('seconds').innerHTML = "00"
                 tonext(true);
+                clearInterval(intervalTimerID);
+                
                 return;
             }
 
@@ -577,7 +579,6 @@
             var current_question = document.getElementById('current_question').value;
             var question_time_replies_currentval = document.getElementById(`question_time_replies_${current_question}`)
                 .value ?? 0;
-            // var result = parseInt(question_time_reply)<parseInt(question_time_replies_currentval) ? parseInt(question_time_reply) :  (parseInt(question_time_reply) - parseInt(question_time_replies_currentval));
             document.getElementById(`question_time_replies_${current_question}`).value = parseInt(
                 question_time_replies_currentval) + 1;
         }

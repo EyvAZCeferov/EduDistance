@@ -139,12 +139,24 @@ class CommonController extends Controller
                     session()->forget('selected_section');
                 }
 
+                $nexturl='';
+
+                if($nextsection==true){
+                    $nexturl=route("user.exams.redirect_exam", ['exam_id'=>$result->exam_id,'selected_section'=>session()->get('selected_section')??0]);
+                }else{
+                    if($exam->show_result_user==true){
+                        $nexturl=route("user.exam.resultpage", $result->id);
+                    }else{
+                        $nexturl=route("page.welcome");
+                    }
+                }
+
             // });
 
             return response()->json([
                 'status' => 'success',
                 'message' => trans("additional.messages.exam_finished", [], $request->language ?? 'az'),
-                'url' => $nextsection==true ? route("user.exams.redirect_exam", ['exam_id'=>$result->exam_id,'selected_section'=>session()->get('selected_section')??0]) : route("user.exam.resultpage", $result->id),
+                'url' => $nexturl,
                 'nextsection'=>$nextsection
             ]);
         } catch (\Exception $e) {
@@ -220,6 +232,12 @@ class CommonController extends Controller
                     ->with(['sections', 'references'])
                     ->first();
                 $exam_start_pages = collect();
+
+                // if(session()->has('selected_section') && (session()->get('selected_section')==$request->selected_section)){
+                //     $nexturl=exam_finish_and_calc($request->exam_id,Auth::guard('users')->id());
+                //     return redirect($nexturl);
+                // }
+
                 session()->put('selected_section', $request->selected_section ?? 0);
                 session()->put('changedLang', app()->getLocale() ?? 'az');
                 if ($exam->layout_type == "sat") {
@@ -294,6 +312,7 @@ class CommonController extends Controller
                 return redirect(route('login'))->with('error', trans("additional.headers.login"));
             }
         } catch (\Exception $e) {
+            dd($e->getMessage(),$e->getLine());
             return redirect()->back()->with("error", $e->getMessage(), $e->getLine());
         } finally {
             dbdeactive();
@@ -357,6 +376,7 @@ class CommonController extends Controller
                     return $this->notfound();
             }
         } catch (\Exception $e) {
+            dd($e->getMessage(),$e->getLine());
             return redirect()->back()->with("error", $e->getMessage());
         } finally {
             dbdeactive();
@@ -588,6 +608,21 @@ class CommonController extends Controller
         } catch (\Exception $e) {
             dd([$e->getMessage(), $e->getLine()]);
             return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function examResultPageStudentsWithSubdomain($subdomain=null,$result_id)
+    {
+        if(Auth::guard("users")->check() && Auth::guard("users")->user()->user_type==2){
+            $exam=Exam::where('id',$result_id)->where("user_id",Auth::guard("users")->id())->first();
+            $exam_results = ExamResult::where('exam_id', $exam->id)
+                ->with('answers.answer')
+                ->orderByDesc('id')->get();
+            if(!empty($exam_results) && count($exam_results)>0){
+                return view('frontend.exams.results.resultoncompanywithdesign', compact('exam_results','exam'));
+            }else{
+                return redirect()->back()->with('info',trans("additional.pages.exams.notfound"));
+            }
         }
     }
 }

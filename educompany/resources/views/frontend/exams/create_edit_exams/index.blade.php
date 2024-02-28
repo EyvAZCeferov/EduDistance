@@ -982,14 +982,6 @@
                     var textinputid = $(".answer .text-input").attr("id");
                     createeditor(textinputid);
 
-                    var question_answer_one_before=document.getElementsByClassName('question_answer_one');
-                    if(question_answer_one_before!=null && question_answer_one_before.length>0){
-                        for(let index=0; index<question_answer_one_before.length; index++){
-                            const element=question_answer_one_before[index];
-                            createeditor(element.id);
-                        }
-                    }
-
                     var matching_element = $(".matching_element");
                     if (matching_element != null && matching_element.length > 0) {
                         for (let index = 0; index < matching_element.length; index++) {
@@ -1000,6 +992,14 @@
 
                     if (type == 4) {
                         initSortable('match');
+                    }
+
+                    var question_answer_one=document.getElementsByClassName('question_answer_one');
+                    if(question_answer_one!=null && question_answer_one.length>0){
+                        for(var index=0;index<question_answer_one.length;index++){
+                            var elem=question_answer_one[index];
+                            createeditor(elem.id);
+                        }
                     }
 
                 }

@@ -31,7 +31,7 @@
         <input type="hidden" name="exam_id" id="exam_id" value="{{ $exam->id }}">
         <input type="hidden" name="language" id="language" value="{{ app()->getLocale() }}">
         @include('frontend.exams.results.parts.header_result', [
-            'exam' => $exam,
+            'exam' => $exam
         ])
         @include('frontend.exams.results.parts.content', [
             'exam' => $exam,
@@ -57,7 +57,7 @@
                     </button>
                 </div>
 
-                <div class="modal-body overflow-scroll max-h-32">
+                <div class="modal-body overflow-scroll max-h-32" style="height:400px;overflow-y:scroll;">
                     @php($resultsByDay = $exam_results->groupBy(function ($result) {
                         return $result->created_at->format('Y-m-d');
                     }))
@@ -67,18 +67,20 @@
                             {{ $formattedDay }}
                         </div>
                         @foreach($results as $result)
-                            <div class="row mb-1 p-1 pb-2" style="border-bottom:1px solid #ccc;">
-                                <h6>{{ $result->user->name }} / {{ $result->user->email }}</h6>
-                                <div class='text text-dark'>
-                                    @lang('additional.pages.exams.earned_point'): {{ round($result->point, 2) }} / <span
-                                        class="text-success">{{ $exam->point }}</span>
-                                    &nbsp;&nbsp;@lang('additional.pages.exams.timespent'):
-                                    <div class="hour_area d-inline-block text text-info">
-                                        <span id="minutes">{{ floor($result->time_reply / 60) % 60 }}</span>:<span
-                                            id="seconds">{{ $result->time_reply % 60 }}</span>
+                            @if(!empty($result->user))
+                                <div class="row mb-1 p-1 pb-2" style="border-bottom:1px solid #ccc;">
+                                    <h6>{{ $result->user->name }} / {{ $result->user->email }}</h6>
+                                    <div class='text text-dark'>
+                                        @lang('additional.pages.exams.earned_point'): {{ $result->point }}/ <span
+                                            class="text-success">{{ $exam->point }}</span>
+                                        &nbsp;&nbsp;@lang('additional.pages.exams.timespent'):
+                                        <div class="hour_area d-inline-block text text-info">
+                                            <span id="minutes">{{ floor($result->time_reply / 60) % 60 }}</span>:<span
+                                                id="seconds">{{ $result->time_reply % 60 }}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endif
                         @endforeach
                     @endforeach
                 </div>
@@ -406,7 +408,7 @@
                                                 </button>
                                             </div>
 
-                                            <div class="modal-body overflow-scroll max-h-32">
+                                            <div class="modal-body overflow-scroll max-h-32" style="height:400px;overflow-y:scroll;">
                                                 ${n.data}
                                             </div>
 

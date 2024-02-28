@@ -42,6 +42,7 @@ Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalizati
                 Route::post('add_edit_exam', [CommonController::class, 'add_edit_exam'])->name("exam.add_edit_exam");
                 Route::get('results', [CommonController::class, 'examResults'])->name('exam.results');
                 Route::get('resultpage/{result_id}', [CommonController::class, 'examResultPage_nosubdomain'])->name('exam.resultpage');
+                Route::get('resultpageallstudents/{exam_id}', [CommonController::class, 'examResultPageStudents'])->name('exam.resultpagestudents');
                 Route::get('results/{result_id}', [CommonController::class, 'examResult_nosubdomain'])->name('exam.result');
                 Route::get("exams/redirect_exam", [CommonController::class, 'redirect_exam'])->name("exams.redirect_exam");
                 Route::any("exams/set_exam", [CommonController::class, 'set_exam'])->name("exams.set_exam");

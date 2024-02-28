@@ -164,9 +164,9 @@ if (!function_exists('count_endirim_faiz')) {
     function count_endirim_faiz($price, $endirim_price)
     {
         $model = 0;
-        if ($price > 0 && $endirim_price > 0 && $endirim_price <= $price) {
+        if ($price > 0 && $endirim_price > 0) {
             $discount_percentage = (($price - $endirim_price) / $price) * 100;
-            $formatted_discount = number_format($discount_percentage, 2); // İki ondalık basamak
+            $formatted_discount = number_format($discount_percentage, 2);
             $model = $formatted_discount;
         }
         return Cache::rememberForever("count_endirim_faiz" . $price . $endirim_price, fn () => $model);
@@ -840,5 +840,29 @@ if (!function_exists('formattedTime')) {
             $model = str_pad($seconds % 60, 2, '0', STR_PAD_LEFT);
         }
         return Cache::rememberForever("formattedTime"  . $seconds . $type, fn () => $model);
+    }
+}
+
+if (!function_exists('exam_finish_and_calc')) {
+    function exam_finish_and_calc($exam_id, $auth_id)
+    {
+        $model = null;
+        $examresult=ExamResult::where('exam_id',$exam_id)->where('user_id',$auth_id)->whereNull('point')->orderBy('id','DESC')->first();
+        if (!empty($examresult) && isset($examresult->id)) {
+            $examresultanswers=ExamResultAnswer::where('result_id',$examresult->id)->get();
+            $point=calculate_exam_result($result->id);
+            $examresult->update(['point'=>$point??0]);
+
+            $exam=Exam::find($exam_id);
+            if($exam->show_result_user==true){
+                $model=route("user.exam.resultpage", $examresult->id);
+            }else{
+                $model=route("page.welcome");
+            }
+        }else{
+            $model=route("page.welcome");
+        }
+
+        return Cache::rememberForever("exam_finish_and_calc"  . $exam_id . $auth_id, fn () => $model);
     }
 }
