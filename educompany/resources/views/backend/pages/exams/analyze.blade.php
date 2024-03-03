@@ -51,7 +51,7 @@
                                     <option value=""></option>
                                     @foreach ($exams as $value)
                                         <option value="{{ $value->id }}">{{ $value->name[app()->getLocale().'_name'] }} /
-                                            {{ $value->category->name['az_name'] }}</option>
+                                            {{ @$value->category->name['az_name'] }}</option>
                                     @endforeach
                                 </select>
                             </div>

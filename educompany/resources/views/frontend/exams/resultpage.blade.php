@@ -83,7 +83,7 @@
                     <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
                         @foreach ($questions as $key => $value)
                             <button
-                                class="btn btn-sm btn-question {{ exam_result_answer_true_or_false($value->id, $exam_result->id) }}"
+                                class="btn btn-sm my-1 btn-question {{ exam_result_answer_true_or_false($value->id, $exam_result->id) }}"
                                 type="button">{{ $key + 1 }}</button>
                         @endforeach
 
@@ -103,7 +103,7 @@
                                 aria-labelledby="nav-{{ $key }}-tab">
                                 @foreach ($value->questions as $key1 => $val)
                                         <button
-                                            class="btn btn-sm btn-question {{ exam_result_answer_true_or_false($val->id, $exam_result->id) }}"
+                                            class="btn btn-sm my-1 btn-question {{ exam_result_answer_true_or_false($val->id, $exam_result->id) }}"
                                             type="button">{{ $key1 + 1 }}</button>
                                 @endforeach
 

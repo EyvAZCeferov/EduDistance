@@ -13,7 +13,7 @@
     </div>
     <div class="questions_row">
         @foreach ($questions as $key => $value)
-            <button class="btn btn-sm btn-question not_answered footer_question_buttons" type="button"
+            <button class="btn btn-sm btn-question not_answered footer_question_buttons  @if(isset($exam_result) && !empty($exam_result)) {{ exam_result_answer_true_or_false($value->id,$exam_result->id) }} @endif " type="button"
             data-key="{{ $value->id }}"
                 id="question_row_button_{{ $value->id }}"
                 onclick="getquestion({{ $value->id }})">{{ $key + 1 }}</button>

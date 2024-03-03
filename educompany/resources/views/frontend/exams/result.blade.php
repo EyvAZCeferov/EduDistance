@@ -46,6 +46,7 @@
         @include('frontend.exams.exam_main_process.parts.footer', [
             'exam' => $exam,
             'questions' => $questions,
+            'exam_result' => $exam_result,
         ])
     </section>
 @endsection

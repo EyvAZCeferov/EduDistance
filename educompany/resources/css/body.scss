@@ -1796,6 +1796,18 @@ body {
                             }
                         }
 
+                        &.true{
+                            background-color:$success-color;
+                            color:#fff;
+                            border-color:$success-color;
+                        }
+
+                        &.false{
+                            background-color:$error-color;
+                            color:#fff;
+                            border-color:$error-color;
+                        }
+
                         &:hover,
                         &:focus,
                         &:active {

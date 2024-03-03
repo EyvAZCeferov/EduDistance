@@ -11,12 +11,11 @@
             display: block;
         }
     </style>
-    {{-- <style>
-        body{
-            transform: scale(0.9);
-            transform-origin: top center;
+    <style>
+        #desmoscalculator {
+            z-index: 9999999999;
         }
-    </style> --}}
+    </style>
 @endpush
 @section('content')
     @php
@@ -232,8 +231,59 @@
 
         function togglecalculator() {
             $('#desmoscalculator').toggle();
-            $('#desmoscalculator').draggable();
+            //jquery Draggable
+            $('#desmoscalculator').draggable({
+                drag: function(event, ui) {
+                    $(this).css({
+                        'top': ui.position.top + 'px',
+                        'left': ui.position.left + 'px'
+                    });
+                },
+                touchStart: function(event, ui) {
+                    var offsetX = event.originalEvent.touches[0].pageX - $(this).offset().left;
+                    var offsetY = event.originalEvent.touches[0].pageY - $(this).offset().top;
+                    $(this).data('offset', {
+                        x: offsetX,
+                        y: offsetY
+                    });
+                },
+                touchMove: function(event, ui) {
+                    var offset = $(this).data('offset');
+                    var x = event.originalEvent.touches[0].pageX - offset.x;
+                    var y = event.originalEvent.touches[0].pageY - offset.y;
+                    $(this).css({
+                        'top': y + 'px',
+                        'left': x + 'px'
+                    });
+                }
+            });
+
         }
+
+        function touchHandler(event) {
+            var touch = event.changedTouches[0];
+
+            var simulatedEvent = document.createEvent("MouseEvent");
+            simulatedEvent.initMouseEvent({
+                    touchstart: "mousedown",
+                    touchmove: "mousemove",
+                    touchend: "mouseup"
+                } [event.type], true, true, window, 1,
+                touch.screenX, touch.screenY,
+                touch.clientX, touch.clientY, false,
+                false, false, false, 0, null);
+
+            touch.target.dispatchEvent(simulatedEvent);
+        }
+
+        function init() {
+            document.addEventListener("touchstart", touchHandler, true);
+            document.addEventListener("touchmove", touchHandler, true);
+            document.addEventListener("touchend", touchHandler, true);
+            document.addEventListener("touchcancel", touchHandler, true);
+        }
+
+        init();
 
         function togglereferances() {
             $('#references').toggle();
@@ -292,7 +342,7 @@
             }
         }
 
-        function tonext(tolast = false) {
+        function tonext(tolast = false, type = null) {
             try {
                 showLoader();
                 var current_question = document.getElementById("current_question").value;
@@ -310,45 +360,66 @@
                         hideLoader();
                         showfinishmodal('open');
                     } else {
-                        var forum = document.getElementById("exam");
-                        var formData = new FormData(forum);
-                        fetch("{{ route('finish_exam') }}", {
-                                method: "POST",
-                                body: formData
-                            })
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error("Network response was not ok.");
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                toast(data.message, data.status);
+                        if (type == "imtahanzamanibitdi" && next_section == true && time_range_sections > 0) {
+                            document.getElementById("time_range_sections").value = time_range_sections - 1;
+                            if (time_range_sections > 0) {
                                 hideLoader();
-                                if (data.url != null && data.url != '' && data.url != ' ') {
-                                    redirect_url = data.url;
+                                if (next_section == 1) {
+                                    section_start_time.value = document.getElementById("time_exam").value;
+                                    form.classList.remove('d-block');
+                                    form.style.display = "none";
+                                    loader_for_sections.classList.add("active");
                                 }
-
-                                if (data.nextsection == false) {
-                                    allowReload = true;
-                                    window.location.href = data.url;
-                                }
-                            })
-                            .catch(error => {
-                                hideLoader();
-                                toast(error.message, "error");
-                            });
-
-                        if (time_range_sections > 0) {
-                            hideLoader();
-                            if (next_section == 1) {
-                                section_start_time.value = document.getElementById("time_exam").value;
-                                form.classList.remove('d-block');
-                                form.style.display = "none";
-                                loader_for_sections.classList.add("active");
+                            } else {
+                                allowReload = true;
+                                tonext(true, 'imtahanzamanibitdi');
                             }
                         } else {
-                            clearInterval(intervalTimerID);
+                            var forum = document.getElementById("exam");
+                            var formData = new FormData(forum);
+                            fetch("{{ route('finish_exam') }}", {
+                                    method: "POST",
+                                    body: formData
+                                })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error("Network response was not ok.");
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    toast(data.message, data.status);
+                                    hideLoader();
+                                    if (data.url != null && data.url != '' && data.url != ' ') {
+                                        redirect_url = data.url;
+                                    }
+
+                                    if (data.nextsection == false) {
+                                        allowReload = true;
+                                        window.location.href = data.url;
+                                    }
+
+                                    if (type == "imtahanzamanibitdi") {
+                                        allowReload = true;
+                                        window.location.href = data.url;
+                                    }
+                                })
+                                .catch(error => {
+                                    hideLoader();
+                                    toast(error.message, "error");
+                                });
+
+                            if (time_range_sections > 0) {
+                                hideLoader();
+                                if (next_section == 1) {
+                                    section_start_time.value = document.getElementById("time_exam").value;
+                                    form.classList.remove('d-block');
+                                    form.style.display = "none";
+                                    loader_for_sections.classList.add("active");
+                                }
+                            } else {
+                                clearInterval(intervalTimerID);
+                            }
                         }
                     }
                 } else {
@@ -542,12 +613,18 @@
 
                 if (qalan_vaxt == 0) {
                     clearInterval(intervalTimerID);
-                    if(onchangecountdown!=null){
+                    if (onchangecountdown != null) {
                         clearInterval(onchangecountdown);
                     }
 
                     allowReload = true;
-                    window.location.href = redirect_url;
+
+                    if (redirect_url != null) {
+                        window.location.href = redirect_url;
+                    } else {
+                        tonext(true, 'imtahanzamanibitdi');
+                    }
+
                 }
             } else {
                 section_start_time.value = 0;
@@ -558,9 +635,7 @@
                 allowReload = true;
                 document.getElementById('minutes').innerHTML = "00";
                 document.getElementById('seconds').innerHTML = "00"
-                tonext(true);
-                clearInterval(intervalTimerID);
-                
+                tonext(true, "imtahanzamanibitdi");
                 return;
             }
 
@@ -635,7 +710,7 @@
                             toggleModalnow('modalshowcountdown', 'hide');
                             modalshowcountdown.remove();
                         }, 1000);
-                    }else{
+                    } else {
                         clearInterval(onchangecountdown);
                         clearInterval(intervalTimerID);
                     }
@@ -1120,4 +1195,28 @@
     {{-- Disable F5 --}}
 
     {{-- Page Functions --}}
+
+    {{-- Exam Refresh Function --}}
+    <script defer>
+        function changeurlpage() {
+            var currentUrl = window.location.href;
+            var setExamIndex = currentUrl.indexOf('/set_exam');
+
+            if (currentUrl.indexOf('selected_section') === -1) {
+                if (setExamIndex !== -1) {
+                    // '/set_exam' kısmından önceki kısmı al
+                    var cururl = currentUrl.substring(0, setExamIndex);
+
+                    var exam_id = document.getElementById("exam_id").value;
+                    var updatedUrl = cururl+"/redirect_exam" + (cururl.indexOf('?') !== -1 ? '&' : '?') +
+                        'selected_section={{ session()->get('selected_section') }}&exam_id=' + exam_id;
+                    history.replaceState(null, null, updatedUrl);
+                }
+            }
+        }
+
+
+        changeurlpage();
+    </script>
+    {{-- Exam Refresh Function --}}
 @endpush

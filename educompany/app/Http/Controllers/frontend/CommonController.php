@@ -233,10 +233,11 @@ class CommonController extends Controller
                     ->first();
                 $exam_start_pages = collect();
 
-                // if(session()->has('selected_section') && (session()->get('selected_section')==$request->selected_section)){
-                //     $nexturl=exam_finish_and_calc($request->exam_id,Auth::guard('users')->id());
-                //     return redirect($nexturl);
-                // }
+                if(session()->has('selected_section') && (session()->get('selected_section')==$request->selected_section)){
+                    $nexturl=exam_finish_and_calc($request->exam_id,Auth::guard('users')->id());
+                    if(!empty($nexturl))
+                        return redirect($nexturl);
+                }
 
                 session()->put('selected_section', $request->selected_section ?? 0);
                 session()->put('changedLang', app()->getLocale() ?? 'az');
@@ -411,6 +412,7 @@ class CommonController extends Controller
             else
                 return null;
         } catch (\Exception $e) {
+            dd($e->getMessage(),$e->getLine());
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
@@ -610,7 +612,6 @@ class CommonController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
-
     public function examResultPageStudentsWithSubdomain($subdomain=null,$result_id)
     {
         if(Auth::guard("users")->check() && Auth::guard("users")->user()->user_type==2){

@@ -754,7 +754,7 @@ if (!function_exists('calculate_exam_result')) {
         $correctAnswers = $examResult->correctAnswers();
         $examquestionscount = count($examquestions);
         $model = 0;
-        $model = ($correctAnswers / $examquestionscount) * $exampoint;
+        $model = $examquestionscount>0 ?($correctAnswers / $examquestionscount) * $exampoint : $correctAnswers * $exampoint;
         return $model;
     }
 }
@@ -773,7 +773,7 @@ if (!function_exists('exam_result')) {
         } else {
             $model = $model->where('user_id', $auth_id);
             $model = $model->whereNotNull("point");
-            $model = $model->where("time_reply", '>', 0);
+            $model = $model->whereNotNull("time_reply");
             $model = $model->where("payed", 1);
         }
 
@@ -849,8 +849,8 @@ if (!function_exists('exam_finish_and_calc')) {
         $model = null;
         $examresult=ExamResult::where('exam_id',$exam_id)->where('user_id',$auth_id)->whereNull('point')->orderBy('id','DESC')->first();
         if (!empty($examresult) && isset($examresult->id)) {
-            $examresultanswers=ExamResultAnswer::where('result_id',$examresult->id)->get();
-            $point=calculate_exam_result($result->id);
+            $lastpoint=session()->has("point") ? session()->get('point') :0;
+            $point=$lastpoint+calculate_exam_result($examresult->id);
             $examresult->update(['point'=>$point??0]);
 
             $exam=Exam::find($exam_id);
@@ -860,7 +860,7 @@ if (!function_exists('exam_finish_and_calc')) {
                 $model=route("page.welcome");
             }
         }else{
-            $model=route("page.welcome");
+            $model=null;
         }
 
         return Cache::rememberForever("exam_finish_and_calc"  . $exam_id . $auth_id, fn () => $model);

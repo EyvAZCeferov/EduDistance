@@ -946,7 +946,6 @@
 
                 var question_input_id = $(".question_input").prop('id');
                 createeditor(question_input_id);
-                var question_input2_id;
                 if (type == 3) {
                     var textbox_0_id = $(".textbox_0").prop('id');
                     var textbox_0 = createeditor(textbox_0_id);
@@ -979,8 +978,21 @@
                         answers = `@include('frontend.exams.create_edit_exams.question_radio')`;
                     }
                     answers_area.innerHTML = answers;
-                    var textinputid = $(".answer .text-input").attr("id");
-                    createeditor(textinputid);
+
+                    var textinput = $(".answer .text-input");
+                    if (textinput != null && textinput.length > 0) {
+                        textinput.each(function(index, elem) {
+                            var currentid = $(elem).attr('id');
+                            var answer__input_ = $("#answer__input_" + currentid);
+                            var button = $(elem).find('.add_button');
+                            var codeofelement = createRandomCode('string', 11);
+                            $(elem).attr('id', codeofelement);
+                            answer__input_.attr("id", "answer__input_" + codeofelement);
+                            button.attr("onclick", "addoreditanswer('single','add','" + codeofelement + "')");
+                            createeditor(codeofelement);
+                        });
+                    }
+
 
                     var matching_element = $(".matching_element");
                     if (matching_element != null && matching_element.length > 0) {
@@ -994,11 +1006,13 @@
                         initSortable('match');
                     }
 
-                    var question_answer_one=document.getElementsByClassName('question_answer_one');
-                    if(question_answer_one!=null && question_answer_one.length>0){
-                        for(var index=0;index<question_answer_one.length;index++){
-                            var elem=question_answer_one[index];
-                            createeditor(elem.id);
+                    var question_answer_ones = document.getElementsByClassName('answer');
+                    if (question_answer_ones != null && question_answer_ones.length > 0) {
+                        for (var index = 0; index < question_answer_ones.length; index++) {
+                            var elem = question_answer_ones[index].querySelector('.answer_content span.text-input');
+                            if (elem) {
+                                createeditor(elem.id);
+                            }
                         }
                     }
 
@@ -1042,7 +1056,7 @@
                     element.remove();
                 } else {
                     var codeofelement = createRandomCode('string', 11);
-                    var element = document.createElement('div');
+                    element = document.createElement('div');
                     element.className = `answer ${type}`;
                     element.id = codeofelement;
 
@@ -1090,6 +1104,16 @@
                     } else {
                         createeditor(`answer__input_${codeofelement}`);
                     }
+
+                    var question_answer_ones = document.getElementsByClassName('answer');
+                    if (question_answer_ones != null && question_answer_ones.length > 0) {
+                        for (var index = 0; index < question_answer_ones.length; index++) {
+                            var elem = question_answer_ones[index].querySelector('.answer_content span.text-input');
+                            if (elem) {
+                                createeditor(elem.id);
+                            }
+                        }
+                    }
                 }
             } catch (error) {
                 toast(error, 'error');
@@ -1121,56 +1145,57 @@
             try {
                 var selector = id ? `#${id}` : `.summernote_element`;
                 let tinmyMceInstance = tinymce.get(selector);
-                if (tinmyMceInstance != null) {
-                    tinmyMceInstance.remove(selector);
+                if (tinmyMceInstance == null) {
+                    // tinmyMceInstance.remove(selector);
+
+                    tinymce.init({
+                        selector: selector,
+                        plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+                        toolbar: 'fontfamily fontsize forecolor backcolor | bold italic underline strikethrough subscript superscript | link image media table | align lineheight | numlist bullist indent outdent | charmap',
+                        menubar: false,
+                        image_advtab: false,
+                        a11y_advanced_options: true,
+                        image_caption: true,
+                        image_description: false,
+                        image_dimensions: false,
+                        image_title: true,
+                        images_upload_credentials: true,
+                        images_upload_url: "{{ route('api.upload_image_editor') }}",
+                        automatic_uploads: true,
+                        block_unsupported_drop: false,
+                        file_picker_types: 'file image media',
+                        images_upload_handler: function(blobInfo, progress) {
+                            return new Promise((resolve, reject) => {
+                                var url = "{{ route('api.upload_image_editor') }}";
+                                var formData = new FormData();
+                                formData.append('image', blobInfo.blob(), blobInfo.filename());
+
+                                fetch(url, {
+                                        method: 'POST',
+                                        body: formData,
+                                    })
+                                    .then(function(response) {
+                                        if (!response.ok) {
+                                            throw new Error('Network response was not ok');
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(function(data) {
+                                        resolve(data.location);
+                                    })
+                                    .catch(function(error) {
+                                        console.error('Error during image upload:', error);
+                                        reject(error); // Hata durumunda reddet
+                                    });
+                            });
+                        },
+
+                        toolbar_mode: 'floating',
+                        inline: true,
+                        directionality: 'ltr'
+                    });
+                    return tinymce.get(selector);
                 }
-                tinymce.init({
-                    selector: selector,
-                    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
-                    toolbar: 'fontfamily fontsize forecolor backcolor | bold italic underline strikethrough subscript superscript | link image media table | align lineheight | numlist bullist indent outdent | charmap',
-                    menubar: false,
-                    image_advtab: false,
-                    a11y_advanced_options: true,
-                    image_caption: true,
-                    image_description: false,
-                    image_dimensions: false,
-                    image_title: true,
-                    images_upload_credentials: true,
-                    images_upload_url: "{{ route('api.upload_image_editor') }}",
-                    automatic_uploads: true,
-                    block_unsupported_drop: false,
-                    file_picker_types: 'file image media',
-                    images_upload_handler: function(blobInfo, progress) {
-                        return new Promise((resolve, reject) => {
-                            var url = "{{ route('api.upload_image_editor') }}";
-                            var formData = new FormData();
-                            formData.append('image', blobInfo.blob(), blobInfo.filename());
-
-                            fetch(url, {
-                                    method: 'POST',
-                                    body: formData,
-                                })
-                                .then(function(response) {
-                                    if (!response.ok) {
-                                        throw new Error('Network response was not ok');
-                                    }
-                                    return response.json();
-                                })
-                                .then(function(data) {
-                                    resolve(data.location);
-                                })
-                                .catch(function(error) {
-                                    console.error('Error during image upload:', error);
-                                    reject(error); // Hata durumunda reddet
-                                });
-                        });
-                    },
-
-                    toolbar_mode: 'floating',
-                    inline: true,
-                    directionality: 'ltr'
-                });
-                return tinymce.get(selector);
             } catch (error) {
                 toast(error, 'error');
                 console.error('------------createeditorError----------------', error);
