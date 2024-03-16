@@ -68,7 +68,7 @@
     </script>
 </head>
 
-<body>
+<body class="pageonmobile_exam_page">
     <div class="container-xxl">
         @yield('content')
     </div>

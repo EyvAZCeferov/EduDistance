@@ -48,7 +48,7 @@ class CommonController extends Controller
                             $section = $exam->sections->find($section_id);
                             $question = ExamQuestion::where("id", $question_id)->first();
                             $time_reply=$request->question_time_replies[$question_id]??0;
-                            if (!empty($question) && !empty($section)) {
+                            // if (!empty($question) && !empty($section)) {
                                 if ($question->type === 1 || $question->type==5) {
                                     $resultAnswer = new ExamResultAnswer();
                                     $resultAnswer->result_id = $result->id;
@@ -112,7 +112,7 @@ class CommonController extends Controller
                                         }
                                     }
                                 }
-                            }
+                            // }
                         }
                     }
                 }
@@ -407,10 +407,11 @@ class CommonController extends Controller
             ];
             $apiscontroller = new ApisController();
             $data = $apiscontroller->create_payment($payment_dat);
-            if (!empty($data) && isset($data->redirect_url) && !empty($data->redirect_url))
-                return $data->redirect_url;
-            else
+            if (!empty($data) && isset($data)){
+                return $data;
+            }else{
                 return null;
+            }
         } catch (\Exception $e) {
             dd($e->getMessage(),$e->getLine());
             return response()->json([

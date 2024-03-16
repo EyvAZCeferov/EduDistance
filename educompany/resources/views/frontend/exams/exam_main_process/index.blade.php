@@ -66,6 +66,9 @@
         @foreach ($questions as $key => $value)
             <input type="hidden" name="question_time_replies[{{ $value->id }}]"
                 id="question_time_replies_{{ $value->id }}" value="0">
+
+            <input type="hidden" name="question_answers_values[{{ $value->id }}]"
+                id="question_answers_values_{{ $value->id }}" />
         @endforeach
         {{-- Question Time replies --}}
 
@@ -292,7 +295,7 @@
     </script>
     {{-- Header Buttons --}}
     {{-- Footer Buttons --}}
-    <script defer>
+    <script>
         let finishmodalshowed = false;
         let redirect_url = null;
         let allowReload = false;
@@ -817,7 +820,7 @@
     {{-- References Functions --}}
 
     {{-- Exam Functions --}}
-    <script defer>
+    <script>
         document.addEventListener("DOMContentLoaded", function() {
             renderMathInElement(document.body, {
                 delimiters: [{
@@ -899,22 +902,24 @@
             var currentDivQuestion = document.getElementById(`content_exam_${question_id}`);
             var answers_selected = document.getElementsByClassName(`answers_${question_id}`);
             var clicked_el = document.getElementById(`question_answer_one_${question_id}_${answer_id}_${type}`);
+            var radio_input = clicked_el.querySelector('input[type="radio"]');
 
             if (clicked_el.classList.contains('removable')) {
                 return;
             } else {
-
                 if (type == "radio") {
                     for (var i = 0; i < answers_selected.length; i++) {
                         answers_selected[i].classList.remove('selected');
                     }
                 }
 
-
                 if (clicked_el.classList.contains('selected')) {
                     clicked_el.classList.remove('selected');
                 } else {
                     clicked_el.classList.add('selected');
+                    if (radio_input) {
+                        radio_input.checked = true;
+                    }
                 }
                 if (all_questions != currentDivQuestion.dataset.key) {
                     if (type == "radio") {
@@ -1018,41 +1023,60 @@
         function draggingleftandrightcolumns() {
             for (let index = 0; index < resizer.length; index++) {
                 const element = resizer[index];
-                element.addEventListener("mousedown", (e) => {
-                    e.preventDefault();
-                    isResizing = true;
-                    offsetX = element.clientWidth / 2;
-                    document.addEventListener("mousemove", resize);
-                    document.addEventListener("mouseup", () => {
-                        isResizing = false;
-                        document.removeEventListener("mousemove", resize);
-                    });
-                });
-                element.addEventListener("mouseover", (e) => {
-                    if (!isResizing) {
-                        element.style.opacity = 1;
-                    }
-                });
-                element.addEventListener("mouseleave", (e) => {
-                    if (!isResizing) {
-                        element.style.opacity = 0.5;
-                    }
-                });
+                element.addEventListener("mousedown", startResize);
+                element.addEventListener("touchstart", startResize);
+                element.addEventListener("mouseover", handleMouseOver);
+                element.addEventListener("mouseleave", handleMouseLeave);
             }
+        }
+
+        function startResize(e) {
+            isResizing = true;
+            offsetX = (e.type === "mousedown") ? e.clientX : e.touches[0].clientX;
+            document.addEventListener("mousemove", resize);
+            document.addEventListener("touchmove", resize);
+            document.addEventListener("mouseup", stopResize);
+            document.addEventListener("touchend", stopResize);
         }
 
         function resize(e) {
             if (!isResizing) return;
             var minusable = 0;
-            if (e.layerX > 0) {
-                minusable = e.clientX - (e.layerX + e.srcElement.offsetLeft);
+
+            if (e.type === "touchstart") {
+                minusable = e.touches[0].clientX - (e.srcElement.getBoundingClientRect().left || e.srcElement.offsetLeft);
             } else {
-                minusable = e.clientX - e.srcElement.offsetLeft;
+                if (e.layerX > 0) {
+                    minusable = e.clientX - (e.layerX + e.srcElement.offsetLeft);
+                } else {
+                    minusable = e.clientX - e.srcElement.offsetLeft;
+                }
             }
-            const size = `${e.clientX - minusable}px`;
+
+            const size = `${e.touches ? e.touches[0].clientX : e.clientX - minusable}px`;
             for (let index = 0; index < leftCol.length; index++) {
                 const element = leftCol[index];
                 element.style.width = size;
+            }
+        }
+
+        function stopResize() {
+            isResizing = false;
+            document.removeEventListener("mousemove", resize);
+            document.removeEventListener("touchmove", resize);
+            document.removeEventListener("mouseup", stopResize);
+            document.removeEventListener("touchend", stopResize);
+        }
+
+        function handleMouseOver(e) {
+            if (!isResizing) {
+                e.currentTarget.style.opacity = 1;
+            }
+        }
+
+        function handleMouseLeave(e) {
+            if (!isResizing) {
+                e.currentTarget.style.opacity = 0.5;
             }
         }
 
@@ -1208,7 +1232,7 @@
                     var cururl = currentUrl.substring(0, setExamIndex);
 
                     var exam_id = document.getElementById("exam_id").value;
-                    var updatedUrl = cururl+"/redirect_exam" + (cururl.indexOf('?') !== -1 ? '&' : '?') +
+                    var updatedUrl = cururl + "/redirect_exam" + (cururl.indexOf('?') !== -1 ? '&' : '?') +
                         'selected_section={{ session()->get('selected_section') }}&exam_id=' + exam_id;
                     history.replaceState(null, null, updatedUrl);
                 }

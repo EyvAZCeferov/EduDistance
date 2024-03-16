@@ -113,6 +113,8 @@
                                             <td class="text-right">
                                                 <a href="{{ route('exam.result.show', $data->id) }}"
                                                     class="btn btn-warning btn-sm">Ətraflı</a>
+
+                                                    <a href="{{ route('exam.result.destroy', $data->id) }}" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
                                             </td>
                                         </tr>
                                     @endif

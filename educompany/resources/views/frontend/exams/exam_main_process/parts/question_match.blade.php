@@ -39,7 +39,6 @@
 @if (empty($exam_result->point))
     <p class="text-muted text-small my-2 text-center">@lang('additional.pages.exams.sort_right_tab_elements')</p>
 @else
-
     <p
         class="text-small my-2 text-center @if (
             !empty($exam_result) &&

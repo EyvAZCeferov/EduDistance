@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\PulPal;
 
 
 class ApisController extends Controller
@@ -182,11 +183,16 @@ class ApisController extends Controller
                     'type' => $req['coupon_type'] ?? null,
                     'id' => $req['coupon_id'] ?? null
                 ];
+
+                $data=$req;
+                $data['nonce']=createRandomCode('string',11);
+                $data['external_id']=createRandomCode('string',11);
+
                 $payment = new Payments();
                 $payment->token = $req['token'];
                 $payment->amount = $req['amount'] == 0 ? $exam_price : $req['amount'];
                 $payment->payment_status = 0;
-                $payment->data = $req;
+                $payment->data = $data;
                 $payment->user_id = $req['user_id'];
                 $payment->exam_id = $req['exam_id'];
                 $payment->coupon_id = $req['coupon_id'] ?? null;
@@ -194,17 +200,22 @@ class ApisController extends Controller
                 $payment->exam_data = $exam;
                 $payment->user_data = $user;
                 $payment->coupon_data = $coupon;
+                $payment->transaction_id=createRandomCode('string',11);
                 $payment->save();
             }
+
             if ($payment->amount > 0) {
-                $epoint = Epoint::typeCard($payment->id, $payment->amount, "Hu");
-                if (!empty($epoint) && isset($epoint->transaction) && !empty($epoint->transaction))
-                    $payment->update(['transaction_id' => $epoint->transaction]);
-                return $epoint;
+                $modelpulpal=new PulPal();
+                $pulpal=$modelpulpal->createPayment($payment->transaction_id);
+                $data['url']=$pulpal;
+                $payment->update(['data'=>$data]);
+                \Log::info(['------------------PulPal creation link-----------',$pulpal]);
+                return $pulpal;
             } else {
                 return $payment;
             }
         } catch (\Exception $e) {
+            \Log::info(['------------------PulPal- Errorrr----------','message'=>$e->getMessage(),'line'=>$e->getLine()]);
             return ['status' => 'error', 'message' => $e->getMessage(), 'line' => $e->getLine()];
             Log::info(['------------------Payment Create Callback------------------', $e->getMessage(), $e->getLine()]);
         }

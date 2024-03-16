@@ -139,6 +139,7 @@ Route::group([
         ], function () {
             Route::get('/', [CommonController::class, 'examResults'])->name('exam.results');
             Route::get('/show/{result_id}', [CommonController::class, 'examResultShow'])->name('exam.result.show');
+            Route::get('/destroy/{result_id}', [CommonController::class, 'examResultDestroy'])->name('exam.result.destroy');
         });
 
         Route::resource('studentratings', StudentRatingsController::class);

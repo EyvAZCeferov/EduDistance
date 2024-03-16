@@ -1,5 +1,6 @@
 @foreach ($question->answers as $key => $value)
-<div class="question_answer_one_element_container" id="question_answer_one_element_container_{{ $question->id }}_{{ $value->id }}">
+<div class="question_answer_one_element_container" id="question_answer_one_element_container_{{ $question->id }}_{{ $value->id }}"
+    onclick="select_answer({{ $question->id }},{{ $value->id }},'radio')">
     <div id="question_answer_one_{{ $question->id }}_{{ $value->id }}_radio"
         class="question_answer_one answers_{{ $question->id }}
         @if (!empty($exam_result->point)) @if (answer_result_true_or_false($question->id, $value->id) == true) true @else false @endif @endif

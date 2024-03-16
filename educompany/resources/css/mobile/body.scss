@@ -364,7 +364,7 @@
                 }
 
                 .conlol {
-                    min-height: 200px;
+                    // min-height: 200px;
 
                     &#showfinishmodal {
                         .footer_questions {
@@ -374,8 +374,8 @@
                 }
 
                 .content_exam {
-                    min-height:60vh!important;
-                    max-height: 78vh !important;
+                    // min-height:60vh!important;
+                    // max-height: 78vh !important;
                     display: none;
                     border-bottom: 2px dashed $primary-color;
                     margin-bottom: 10px;
@@ -398,38 +398,14 @@
                         }
 
                         &.left_col {
-                            overflow-x: hidden;
-                            overflow-y: auto;
-                            scroll-behavior: smooth;
-                            scrollbar-width: thin;
+                            overflow-x: unset !important;
+                            overflow-y: unset !important;
                             text-align: left;
                             flex-direction: column;
                             width: 33vw;
-
-                            &::-webkit-scrollbar {
-                                width: 12px;
-                                transition: all ease 0.7s;
-                            }
-
-                            &::-webkit-scrollbar-track {
-                                background: #f1f1f1;
-                                transition: all ease 0.7s;
-                            }
-
-                            &::-webkit-scrollbar-thumb {
-                                background: $primary-color;
-                                border-radius: 10px;
-                                cursor: pointer;
-                                transition: all ease 0.7s;
-                            }
-
-                            &::-webkit-scrollbar-thumb:hover {
-                                background: $secondary-color;
-                                transition: all ease 0.7s;
-                                cursor: pointer;
-                            }
-
-
+                            height:unset;
+                            min-height:unset;
+                            max-height: unset;
 
                             .buttons_top_aplusandminus {
                                 margin-bottom: 5px;
@@ -466,6 +442,11 @@
                                         }
                                     }
                                 }
+                            }
+
+                            p{
+                                width:100%;
+                                height: 100%;
                             }
                         }
 
@@ -1289,6 +1270,42 @@
 
             .time_wait_please {
                 margin: 8px auto;
+            }
+        }
+
+        &.pageonmobile_exam_page{
+            height: unset;
+            min-height:unset;
+            max-height:unset;
+            .container-xxl{
+                height: unset;
+                min-height:unset;
+                max-height:unset;
+                form#exam{
+                    height: unset;
+                    min-height:unset;
+                    max-height:unset;
+                    section.exam_page{
+                        height: unset;
+                        min-height:unset;
+                        max-height:unset;
+                        div#content_area_exam{
+                            height: unset;
+                            min-height:unset;
+                            max-height:unset;
+                            div.content_exam{
+                                height: unset;
+                                min-height:unset;
+                                max-height:unset;
+                                div.col{
+                                    height: unset;
+                                    min-height:unset;
+                                    max-height:unset;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

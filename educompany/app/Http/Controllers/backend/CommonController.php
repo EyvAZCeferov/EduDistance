@@ -54,4 +54,13 @@ class CommonController extends Controller
         return view('backend.pages.exam_results.show', compact('result'));
     }
 
+    public function examResultDestroy($result_id){
+        $this->authorizeForUser(auth('admins')->user(), 'exam-result');
+
+        $result = ExamResult::with('answers.answer')->findOrFail($result_id);
+
+        $result->delete();
+        return redirect()->back()->with("success",'Silindi');
+    }
+
 }

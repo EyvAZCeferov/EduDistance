@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\PulPal;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\backend\ExamController;
@@ -21,3 +22,15 @@ Route::post('setsectiondata',[ApisController::class,'setsectiondata'])->name("ap
 Route::post('getexamsections',[ApisController::class,'getexamsections'])->name("api.getexamsections");
 Route::post('get_markedquestions_users',[ApisController::class,'get_markedquestions_users'])->name("api.get_markedquestions_users");
 Route::post('get_show_user_which_answered',[ApisController::class,'get_show_user_which_answered'])->name('api.get_show_user_which_answered');
+
+Route::get("get_paymenturl",function(){
+    $pulpal=new PulPal();
+    $url=$pulpal->createPayment(40);
+    return $url;
+});
+
+Route::get("get_status",function(){
+    $pulpal=new PulPal();
+    $url=$pulpal->getStatus(1,40);
+    return $url;
+});
