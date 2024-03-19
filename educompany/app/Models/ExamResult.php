@@ -43,11 +43,20 @@ class ExamResult extends Model
 
     public function correctAnswers(): int
     {
-        return $this->answers->where('result', 1)->count();
+        // Yanıtları alırken yalnızca benzersiz soru kimliği (question_id) olanları seç
+        $distinctAnswers = $this->answers()->distinct('question_id')->get();
+
+        // Seçilen benzersiz yanıtların içinden doğru olanları sayar
+        return $distinctAnswers->where('result', 1)->count();
     }
+
     public function wrongAnswers(): int
     {
-        return $this->answers->where('result', 0)->count();
+        // Yanıtları alırken yalnızca benzersiz soru kimliği (question_id) olanları seç
+        $distinctAnswers = $this->answers()->distinct('question_id')->get();
+
+        // Seçilen benzersiz yanıtların içinden yanlış olanları sayar
+        return $distinctAnswers->where('result', 0)->count();
     }
     public function marked(){
         return $this->hasMany(MarkQuestions::class,'exam_result_id','id');

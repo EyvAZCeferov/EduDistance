@@ -33,7 +33,9 @@
     <div class="container">
         @foreach ($exam_results as $exam_result)
             @if(!empty($exam_result->user))
+
                 @php
+                    remove_repeated_result_answers($exam_result->id);
                     $exam = $exam_result->exam;
                     $questions = collect();
                     $qesutions = $exam->sections->pluck('questions');
@@ -71,10 +73,10 @@
 
                                 @if (!empty($exam->sections) && count($exam->sections) > 0)
                                     @foreach ($exam->sections as $key => $value)
-                                        <button onclick="changetab({{ $key }})" class="nav-link"
-                                            id="nav-{{ $key }}-tab" data-bs-toggle="tab"
-                                            data-bs-target="#nav-{{ $key }}" type="button" role="tab"
-                                            aria-controls="nav-{{ $key }}"
+                                        <button onclick="changetab({{ $key.''.$value->id }})" class="nav-link"
+                                            id="nav-{{ $key.''.$value->id }}-tab" data-bs-toggle="tab"
+                                            data-bs-target="#nav-{{ $key.''.$value->id }}" type="button" role="tab"
+                                            aria-controls="nav-{{ $key.''.$value->id }}"
                                             aria-selected="true">{{ $value->name }}</button>
                                     @endforeach
                                 @endif
@@ -101,8 +103,8 @@
 
                             @if (!empty($exam->sections) && count($exam->sections) > 0)
                                 @foreach ($exam->sections as $key => $value)
-                                    <div class="tab-pane fade" id="nav-{{ $key }}" role="tabpanel"
-                                        aria-labelledby="nav-{{ $key }}-tab">
+                                    <div class="tab-pane fade" id="nav-{{ $key.$value->id }}" role="tabpanel"
+                                        aria-labelledby="nav-{{ $key.$value->id }}-tab">
                                         @foreach ($value->questions as $key1 => $val)
                                             <button
                                                 class="btn btn-sm btn-question {{ exam_result_answer_true_or_false($val->id, $exam_result->id) }}"

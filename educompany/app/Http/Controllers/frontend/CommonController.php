@@ -146,6 +146,7 @@ class CommonController extends Controller
                 }else{
                     if($exam->show_result_user==true){
                         $nexturl=route("user.exam.resultpage", $result->id);
+                        remove_repeated_result_answers($result->id);
                     }else{
                         $nexturl=route("page.welcome");
                     }

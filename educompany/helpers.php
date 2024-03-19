@@ -525,7 +525,7 @@ if (!function_exists('answer_result_true_or_false')) {
         $model = null;
         if ($value != null) {
             $question = ExamQuestion::where("id", $question_id)->first();
-            if(!empty($question->correctAnswer())){
+            if (!empty($question->correctAnswer())) {
                 if ($question->type == 1 || $question->type == 5) {
                     if ($question->correctAnswer()->id == $value) {
                         $model = true;
@@ -754,7 +754,7 @@ if (!function_exists('calculate_exam_result')) {
         $correctAnswers = $examResult->correctAnswers();
         $examquestionscount = count($examquestions);
         $model = 0;
-        $model = $examquestionscount>0 ?($correctAnswers / $examquestionscount) * $exampoint : $correctAnswers * $exampoint;
+        $model = $examquestionscount > 0 ? ($correctAnswers / $examquestionscount) * $exampoint : $correctAnswers * $exampoint;
         return $model;
     }
 }
@@ -847,22 +847,43 @@ if (!function_exists('exam_finish_and_calc')) {
     function exam_finish_and_calc($exam_id, $auth_id)
     {
         $model = null;
-        $examresult=ExamResult::where('exam_id',$exam_id)->where('user_id',$auth_id)->whereNull('point')->orderBy('id','DESC')->first();
+        $examresult = ExamResult::where('exam_id', $exam_id)->where('user_id', $auth_id)->whereNull('point')->orderBy('id', 'DESC')->first();
         if (!empty($examresult) && isset($examresult->id)) {
-            $lastpoint=session()->has("point") ? session()->get('point') :0;
-            $point=$lastpoint+calculate_exam_result($examresult->id);
-            $examresult->update(['point'=>$point??0]);
+            $lastpoint = session()->has("point") ? session()->get('point') : 0;
+            $point = $lastpoint + calculate_exam_result($examresult->id);
+            $examresult->update(['point' => $point ?? 0]);
 
-            $exam=Exam::find($exam_id);
-            if($exam->show_result_user==true){
-                $model=route("user.exam.resultpage", $examresult->id);
-            }else{
-                $model=route("page.welcome");
+            $exam = Exam::find($exam_id);
+            if ($exam->show_result_user == true) {
+                $model = route("user.exam.resultpage", $examresult->id);
+            } else {
+                $model = route("page.welcome");
             }
-        }else{
-            $model=null;
+        } else {
+            $model = null;
         }
 
         return Cache::rememberForever("exam_finish_and_calc"  . $exam_id . $auth_id, fn () => $model);
+    }
+}
+
+if (!function_exists('remove_repeated_result_answers')) {
+    function remove_repeated_result_answers($result_id)
+    {
+        DB::transaction(function () use ($result_id) {
+            $examresult = ExamResult::where('id', $result_id)->whereNotNull('point')->orderBy('id', 'DESC')->first();
+            if (!empty($examresult) && isset($examresult->id)) {
+                $old_question_ids = [];
+                foreach ($examresult->answers as $answer) {
+                    if (in_array($answer->question_id, $old_question_ids)) {
+                        $answer->delete();
+                    } else {
+                        array_push($old_question_ids, $answer->question_id);
+                    }
+                }
+            }
+        });
+
+        return true;
     }
 }
