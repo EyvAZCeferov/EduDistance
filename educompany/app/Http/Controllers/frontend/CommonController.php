@@ -38,9 +38,19 @@ class CommonController extends Controller
                 $exam = Exam::findOrFail($request->exam_id);
                 $examsection=Section::where("id",$request->current_section)->first();
                 $result = ExamResult::where("id", $request->exam_result_id)->first();
-                $result->update([
-                    'time_reply' => $request->time_exam,
-                ]);
+                if(!empty($result) && isset($result->id)){
+                    $result->update([
+                        'time_reply' => session()->get("time_reply")??0+$request->time_exam,
+                    ]);
+                }else{
+                   $result =new ExamResult();
+                   $result->user_id=$request->user_id;
+                   $result->exam_id=$request->exam_id;
+                   $result->payed=1;
+                   $result->continued=1;
+                   $result->time_reply=session()->get("time_reply")??0+$request->time_exam;
+                   $result->save();
+                }
 
                 if(!empty($request->answers) && count($request->answers)>0){
                     foreach ($request->answers as $section_id => $answers) {

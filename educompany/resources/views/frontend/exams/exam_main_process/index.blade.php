@@ -859,6 +859,30 @@
                 } else if (type === "decrease") {
                     elements[i].style.fontSize = (fontSize - 1) + 'px'; // Font boyutunu azalt
                 }
+
+                // p ve span elementlerini bul
+                var pElements = elements[i].getElementsByTagName('p');
+                var spanElements = elements[i].getElementsByTagName('span');
+
+                // p elementlerinin font boyutunu değiştir
+                for (var j = 0; j < pElements.length; j++) {
+                    var pFontSize = parseInt(window.getComputedStyle(pElements[j]).fontSize);
+                    if (type === "increase") {
+                        pElements[j].style.fontSize = (pFontSize + 1) + 'px';
+                    } else if (type === "decrease") {
+                        pElements[j].style.fontSize = (pFontSize - 1) + 'px';
+                    }
+                }
+
+                // span elementlerinin font boyutunu değiştir
+                for (var k = 0; k < spanElements.length; k++) {
+                    var spanFontSize = parseInt(window.getComputedStyle(spanElements[k]).fontSize);
+                    if (type === "increase") {
+                        spanElements[k].style.fontSize = (spanFontSize + 1) + 'px';
+                    } else if (type === "decrease") {
+                        spanElements[k].style.fontSize = (spanFontSize - 1) + 'px';
+                    }
+                }
             }
         }
 

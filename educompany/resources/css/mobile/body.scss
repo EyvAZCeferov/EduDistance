@@ -670,20 +670,31 @@
                     &.show {
                         display: grid;
                         grid-template-columns: auto auto 1fr;
+                        height: unset;
+                        min-height:unset;
+                        max-height:unset;
 
                         &.onepage {
                             display: flex;
                             flex-direction: column;
+                            height: unset;
+                            min-height:unset;
+                            max-height:unset;
 
                             .col {
                                 width: 100%;
-                                height: auto;
                                 padding: 0;
                                 width:95%;
                                 margin:20px auto;
+                                height: unset;
+                                min-height:unset;
+                                max-height:unset;
 
                                 &.left_col {
                                     border-right: 0;
+                                    height: unset;
+                                    min-height:unset;
+                                    max-height:unset;
                                 }
                             }
                         }
