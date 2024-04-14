@@ -54,7 +54,7 @@
                     <div class="col false">
                         @lang('additional.pages.exams.false_answers') <div class="blockwithbg"></div>
                     </div>
-                    <div class="col">
+                    <div class="col none">
                         @lang('additional.pages.exams.notanswered_answers') <div class="blockwithbg"></div>
                     </div>
                     <div class="col"></div>

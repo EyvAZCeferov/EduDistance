@@ -5,21 +5,17 @@
         function changetab(id) {
             var navlinks = document.getElementsByClassName("nav-link");
             var tabpanes = document.getElementsByClassName('tab-pane');
-
-            // Nav linklerinde döngü yapma
             Array.from(navlinks).forEach(element => {
                 if (element.classList.contains("active"))
                     element.classList.remove("active");
             });
 
-            // Tab panes döngüsü
             Array.from(tabpanes).forEach(element => {
                 if (element.classList.contains("active"))
                     element.classList.remove("active");
                 element.classList.remove("show");
             });
 
-            // Seçilen nav link ve tab pane'ı aktif hale getirme
             var selectednavlink = document.getElementById(`nav-${id}-tab`);
             var selectedtabpane = document.getElementById(`nav-${id}`);
             selectednavlink.classList.add('active');
@@ -73,10 +69,10 @@
 
                                 @if (!empty($exam->sections) && count($exam->sections) > 0)
                                     @foreach ($exam->sections as $key => $value)
-                                        <button onclick="changetab({{ $key.''.$value->id }})" class="nav-link"
-                                            id="nav-{{ $key.''.$value->id }}-tab" data-bs-toggle="tab"
-                                            data-bs-target="#nav-{{ $key.''.$value->id }}" type="button" role="tab"
-                                            aria-controls="nav-{{ $key.''.$value->id }}"
+                                        <button onclick="changetab('{{ $key.''.$value->id.''.$exam_result->id }}')" class="nav-link"
+                                            id="nav-{{  $key.''.$value->id.''.$exam_result->id }}-tab" data-bs-toggle="tab"
+                                            data-bs-target="#nav-{{  $key.''.$value->id.''.$exam_result->id }}" type="button" role="tab"
+                                            aria-controls="nav-{{  $key.''.$value->id.''.$exam_result->id }}"
                                             aria-selected="true">{{ $value->name }}</button>
                                     @endforeach
                                 @endif
@@ -103,8 +99,8 @@
 
                             @if (!empty($exam->sections) && count($exam->sections) > 0)
                                 @foreach ($exam->sections as $key => $value)
-                                    <div class="tab-pane fade" id="nav-{{ $key.$value->id }}" role="tabpanel"
-                                        aria-labelledby="nav-{{ $key.$value->id }}-tab">
+                                    <div class="tab-pane fade" id="nav-{{  $key.''.$value->id.''.$exam_result->id }}" role="tabpanel"
+                                        aria-labelledby="nav-{{  $key.''.$value->id.''.$exam_result->id }}-tab">
                                         @foreach ($value->questions as $key1 => $val)
                                             <button
                                                 class="btn btn-sm btn-question {{ exam_result_answer_true_or_false($val->id, $exam_result->id) }}"

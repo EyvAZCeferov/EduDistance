@@ -47,8 +47,6 @@ class UserController extends Controller
         $model->email = $request->input('email');
         $model->phone = $request->input('phone');
         $model->password = Hash::make($request->input('password'));
-        $model->school = $request->input('school')??null;
-        $model->classroom = $request->input('classroom')??null;
 
         $model->save();
 
@@ -86,9 +84,7 @@ class UserController extends Controller
             $model->name = $request->input('name');
             $model->email = $request->input('email');
             $model->phone = $request->input('phone');
-            $model->school = $request->input('school')??null;
-            $model->classroom = $request->input('classroom')??null;
-
+            
             if ($request->password) {
                 $model->password = Hash::make($request->input('password'));
             }

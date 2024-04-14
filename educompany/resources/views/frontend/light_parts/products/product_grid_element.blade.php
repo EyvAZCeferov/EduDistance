@@ -51,8 +51,10 @@
 
             <div class="products_section_element_content" @if ($start_time === null || \Carbon\Carbon::now()->greaterThan($start_time)) onclick="redirect_tourl('{{ session()->has('subdomain')? route('exams.show.subdomain', ['slug' => $product->slug, 'subdomain' => session()->get('subdomain')]) :  route('exams.show', $product->slug) }}')"
                 @endif>
-                <h5 class="products_section_element_content_name">
-                    {{ mb_substr($product->name[app()->getLocale() . '_name'], 0, 10) }}</h5>
+                <h5 class="products_section_element_content_name text-left minified">
+                    {{ mb_substr($product->name[app()->getLocale() . '_name'], 0, 20) }}</h5>
+                <h5 class="products_section_element_content_name text-left full d-none">
+                        {{ $product->name[app()->getLocale() . '_name'] }}</h5>
                 @if ($start_time === null || \Carbon\Carbon::now()->greaterThan($start_time))
                     <button
                         class="products_section_element_content_button @if ($product->price == 0) free_price @endif">
@@ -120,8 +122,10 @@
 
             <div class="products_section_element_content" @if ($start_time === null || \Carbon\Carbon::now()->greaterThan($start_time)) onclick="redirect_tourl('{{ session()->has('subdomain')? route('exams.show.subdomain', ['slug' => $product->slug, 'subdomain' => session()->get('subdomain')]) :  route('exams.show', $product->slug) }}')"
                 @endif>
-                <h5 class="products_section_element_content_name">
-                    {{ mb_substr($product->name[app()->getLocale() . '_name'], 0, 14) }}</h5>
+                <h5 class="products_section_element_content_name text-left minified">
+                    {{ mb_substr($product->name[app()->getLocale() . '_name'], 0, 20) }}</h5>
+                <h5 class="products_section_element_content_name text-left full d-none">
+                        {{ $product->name[app()->getLocale() . '_name'] }}</h5>
                 @if ($start_time === null || \Carbon\Carbon::now()->greaterThan($start_time))
                     <button
                         class="products_section_element_content_button @if ($product->price == 0) free_price @endif">

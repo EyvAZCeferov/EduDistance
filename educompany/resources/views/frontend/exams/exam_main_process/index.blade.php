@@ -928,6 +928,8 @@
             var clicked_el = document.getElementById(`question_answer_one_${question_id}_${answer_id}_${type}`);
             var radio_input = clicked_el.querySelector('input[type="radio"]');
 
+            set_question_value_on_session(question_id,answer_id,type);
+
             if (clicked_el.classList.contains('removable')) {
                 return;
             } else {
@@ -983,8 +985,10 @@
                         displayMode: true
                     });
                     question_textbox_text_span.innerHTML = `<span>${rendered}</span>`;
+                    set_question_value_on_session(question_id,rendered,type);
                 } else {
                     question_textbox_text_span.innerHTML = `${text_box}`;
+                    set_question_value_on_session(question_id,text_box,type);
                 }
             } else {
                 answer_footer_buttons.classList.remove('answered');
@@ -1159,6 +1163,29 @@
                     question_answer_one_element_container_checkbox.classList.add('removable');
                     question_container_undo_or_redo.innerHTML = '<span>@lang('additional.buttons.undo')</span>';
                 }
+            }
+        }
+
+        function set_question_value_on_session(question_id,answer_id,type){
+            try{
+                var exam_id = document.getElementById('exam_id').value;
+                var exam_result_id = document.getElementById('exam_result_id').value;
+                var user_id = document.getElementById("user_id").value;
+                var language = document.getElementById('language').value;
+                sendAjaxRequestOLD("/exams_set_question_value_on_session", "post", {
+                    exam_id,
+                    result_id: exam_result_id,
+                    language,
+                    user_id,
+                    question_id,
+                    answer_id,
+                    type_value:type
+                }, function(e, t) {
+                    let n = JSON.parse(t);
+                    console.log(n);        
+                });
+            }catch(err){
+                console.log(err);
             }
         }
     </script>

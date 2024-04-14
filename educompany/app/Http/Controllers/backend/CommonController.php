@@ -60,6 +60,7 @@ class CommonController extends Controller
         $result = ExamResult::with('answers.answer')->findOrFail($result_id);
 
         $result->delete();
+        dbdeactive();
         return redirect()->back()->with("success",'Silindi');
     }
 

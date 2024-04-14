@@ -174,7 +174,7 @@
         });
     </script>
 
-    <script defer>
+    <script>
         function deleteproduct(id = null, type = null) {
             var deleting_question_id = document.getElementById('deleting_question_id');
             var deleting_question_type = document.getElementById('deleting_question_type');
@@ -212,6 +212,34 @@
         function redirect_tourl(url) {
             window.location.href = url;
         }
+
+        function toggleContent(event) {
+            let minified = $(event.currentTarget).find('.minified');
+            let full = $(event.currentTarget).find('.full');
+            let products_section_element_content_button = $(event.currentTarget).find(
+                ".products_section_element_content_button");
+
+            if (minified.length && full.length && products_section_element_content_button.length) {
+                if (event.type === 'mouseleave' || event.type === 'touchend') {
+                    minified.removeClass('d-none');
+                    full.addClass('d-none');
+                    products_section_element_content_button.removeClass('d-none');
+                } else {
+                    minified.addClass('d-none');
+                    full.removeClass('d-none');
+                    products_section_element_content_button.addClass('d-none');
+                }
+            }
+        }
+        $(document).ready(function() {
+
+            $('.products_section_element').on({
+                'mouseenter': toggleContent,
+                'mouseleave': toggleContent,
+                'touchstart': toggleContent,
+                'touchend': toggleContent
+            });
+        });
     </script>
 
 

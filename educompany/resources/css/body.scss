@@ -696,7 +696,7 @@ body {
                         max-width: 70%;
                         word-break: break-word;
                         word-wrap: break-word;
-                        font-size: $subsubheading_size;
+                        font-size: $normal_size;
                         color: #000;
                         font-weight: 500;
                         transition: all ease 0.8s;
@@ -705,6 +705,10 @@ body {
                         &:focus,
                         &:active {
                             color: #010101;
+                        }
+
+                        &.full{
+                            max-width: 100%;
                         }
                     }
 
@@ -1652,11 +1656,12 @@ body {
                                     margin:2px auto;
                                 }
                                 .content_exam_info {
-                                    width:96.5%;
+                                    width:94%;
                                     margin:5px auto;
                                     height:auto;
                                     min-height:100%;
                                     overflow-y:auto;
+                                    overflow-x:hidden;
                                     text-align:center;
                                     p{
                                         width:100%;
@@ -3073,7 +3078,7 @@ body {
                 @extend .classjustifstart;
                 width: 90%;
                 margin: 5px auto;
-                overflow-x: scroll;
+                overflow-x: hidden;
                 overflow-y: hidden;
 
                 .category_item {
@@ -3476,7 +3481,7 @@ body {
                             width: 80vw !important;
                             top: 25%;
                             left: 0;
-                            overflow-x: scroll;
+                            overflow-x: hidden;
                             overflow-y: hidden;
                         }
                     }

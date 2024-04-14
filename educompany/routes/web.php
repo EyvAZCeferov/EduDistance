@@ -64,5 +64,6 @@ Route::any('successpayment', [ApisController::class, 'success_error_page_payment
 Route::any('errorpayment', [ApisController::class, 'success_error_page_payment'])->name("payments.error");
 Route::get("sitemap.xml",[RoutesController::class,'sitemap'])->name("sitemap.xml");
 
+Route::post('exams_set_question_value_on_session',[ApisController::class,'set_question_value_on_session']);
 
 Route::any("checkpayment",[CommonController::class,'checkpayment'])->name("payment.checkpayment");

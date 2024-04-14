@@ -495,4 +495,20 @@ class ApisController extends Controller
             return response()->json(['status' => 'error', 'message' => $e->getMessage(), 'line' => $e->getLine()]);
         }
     }
+    public function set_question_value_on_session(Request $request){
+        try{
+            $exam_id=$request->input('exam_id');
+            $result_id=$request->input('result_id');
+            $user_id=$request->input('user_id');
+            $answer_id=$request->input('answer_id');
+            $question_id=$request->input('question_id');
+            $type_value=$request->input("type_value");
+            $session_key=$result_id.$exam_id.$user_id.$question_id.$type_value;
+            
+            session()->put($session_key,$answer_id);
+            return response()->json($session_key);
+        }catch(\Exception $e){
+            return response()->json(['status'=>'error','message'=>$e->getMessage()]);
+        }
+    }
 }

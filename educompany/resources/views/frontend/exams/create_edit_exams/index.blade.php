@@ -825,21 +825,27 @@
 
                                 set_type(n.data.type);
                                 var question_input_id = $(".question_input").prop('id');
-                                createeditor(question_input_id);
+                                if(question_input_id!=null)
+                                    createeditor(question_input_id);
                                 var question_input2_id;
 
                                 if(n.data.type==3){
                                     question_input2_id = $(".question_input2").prop('id');
-                                    createeditor(question_input2_id);
+                                    if(question_input2_id!=null)
+                                        createeditor(question_input2_id);
                                 }
 
                                 for (var i = 0; i < idscontenteditable.length; i++) {
-                                    createeditor('answer__input_' + idscontenteditable[i]);
+                                    var elem=$('answer__input_' + idscontenteditable[i]);
+                                    if(elem!=null)
+                                        createeditor('answer__input_' + idscontenteditable[i]);
                                 }
 
                                 var matching_elements = document.getElementsByClassName("matching_element");
                                 for (var i = 0; i < matching_elements.length; i++) {
-                                    createeditor(matching_elements[i].id);
+                                    var elem2=$(matching_elements[i].id);
+                                    if(elem2!=null)
+                                        createeditor(matching_elements[i].id);
                                 }
 
                                 if (n.data.type == 4) {
@@ -945,11 +951,16 @@
 
 
                 var question_input_id = $(".question_input").prop('id');
-                createeditor(question_input_id);
+                if(question_input_id!=null)
+                    createeditor(question_input_id);
                 if (type == 3) {
                     var textbox_0_id = $(".textbox_0").prop('id');
-                    var textbox_0 = createeditor(textbox_0_id);
-                    var question_input2 = createeditor($(".question_input2").prop('id'));
+                    if(textbox_0_id!=null)
+                        var textbox_0 = createeditor(textbox_0_id);
+
+                    if($(".question_input2").prop('id')!=null)
+                        var question_input2 = createeditor($(".question_input2").prop('id'));
+
                     var question2_input_area=document.getElementById('question2_input_area');
                     if(question2_input_area!=null)
                         question2_input_area.classList.remove("d-none");
@@ -989,7 +1000,8 @@
                             $(elem).attr('id', codeofelement);
                             answer__input_.attr("id", "answer__input_" + codeofelement);
                             button.attr("onclick", "addoreditanswer('single','add','" + codeofelement + "')");
-                            createeditor(codeofelement);
+                            if($(codeofelement)!=null)
+                                createeditor(codeofelement);
                         });
                     }
 
@@ -998,7 +1010,8 @@
                     if (matching_element != null && matching_element.length > 0) {
                         for (let index = 0; index < matching_element.length; index++) {
                             const element = matching_element[index];
-                            createeditor(element.id);
+                            if(element!=null)
+                                createeditor(element.id);
                         }
                     }
 
@@ -1099,10 +1112,14 @@
 
                     answers.appendChild(element);
                     if (type == "match") {
-                        createeditor(`mathing_questions_${answer_elements.length}`);
-                        createeditor(`mathing_answers_${answer_elements.length}`);
+                        if($(`mathing_questions_${answer_elements.length}`) !=null)
+                            createeditor(`mathing_questions_${answer_elements.length}`);
+
+                        if($(`mathing_answers_${answer_elements.length}`) !=null)
+                            createeditor(`mathing_answers_${answer_elements.length}`);
                     } else {
-                        createeditor(`answer__input_${codeofelement}`);
+                        if($(`answer__input_${codeofelement}`) !=null)
+                            createeditor(`answer__input_${codeofelement}`);
                     }
 
                     var question_answer_ones = document.getElementsByClassName('answer');

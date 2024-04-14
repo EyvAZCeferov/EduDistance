@@ -82,7 +82,7 @@
                             </div>
                         </div>
 
-                        <div class="row">
+                        <div class="row"> 
                             @php
                                 $index = 0;
                             @endphp

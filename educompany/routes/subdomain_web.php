@@ -4,6 +4,7 @@ use App\Http\Controllers\frontend\HomeController;
 use App\Http\Controllers\frontend\AuthController;
 use \App\Http\Controllers\frontend\CommonController;
 use App\Http\Controllers\frontend\RoutesController;
+use App\Http\Controllers\frontend\ApisController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -40,9 +41,12 @@ Route::group([
                 Route::get('results/{result_id}', [CommonController::class, 'examResult'])->name('exam.result.subdomain');
                 Route::get("exams/redirect_exam", [CommonController::class, 'redirect_exam'])->name("exams.redirect_exam.subdomain");
                 Route::any("exams/set_exam", [CommonController::class, 'set_exam'])->name("exams.set_exam.subdomain");
+                Route::post('exams_set_question_value_on_session',[ApisController::class,'set_question_value_on_session']);
                 Route::any('/finish', [CommonController::class, 'examFinish'])->name('exam.finish')->middleware('remove.null_value.subdomain');
             });
         });
         Route::fallback([CommonController::class, 'notfound'])->name('notfound.subdomain');
 });
+
+Route::post('exams_set_question_value_on_session',[ApisController::class,'set_question_value_on_session']);
 

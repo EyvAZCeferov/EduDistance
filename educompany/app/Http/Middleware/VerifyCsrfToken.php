@@ -21,5 +21,6 @@ class VerifyCsrfToken extends Middleware
         '/remove_questionorsection_data',
         '*/register-save',
         '*/authenticate',
+        '/exams_set_question_value_on_session'
     ];
 }
