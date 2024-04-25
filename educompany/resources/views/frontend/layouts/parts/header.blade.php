@@ -14,6 +14,10 @@
                 href="{{ route('pages.show', standartpages('about', 'type')->slugs[app()->getLocale() . '_slug']) }}">{{ standartpages('about', 'type')->name[app()->getLocale() . '_name'] }}</a>
         @endif
 
+        <a class="header_link_item"
+        href="{{ route('exams_front.index') }}">@lang("additional.pages.exams.exams")</a>
+        
+
         @if (auth('users')->check())
             <a href="{{ route('user.profile') }}" class="header_link_item">{{ auth('users')->user()->name }} &nbsp;
                 @if (isset(auth('users')->user()->picture) && !empty(auth('users')->user()->picture))

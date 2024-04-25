@@ -34,7 +34,8 @@ class CommonController extends Controller
         try {
             $result = collect();
             $nextsection=false;
-            // DB::transaction(function () use ($request, &$result,&$nextsection) {
+            $nexturl='';
+            DB::transaction(function () use ($request, &$result,&$nextsection,&$nexturl) {
                 $exam = Exam::where('id',$request->input('exam_id'))->first();
                 $examsection=Section::where("id",$request->current_section)->first();
                 $result = ExamResult::where("id", $request->exam_result_id)->first();
@@ -53,6 +54,21 @@ class CommonController extends Controller
                 }
 
 
+                if(empty($result) && !isset($result->id))
+                    $result=ExamResult::where("id",$request->exam_result_id??session()->get("result_id"))->first();
+
+                $result_id=$result->id??$request->exam_result_id;
+                if(empty($result_id))
+                    $result_id=session()->get('result_id');
+
+                $exam_id=$result->exam_id??$exam->id;
+                if(empty($result_id))
+                    $exam_id=$request->exam_id??session()->get('result_id');
+
+                $user_id=$result->user_id??$request->user_id;
+                    if(empty($user_id))
+                        $user_id=session()->get('user_id');
+
                 if(!empty($request->answers) && count($request->answers)>0){
                     foreach ($request->answers as $section_id => $answers) {
                         foreach ($answers as $question_id => $answer) {
@@ -62,7 +78,7 @@ class CommonController extends Controller
                             // if (!empty($question) && !empty($section)) {
                                 if ($question->type === 1 || $question->type==5) {
                                     $resultAnswer = new ExamResultAnswer();
-                                    $resultAnswer->result_id = $result->id;
+                                    $resultAnswer->result_id = $result->id??$request->exam_result_id;
                                     $resultAnswer->section_id = $section_id;
                                     $resultAnswer->question_id = $question->id;
                                     $resultAnswer->answer_id = $answer;
@@ -74,7 +90,7 @@ class CommonController extends Controller
                                     $user_answer = serialize($answer);
                                     $correct_answer = serialize($question->correctAnswer()?->pluck('id')->toArray());
                                     $resultAnswer = new ExamResultAnswer();
-                                    $resultAnswer->result_id = $result->id;
+                                    $resultAnswer->result_id = $result->id??$request->exam_result_id;
                                     $resultAnswer->section_id = $section_id;
                                     $resultAnswer->question_id = $question->id;
                                     $resultAnswer->answers = $answer;
@@ -83,14 +99,15 @@ class CommonController extends Controller
                                     $resultAnswer->save();
                                 } else if ($question->type == 3) {
                                     $resultAnswer = new ExamResultAnswer();
-                                    $resultAnswer->result_id = $result->id;
+                                    $resultAnswer->result_id = $result->id??$request->exam_result_id;
                                     $resultAnswer->section_id = $section_id;
                                     $resultAnswer->question_id = $question->id;
                                     $resultAnswer->value = $answer;
                                     $correctAnswer = $question->correctAnswer()?->answer;
                                     if ($correctAnswer && !empty($answer)) {
                                         $correctAnswersArray = explode(',', strip_tags_with_whitespace($correctAnswer));
-                                        $resultAnswer->result = in_array(strip_tags_with_whitespace($answer), $correctAnswersArray) ? 1 : 0;
+                                        $result = in_array(strip_tags_with_whitespace($answer), $correctAnswersArray) ? 1 : 0;
+                                        $resultAnswer->result =$result;
                                     } else {
                                         $resultAnswer->result = 0;
                                     }
@@ -113,7 +130,7 @@ class CommonController extends Controller
 
                                             $difference = ($newArrayEncoded === $newArray2) ? true : false;
                                             $resultAnswer = new ExamResultAnswer();
-                                            $resultAnswer->result_id = $result->id;
+                                            $resultAnswer->result_id = $result->id??$request->exam_result_id;
                                             $resultAnswer->section_id = $section_id;
                                             $resultAnswer->question_id = $question->id;
                                             $resultAnswer->value = json_encode($newArray);
@@ -130,7 +147,7 @@ class CommonController extends Controller
 
                 $examquestions=ExamQuestion::whereIn("section_id",$exam->sections->pluck("id"))->get();
 
-                if(!empty($examquestions) && count($examquestions)>0){ 
+                if(!empty($examquestions) && count($examquestions)>0){
                     foreach($examquestions as $question){
                         $questtype='radio';
                         switch($question->type){
@@ -152,9 +169,23 @@ class CommonController extends Controller
                             default:
                                 $questtype='radio';
                         }
+                        if(empty($result) && !isset($result->id))
+                            $result=ExamResult::where("id",$request->exam_result_id??session()->get("result_id"))->first();
 
-                        $session_key=$result->id.$result->exam_id.$result->user_id.$question->id.$questtype;
-                        $getresultanswer=ExamResultAnswer::where("result_id",$result->id)
+                        $result_id=$result->id??$request->exam_result_id;
+                        if(empty($result_id))
+                            $result_id=session()->get('result_id');
+
+                        $exam_id=$result->exam_id??$exam->id;
+                        if(empty($result_id))
+                            $exam_id=$request->exam_id??session()->get('result_id');
+
+                        $user_id=$result->user_id??$request->user_id;
+                            if(empty($user_id))
+                                $user_id=session()->get('user_id');
+
+                        $session_key=$result_id.$exam_id.$user_id.$question->id.$questtype;
+                        $getresultanswer=ExamResultAnswer::where("result_id",$result->id??$request->exam_result_id)
                         ->where('question_id',$question->id)
                         ->first();
                         if(empty($getresultanswer) && !isset($getresultanswer->id) ){
@@ -163,7 +194,7 @@ class CommonController extends Controller
                             if(isset($value) && !empty($value)){
                                 if ($question->type === 1 || $question->type==5) {
                                     $resultAnswer = new ExamResultAnswer();
-                                    $resultAnswer->result_id = $result->id;
+                                    $resultAnswer->result_id = $result->id??$request->exam_result_id;
                                     $resultAnswer->section_id = $question->section_id;
                                     $resultAnswer->question_id = $question->id;
                                     $resultAnswer->answer_id = $value;
@@ -175,7 +206,7 @@ class CommonController extends Controller
                                     $user_answer = serialize($answer);
                                     $correct_answer = serialize($question->correctAnswer()?->pluck('id')->toArray());
                                     $resultAnswer = new ExamResultAnswer();
-                                    $resultAnswer->result_id = $result->id;
+                                    $resultAnswer->result_id = $result->id??$request->exam_result_id;
                                     $resultAnswer->section_id = $question->section_id;
                                     $resultAnswer->question_id = $question->id;
                                     $resultAnswer->answers = $answer;
@@ -184,7 +215,7 @@ class CommonController extends Controller
                                     $resultAnswer->save();
                                 } else if ($question->type == 3) {
                                     $resultAnswer = new ExamResultAnswer();
-                                    $resultAnswer->result_id = $result->id;
+                                    $resultAnswer->result_id = $result->id??$request->exam_result_id;
                                     $resultAnswer->section_id = $question->section_id;
                                     $resultAnswer->question_id = $question->id;
                                     $resultAnswer->value = $value;
@@ -214,7 +245,7 @@ class CommonController extends Controller
 
                                             $difference = ($newArrayEncoded === $newArray2) ? true : false;
                                             $resultAnswer = new ExamResultAnswer();
-                                            $resultAnswer->result_id = $result->id;
+                                            $resultAnswer->result_id = $result->id??$request->exam_result_id;
                                             $resultAnswer->section_id = $question->section_id;
                                             $resultAnswer->question_id = $question->id;
                                             $resultAnswer->value = json_encode($newArray);
@@ -230,8 +261,11 @@ class CommonController extends Controller
                 }
 
                 if ($examsection->time_range_sections > 0) {
-                    $point = calculate_exam_result($result->id);
+                    $point = calculate_exam_result($result_id);
                     session()->put('point', $point);
+                    session()->put('result_id', $result_id);
+                    session()->put('exam_id', $exam_id);
+                    session()->put('user_id', $user_id);
                     session()->put('time_reply', session()->get("time_reply")??0+$request->time_exam);
                     session()->put('selected_section',$request->selected_section+1);
                     $nextsection=true;
@@ -242,10 +276,19 @@ class CommonController extends Controller
                     app()->setLocale(session()->get('changedLang'));
                     session()->put('language', session()->get('changedLang'));
                     session()->put('lang', session()->get('changedLang'));
-                    $result->update([
-                        'point' => $point,
-                        'time_reply'=>$time_reply
-                    ]);
+                    if($exam->layout_type=="sat"){
+                        $result->update([
+                            'point' => customRound($point),
+                            'counted_point' => $point,
+                            'time_reply'=>$time_reply
+                        ]);
+                    }else{
+                        $result->update([
+                            'point' => $point,
+                            'counted_point' => $point,
+                            'time_reply'=>$time_reply
+                        ]);
+                    }
                     session()->forget('point');
                     session()->forget('time_reply');
                     session()->forget('selected_section');
@@ -254,17 +297,17 @@ class CommonController extends Controller
                 $nexturl='';
 
                 if($nextsection==true){
-                    $nexturl=route("user.exams.redirect_exam", ['exam_id'=>$result->exam_id,'selected_section'=>session()->get('selected_section')??0]);
+                    $nexturl=route("user.exams.redirect_exam", ['exam_id'=>$exam_id,'selected_section'=>session()->get('selected_section')??0]);
                 }else{
                     if($exam->show_result_user==true){
-                        $nexturl=route("user.exam.resultpage", $result->id);
-                        remove_repeated_result_answers($result->id);
+                        $nexturl=route("user.exam.resultpage", $result_id);
+                        remove_repeated_result_answers($result_id);
                     }else{
                         $nexturl=route("page.welcome");
                     }
                 }
 
-            // });
+            });
 
             return response()->json([
                 'status' => 'success',
@@ -302,6 +345,8 @@ class CommonController extends Controller
             $exam_results = ExamResult::where('exam_id', $exam->id)
                 ->with('answers.answer')
                 ->orderByDesc('id')->get();
+            
+            
             if(!empty($exam_results) && count($exam_results)>0){
                 return view('frontend.exams.results.resultoncompany', compact('exam_results','exam'));
             }else{
@@ -312,13 +357,18 @@ class CommonController extends Controller
                 ->with('answers.answer')
                 ->orderByDesc('id')
                 ->findOrFail($result_id);
+
+                if($exam_result->point==0){
+                    $point=customRound($exam_result->counted_point);
+                    $exam_result->update(['point'=>$point]);
+                }
+    
             return view('frontend.exams.resultpage', compact('exam_result'));
         }
     }
     public function examResult_nosubdomain($result_id)
     {
-        $exam_result = ExamResult::where('user_id', auth('users')->user()->id)
-            ->with('answers.answer')
+        $exam_result = ExamResult::with('answers.answer')
             ->orderByDesc('id')
             ->findOrFail($result_id);
 
@@ -326,8 +376,7 @@ class CommonController extends Controller
     }
     public function examResult($subdomain=null,$result_id)
     {
-        $exam_result = ExamResult::where('user_id', auth('users')->user()->id)
-            ->with('answers.answer')
+        $exam_result = ExamResult::with('answers.answer')
             ->orderByDesc('id')
             ->findOrFail($result_id);
 
@@ -426,7 +475,7 @@ class CommonController extends Controller
                 return redirect(route('login'))->with('error', trans("additional.headers.login"));
             }
         } catch (\Exception $e) {
-            dd($e->getMessage(),$e->getLine());
+            dd([$e->getMessage(),$e->getLine()]);
             return redirect()->back()->with("error", $e->getMessage(), $e->getLine());
         } finally {
             dbdeactive();
@@ -490,7 +539,7 @@ class CommonController extends Controller
                     return $this->notfound();
             }
         } catch (\Exception $e) {
-            dd($e->getMessage(),$e->getLine());
+            dd([$e->getMessage(),$e->getLine()]);
             return redirect()->back()->with("error", $e->getMessage());
         } finally {
             dbdeactive();
@@ -726,18 +775,105 @@ class CommonController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
-    public function examResultPageStudentsWithSubdomain($subdomain=null,$result_id)
+    public function examResultPageStudentsWithSubdomain($subdomain=null,$result_id,Request $request)
     {
         if(Auth::guard("users")->check() && Auth::guard("users")->user()->user_type==2){
             $exam=Exam::where('id',$result_id)->where("user_id",Auth::guard("users")->id())->first();
-            $exam_results = ExamResult::where('exam_id', $exam->id)
-                ->with('answers.answer')
-                ->orderByDesc('id')->get();
-            if(!empty($exam_results) && count($exam_results)>0){
-                return view('frontend.exams.results.resultoncompanywithdesign', compact('exam_results','exam'));
-            }else{
-                return redirect()->back()->with('info',trans("additional.pages.exams.notfound"));
+            if($request->has('responseType') && !empty($request->input("responseType")) && $request->input("responseType")=='json'){
+                $exam_results = ExamResult::where('exam_id', $exam->id)
+                    ->with('answers.answer')
+                    ->orderByDesc('id')->get();
+
+                return response()->json(['status'=>'success','data'=>$exam_results]);
             }
+
+            return view('frontend.exams.results.resultoncompanywithdesign',compact("exam"));
+
+        }
+    }
+
+    public function getresultsusers(Request $request){
+        try{
+            if($request->has('responseType') && !empty($request->input("responseType")) && $request->input("responseType")=='json'){
+                $exam_results = ExamResult::where('exam_id', $request->input("exam_id"))
+                    ->with(['answers.answer','user','exam'])
+                    ->orderByDesc('id')->get();
+                $true_false_questions=[];
+                $wrong_and_truecounts=[];
+                    if(!empty($exam_results) && count($exam_results)>0){
+                        foreach($exam_results as $result){
+                            remove_repeated_result_answers($result->id);
+                            $true_false_questions[]=$result->id;
+                            $wrong_and_truecounts[]=$result->id;
+                        }
+                    }
+
+
+                if(count($true_false_questions)>0 && !empty($true_false_questions)){
+                    foreach($true_false_questions as $true_false_question){
+                        $array=[];
+                        $model = ExamResultAnswer::where('result_id', $true_false_question)->get();
+                        if(!empty($model) && count($model)>0){
+                            $sections=Section::where("exam_id",$model[0]->result_model->exam_id)->pluck('id');
+                            $questions = ExamQuestion::whereIn("section_id",$sections)->get();
+                            foreach($questions as $question){
+                                $array[$question->id]='null';
+                            }
+
+                            foreach($model as $mod){
+                                if(isset($array[$mod->question_id])){
+                                    $array[$mod->question_id]=$mod->result==true?'true':'false';
+                                }else{
+                                    $array[$mod->question_id]='null';
+                                }
+                            }
+
+                            $true_false_questions[$true_false_question]=$array;
+                        }
+                    }
+                }
+
+                if(!empty($wrong_and_truecounts) && count($wrong_and_truecounts)){
+                    foreach($wrong_and_truecounts as $wrgtru){
+                        $array=[];
+                        $model = ExamResult::where('id', $wrgtru)->first();
+                        if(!empty($model)){
+                            $wrong_and_truecounts[$wrgtru]=['correct'=>$model->correctAnswers()??0,'wrong'=>$model->wrongAnswers()??0];
+
+
+                        }
+
+                    }
+                }
+
+                return response()->json(['status'=>'success','data'=>$exam_results,'true_false_questions'=>$true_false_questions,'wrong_and_truecounts'=>$wrong_and_truecounts]);
+            }
+        }catch(\Exception $e){
+            return response()->json(['status'=>'error','message'=>$e->getMessage()]);
+        }
+    }
+
+    public function get_exam_result_answer_true_or_false(Request $request){
+        try{
+            $array=[];
+            $model = ExamResultAnswer::where('result_id', $request->input("result_id"))->get();
+            $sections=Section::where("exam_id",$model[0]->result_model->exam_id)->pluck('id');
+            $questions = ExamQuestion::whereIn("section_id",$sections)->get();
+            foreach($questions as $question){
+                $array[$question->id]='null';
+            }
+
+            foreach($model as $mod){
+                if(isset($array[$mod->question_id])){
+                    $array[$mod->question_id]=$mod->result==true?'true':'false';
+                }else{
+                    $array[$mod->question_id]='null';
+                }
+            }
+
+            return $array;
+        }catch(\Exception $e){
+            return response()->json(['status'=>'error','message'=>$e->getMessage(),'line'=>$e->getLine()]);
         }
     }
 }

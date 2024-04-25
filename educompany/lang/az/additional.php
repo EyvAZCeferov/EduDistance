@@ -178,7 +178,8 @@ return [
         'upload_audio'=>"Audio fayl əlavə et",
         'change_audio'=>"Audio faylı dəyişdir",
         "your_question"=>"Sualınız",
-        'repeat_sound'=>'Audio təkrar etsin'
+        'repeat_sound'=>'Audio təkrar etsin',
+        'wrong_point'=>"Yanlış cavab üçün bal"
     ],
     "messages"=>[
         "passwords_incorrect"=>"Şifrəniz yanlışdır",

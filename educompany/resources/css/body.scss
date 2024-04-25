@@ -1139,17 +1139,23 @@ body {
                     padding-top: 0;
 
                     div.content_exam_info {
-                        text-align: left;
+                        text-align: center;
                         font-family: $secondary-font;
                         word-break: break-word;
                         flex-wrap:wrap;
                         display:flex;
+                        justify-content:center;
+                        align-items:center;
+                        align-content:center;
 
                         p{
                             width:100%;
                             word-break: break-word;
                             flex-wrap:wrap;
-                            display:flex;
+                            text-align:left;
+                            &:not(:first-child) {
+                                text-align: center;
+                            }
                         }
                         img{
                             object-fit:contain !important;
@@ -1656,16 +1662,19 @@ body {
                                     margin:2px auto;
                                 }
                                 .content_exam_info {
-                                    width:94%;
-                                    margin:5px auto;
+                                    width:75%;
+                                    margin:5px 0;
+                                    margin-left:63px;
                                     height:auto;
                                     min-height:100%;
                                     overflow-y:auto;
                                     overflow-x:hidden;
-                                    text-align:center;
+                                    text-align:left;
                                     p{
                                         width:100%;
-                                        text-align:center;
+                                        &:not(:first-child) {
+                                            text-align: center;
+                                        }
                                     }
                                 }
                             }

@@ -71,6 +71,18 @@ function change_tabs_elements (class_onpage, key) {
   tab.classList.add ('show', 'active', 'fade');
 }
 
+
+function changeTabElementsIncludedResult(clicked, result_id) {
+    // Belirli result_id'ye sahip olan tab ve buttonları kaldır
+    $(`div.nav-tabs button[data-result="${result_id}"]`).removeClass('active');
+    $(`div.tab-content .tab-pane[data-result="${result_id}"]`).removeClass('show active');
+
+    // Sadece belirli result_id'ye sahip olan tab ve buttonları aktif hale getir
+    $(`div.nav-tabs button.${clicked}[data-result="${result_id}"]`).addClass('active');
+    $(`div.tab-content .tab-pane.${clicked}[data-result="${result_id}"]`).addClass('show active');
+}
+
+
 function createalert (e, t, n = null) {
   if (null != n) var a = document.querySelector (`form#${n} #messages`);
   else a = document.querySelector ('#messages');

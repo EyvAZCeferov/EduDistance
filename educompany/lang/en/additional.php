@@ -178,7 +178,8 @@ return [
         'upload_audio' => "Upload Audio",
         'change_audio' => "Change Audio",
         "your_question" => "Your Question",
-        'repeat_sound' => 'Repeat Audio'
+        'repeat_sound' => 'Repeat Audio',
+        'wrong_point'=>"Points for wrong answer"        
     ],
     "messages" => [
         "passwords_incorrect" => "Incorrect password",

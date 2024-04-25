@@ -17,7 +17,7 @@ class Section extends Model
 
     public function questions (): HasMany
     {
-        return $this->hasMany(ExamQuestion::class, 'section_id', 'id')->whereHas('answers');
+        return $this->hasMany(ExamQuestion::class, 'section_id', 'id')->whereHas('answers')->orderBy("order_number",'ASC');
     }
     public function correctAnswers($id): int
     {

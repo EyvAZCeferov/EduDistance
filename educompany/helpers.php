@@ -187,7 +187,8 @@ if (!function_exists('settings')) {
                     } else if ($key == "description") {
                         $model = isset($mds->name) && !empty($mds->name) ? $mds->name . '-' . $mds->subdomain : $mdsettings->description[app()->getLocale() . '_description'];
                     } else if ($key == "logo") {
-                        $model = isset($mds->picture) && !empty($mds->picture) ? getImageUrl($mds->picture, 'users') : getImageUrl($key, 'settings');
+                        // $model = isset($mds->picture) && !empty($mds->picture) ? getImageUrl($mds->picture, 'users') : getImageUrl($key, 'settings');
+                        $model = getImageUrl($mdsettings->logo, 'settings');
                     } else if ($key == "logo_white") {
                         $model = getImageUrl($mdsettings->logo_white, 'settings');
                     }
@@ -742,20 +743,109 @@ if (!function_exists('modifyRelativeUrlsToAbsolute')) {
 if (!function_exists('calculate_exam_result')) {
     function calculate_exam_result($exam_result_id)
     {
-        $examResult = ExamResult::where("id", $exam_result_id)->first();
-        $exam = Exam::where('id', $examResult->exam_id)->first();
-        $examsections = Section::where("exam_id", $exam->id);
-        if (session()->has('selected_section')) {
-            $examsections = $examsections->where('id', session()->get('selected_section'));
+        try {
+            $examResult = ExamResult::where("id", $exam_result_id)->first();
+            if (!empty($examResult) && isset($examResult->id)) {
+                $exam = Exam::where('id', $examResult->exam_id)->first();
+                if (!empty($exam) && isset($exam->id)) {
+                    $examsections = Section::where("exam_id", $exam->id);
+                    if (session()->has('selected_section')) {
+                        $examsections = $examsections->where('id', session()->get('selected_section'));
+                    }
+
+                    $examsections = $examsections->pluck('id');
+                    $examquestions = ExamQuestion::orderBy("id", 'DESC')->whereIn("section_id", $examsections)->get();
+                    $exampoint = $exam->point;
+                    $correctAnswers = $examResult->correctAnswers();
+                    $examquestionscount = count($examquestions);
+                    $model = 0;
+                    if ($exam->layout_type == "sat") {
+                        $wrongpoint = 0;
+                        $wrongAnswers = $examResult->wrongAnswers(false);
+                        if (!empty($wrongAnswers)) {
+                            foreach ($wrongAnswers as $wronganswer) {
+                                $wrongpoint += floatval($wronganswer->section->wrong_point);
+                            }
+                        }
+                        $model = $exam->point - $wrongpoint;
+                    } else {
+                        $model = $examquestionscount > 0 ? ($correctAnswers / $examquestionscount) * $exampoint : $correctAnswers * $exampoint;
+                    }
+                    return $model;
+                }
+            }
+        } catch (\Exception $e) {
+            return [$e->getMessage(), $e->getLine()];
         }
-        $examsections = $examsections->pluck('id');
-        $examquestions = ExamQuestion::orderBy("id", 'DESC')->whereIn("section_id", $examsections)->get();
-        $exampoint = $exam->point;
-        $correctAnswers = $examResult->correctAnswers();
-        $examquestionscount = count($examquestions);
-        $model = 0;
-        $model = $examquestionscount > 0 ? ($correctAnswers / $examquestionscount) * $exampoint : $correctAnswers * $exampoint;
-        return $model;
+    }
+}
+
+if (!function_exists('calculateforsection')) {
+    function calculateforsection($result_id, $section_number)
+    {
+        try {
+            $result = ExamResult::where('id', $result_id)->first();
+            $point = 200;
+            $sections = collect();
+            if ($section_number == 1) {
+                $sections = Section::where('exam_id', $result->exam_id)->orderBy("id", "ASC")->take(2)->pluck('id');
+            } else {
+                $sections = Section::where('exam_id', $result->exam_id)->orderBy("id", "DESC")->take(2)->pluck('id');
+            }
+
+            $wrongpoint = 0;
+            $answers = ExamResultAnswer::whereIn("section_id", $sections)
+                ->where('result_id',$result->id)
+                ->where("result", false)
+                ->with('section')
+                ->whereNull("deleted_at")
+                ->orderBy('id','DESC')
+                ->distinct('question_id')
+                ->get();
+
+            if (!empty($answers)) {
+                foreach ($answers as $wronganswer) {
+                    $wrongpoint += floatval($wronganswer->section->wrong_point);
+                }
+            }
+
+            $point = 800 - $wrongpoint;
+            $point = customRound($point);
+
+            return $point;
+
+        } catch (\Exception $e) {
+            dd($e->getMessage(), $e->getLine());
+        }
+    }
+}
+
+if (!function_exists('customRound')) {
+    function customRound($number)
+    {
+
+        if (is_string($number)) {
+            if (strpos($number, ',') !== false) {
+                $number = str_replace(',', '', $number);
+            }
+        }
+        $number = floatval($number);
+
+
+        if (is_float($number)) {
+            $number = round($number);
+        }
+
+        $remainder = $number % 10;
+        $base = $number - $remainder;
+
+        if ($remainder >= 5) {
+            $rounded = $base + 10;
+        } else {
+            $rounded = $base;
+        }
+
+        return $rounded;
     }
 }
 

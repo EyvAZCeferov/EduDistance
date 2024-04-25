@@ -16,6 +16,7 @@ class ExamResult extends Model
         'user_id',
         'exam_id',
         'point',
+        'counted_point',
         'time_reply',
         'payed'
     ];
@@ -33,7 +34,7 @@ class ExamResult extends Model
 
     public function exam(): HasOne
     {
-        return $this->hasOne(Exam::class, 'id', 'exam_id');
+        return $this->hasOne(Exam::class, 'id', 'exam_id')->with('sections');
     }
 
     public function answers(): HasMany
@@ -41,22 +42,28 @@ class ExamResult extends Model
         return $this->hasMany(ExamResultAnswer::class, 'result_id', 'id');
     }
 
-    public function correctAnswers(): int
+    public function correctAnswers($onlycount=true)
     {
         // Yanıtları alırken yalnızca benzersiz soru kimliği (question_id) olanları seç
         $distinctAnswers = $this->answers()->distinct('question_id')->get();
 
         // Seçilen benzersiz yanıtların içinden doğru olanları sayar
-        return $distinctAnswers->where('result', 1)->count();
+        if($onlycount==true)
+            return $distinctAnswers->where('result', 1)->count();
+        else
+            return $distinctAnswers->where('result', 1);
     }
 
-    public function wrongAnswers(): int
+    public function wrongAnswers($onlycount=true)
     {
         // Yanıtları alırken yalnızca benzersiz soru kimliği (question_id) olanları seç
         $distinctAnswers = $this->answers()->distinct('question_id')->get();
 
         // Seçilen benzersiz yanıtların içinden yanlış olanları sayar
-        return $distinctAnswers->where('result', 0)->count();
+        if($onlycount==true)
+            return $distinctAnswers->where('result', 0)->count();
+        else
+            return $distinctAnswers->where('result', 0);
     }
     public function marked(){
         return $this->hasMany(MarkQuestions::class,'exam_result_id','id');

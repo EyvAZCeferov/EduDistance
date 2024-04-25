@@ -94,7 +94,15 @@
                             <div>
                                 @lang('additional.pages.exams.your_result', ['point' => $exam_result->point])
                             </div>
+
                         </div>
+
+                        @if($exam->layout_type=='sat')
+                            <div class="footer">
+                                <div>Verbal: {{calculateforsection($exam_result->id,1)}}</div> 
+                                <div>Math: {{calculateforsection($exam_result->id,2)}}</div> 
+                            </div>
+                        @endif
                     </div>
 
                     @if (!empty($exam->sections) && count($exam->sections) > 0)

@@ -279,6 +279,8 @@ class ApisController extends Controller
                 $model = new ExamQuestion();
 
             $model->question = modifyRelativeUrlsToAbsolute($request->input('question_input'));
+
+            $questions=ExamQuestion::where("section_id",$request->input('section_id'))->pluck('id');
             if($request->input("question_type")==3)
                 $model->description = modifyRelativeUrlsToAbsolute($request->input('question_input2'));
             if ($request->input('question_type') == 5 || $request->input('question_type') == '5') {
@@ -290,6 +292,7 @@ class ApisController extends Controller
             $model->type = $request->input('question_type');
             $model->section_id = $request->input('section_id');
             $model->layout = $request->input("question_layout");
+            $model->order_number = $request->input('order_number')!=1 ? $request->input('order_number') : count($questions)+1;
             $model->save();
 
             $examanswers = ExamAnswer::where("question_id", $model->id)->get();
@@ -298,6 +301,7 @@ class ApisController extends Controller
                     $value->delete();
                 }
             }
+
 
             if ($request->input("question_type") != 3 && $request->input("question_type") != 4) {
                 $answers = array();
@@ -313,7 +317,7 @@ class ApisController extends Controller
                 }
             } else if ($request->input("question_type") == 3) {
                 $modelAnswer = new ExamAnswer();
-                $modelAnswer->answer = modifyRelativeUrlsToAbsolute($request->input("textbox_0"));
+                $modelAnswer->answer = !empty($request->input("textbox_0")) ? modifyRelativeUrlsToAbsolute($request->input("textbox_0")) : modifyRelativeUrlsToAbsolute($request->input("answerres_0"));
                 $modelAnswer->correct = true;
                 $modelAnswer->question_id = $model->id;
                 $modelAnswer->save();
@@ -334,7 +338,7 @@ class ApisController extends Controller
 
             dbdeactive();
 
-            return response()->json(['status' => 'success', 'message' => trans("additional.messages.success", [], $request->input('language') ?? 'az')]);
+            return response()->json(['status' => 'success', 'message' => trans("additional.messages.success", [], $request->input('language') ?? 'az'),'model'=>$model]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
@@ -420,6 +424,7 @@ class ApisController extends Controller
                 $model->name = $request->input('name');
                 $model->time_range_sections = intval($request->input('time_range_sections')) ?? 0;
                 $model->duration = intval($request->input('duration')) ?? 0;
+                $model->wrong_point = floatval($request->input('wrong_point')) ?? 1;
                 $model->save();
             // });
             return response()->json(['status' => 'success', 'message' => 'Yaradıldı!']);

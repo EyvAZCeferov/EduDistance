@@ -95,19 +95,19 @@
 
 
 
-            {{-- @if (auth('admins')->user()->hasPermissionFor('studentratings-list'))
+            @if (auth('admins')->user()->hasPermissionFor('studentratings-list'))
                 <li class="{{ url()->current() == route('studentratings.index') ? 'active' : '' }}">
                     <a href="{{ route('studentratings.index') }}"><i class="fa fa-star"></i> <span
                             class="nav-label">Tələbə dəyərləndirmələri</span></a>
                 </li>
-            @endif --}}
+            @endif
 
-            {{-- @if (auth('admins')->user()->hasPermissionFor('counters-list'))
+            @if (auth('admins')->user()->hasPermissionFor('counters-list'))
                 <li class="{{ url()->current() == route('counters.index') ? 'active' : '' }}">
                     <a href="{{ route('counters.index') }}"><i class="fa fa-calculator"></i> <span
                             class="nav-label">Hesabat rəqəmləri</span></a>
                 </li>
-            @endif --}}
+            @endif
 
             @if (auth('admins')->user()->hasPermissionFor('sliders-list'))
                 <li class="{{ url()->current() == route('sliders.index') ? 'active' : '' }}">
@@ -123,19 +123,19 @@
                 </li>
             @endif
 
-            {{-- @if (auth('admins')->user()->hasPermissionFor('blogs-list'))
+            @if (auth('admins')->user()->hasPermissionFor('blogs-list'))
                 <li class="{{ url()->current() == route('blogs.index') ? 'active' : '' }}">
                     <a href="{{ route('blogs.index') }}"><i class="fa fa-rss"></i> <span
                             class="nav-label">Bloqlar</span></a>
                 </li>
-            @endif --}}
+            @endif
 
-            {{-- @if (auth('admins')->user()->hasPermissionFor('teams-list'))
+            @if (auth('admins')->user()->hasPermissionFor('teams-list'))
                 <li class="{{ url()->current() == route('teams.index') ? 'active' : '' }}">
                     <a href="{{ route('teams.index') }}"><i class="fa fa-users"></i> <span
                             class="nav-label">Komanda</span></a>
                 </li>
-            @endif --}}
+            @endif
 
             @if (auth('admins')->user()->hasPermissionFor('settings'))
                 <li class="{{ url()->current() == route('settings.index') ? 'active' : '' }}">

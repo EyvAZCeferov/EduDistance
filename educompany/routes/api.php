@@ -22,6 +22,9 @@ Route::post('setsectiondata',[ApisController::class,'setsectiondata'])->name("ap
 Route::post('getexamsections',[ApisController::class,'getexamsections'])->name("api.getexamsections");
 Route::post('get_markedquestions_users',[ApisController::class,'get_markedquestions_users'])->name("api.get_markedquestions_users");
 Route::post('get_show_user_which_answered',[ApisController::class,'get_show_user_which_answered'])->name('api.get_show_user_which_answered');
+Route::post("get_company_exam_results",[CommonController::class,'getresultsusers'])->name("api.examResultPageStudentsWithSubdomain");
+Route::post("get_exam_result_answer_true_or_false",[CommonController::class,'get_exam_result_answer_true_or_false'])->name("api.exam_result_answer_true_or_false");
+
 
 Route::get("get_paymenturl",function(){
     $pulpal=new PulPal();

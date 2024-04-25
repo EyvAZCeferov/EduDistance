@@ -174,7 +174,7 @@
 
     </section>
 
-    {{-- Add Section Calculator --}}
+    {{-- Add Section --}}
     <div id="create_sections" class="modal custom-modal show" tabindex="-1" role="dialog"
         aria-labelledby="myModalLabel">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -190,7 +190,7 @@
                 <div class="modal-body">
                     <input type="hidden" name="selected_section_id" id="selected_section_id">
                     <div class="row my-2">
-                        <div class="col-md-7">
+                        <div class="col-md-6 my-1">
                             <div class="form-group">
                                 <label for="section_name">@lang('additional.forms.field_name')</label>
                                 <input placeholder="@lang('additional.forms.field_name')" type="text" value="{{ old('section_name') }}"
@@ -200,7 +200,7 @@
 
                         </div>
 
-                        <div class="col-md-5">
+                        <div class="col-md-6 my-1">
                             <div class="form-group">
                                 <label for="duration">@lang('additional.forms.exam_duration')</label>
                                 <input type="number" value="{{ old('duration', 0) }}" name="duration"
@@ -210,13 +210,25 @@
                             </div>
 
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-6 my-1">
                             <div class="form-group">
                                 <label for="section_duration">@lang('additional.forms.field_duration')</label>
                                 <input type="number" value="{{ old('section_duration', 0) }}" name="section_duration"
                                     id="section_duration"
                                     class="form-control {{ $errors->first('section_duration') ? 'is-invalid' : '' }} w-100"
                                     placeholder="@lang('additional.forms.field_duration')">
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6 my-1">
+                            <div class="form-group">
+                                <label for="section_duration">@lang('additional.forms.wrong_point')</label>
+                                <input type="text" value="{{ old('wrong_point', 1) }}" name="wrong_point"
+                                    id="wrong_point"
+                                    class="form-control {{ $errors->first('wrong_point') ? 'is-invalid' : '' }} w-100"
+                                    placeholder="@lang('additional.forms.wrong_point')">
                             </div>
 
                         </div>
@@ -233,7 +245,7 @@
         </div>
         <br>
     </div>
-    {{-- Add Section Calculator --}}
+    {{-- Add Section --}}
 
 @endsection
 
@@ -249,41 +261,10 @@
     <script src="https://cdn.tiny.cloud/1/0j6r4v4wrpghb7ht8z0yf85cuzcv8iadyrza5gp8f4lxi1ib/tinymce/6/tinymce.min.js"
         referrerpolicy="origin"></script>
     <script type="text/javascript" src="{{ asset('front/assets/js/eyvaz/customsortable.js') }}"></script>
-    @if (isset($data) && !empty($data) && isset($data->id) && !empty($data->image))
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"
-            integrity="sha512-uURl+ZXMBrF4AwGaWmEetzrd+J5/8NRkWAvJx5sbPSSuOb0bZLqf+tOzniObO00BjHa/dD7gub9oCGMLPQHtQA=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script type="text/javascript" charset="utf-8">
-            $(document).ready(function() {
-                $('[data-fancybox]').fancybox({
-                    // Options will go here
-                    buttons: [
-                        'close'
-                    ],
-                    wheel: false,
-                    transitionEffect: "slide",
-                    // thumbs          : false,
-                    // hash            : false,
-                    loop: true,
-                    // keyboard        : true,
-                    toolbar: false,
-                    animationEffect: false,
-                    // arrows          : true,
-                    clickContent: false,
-                    toolbar: {
-                        items: {
-                            close: {
-                                tpl: '<button data-fancybox-close class="fancybox-button fancybox-button--close" title="Close"></button>'
-                            }
-                        }
-                    },
-                });
-            });
-        </script>
-    @endif
+
     @if (isset($data) && !empty($data) && isset($data->id))
         {{-- Section Functions --}}
-        <script defer>
+        <script>
             function create_edit_section(event, id = null) {
                 event.preventDefault();
                 try {
@@ -294,6 +275,7 @@
                     } else {
                         var section_name = document.getElementById('section_name').value.trim();
                         var section_duration = document.getElementById('section_duration').value.trim();
+                        var wrong_point = document.getElementById('wrong_point').value.trim();
                         var duration = document.getElementById('duration').value.trim();
 
                         if (section_name && section_duration) {
@@ -303,6 +285,7 @@
                                 user_id: document.getElementById("auth_id").value,
                                 name: section_name,
                                 time_range_sections: section_duration,
+                                wrong_point,
                                 duration: duration,
                                 responseType: 'json',
                                 selected_section_id:selected_section_id.value,
@@ -313,6 +296,7 @@
                                     selected_section_id.value=null;
                                     document.getElementById('section_name').value = null;
                                     document.getElementById('section_duration').value = null;
+                                    document.getElementById('wrong_point').value = null;
                                     document.getElementById('duration').value = null;
                                 }
                             });
@@ -408,7 +392,7 @@
                                             }
 
                                             var element = `<div class="question_list_element" id="question_list_element_${n.data[i].id}">
-                                        <div onclick="getquestion(${n.data[i].id})" class="question_name">${contentWithoutImages}</div>
+                                        <div onclick="getquestion(${n.data[i].id})" class="question_name">${i+1}) ${contentWithoutImages}</div>
                                         <button class='btn btn-outline-danger btn-sm' type='submit' onclick='deletequestion(${n.data[i].id},"question")'><i class='fa fa-trash'></i></i></button>
                                         </div>`;
                                             questions_list.innerHTML += element;
@@ -441,10 +425,12 @@
                                     var section_name=document.getElementById('section_name');
                                     var section_duration=document.getElementById('section_duration');
                                     var duration=document.getElementById('duration');
+                                    var wrong_point=document.getElementById('wrong_point');
                                     var selected_section_id=document.getElementById('selected_section_id');
                                     section_name.value=n.data.name;
                                     section_duration.value=n.data.time_range_sections;
                                     duration.value=n.data.duration;
+                                    wrong_point.value=n.data.wrong_point;
                                     selected_section_id.value=n.data.id;
                                     toggleModalnow('create_sections','open');
                                 }
@@ -500,7 +486,7 @@
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="customDropdownButton">
                                     @foreach (App\Models\ExamQuestion::TYPES as $k => $type)
-                                        <a class="dropdown-item types_element" id="types_{{ $type }}" onclick="set_type('{{ $type }}',true)" href="javascript:void(0)">{{ $k }}</a>
+                                        <a class="dropdown-item types_element" id="types_{{ $type }}" onclick="set_type('{{ $type }}',false)" href="javascript:void(0)">{{ $k }}</a>
                                     @endforeach
                                 </div>
                             </div>
@@ -513,6 +499,9 @@
                                         <option {{ old('question_layout') == $type ? 'selected' : '' }} value="{{ $key }}">{{ $type }}</option>
                                     @endforeach
                                 </select>
+                            </div>
+                            <div style="width:60px">
+                                <input type='number' class='form-control' name='order_number' value='1' placeholder="Sıra" />
                             </div>
                             <button class='btn btn-primary btn-sm submit_answer' type="submit">Təsdiq et</button>
                         </div>
@@ -561,7 +550,10 @@
                     }
 
                     if (question_type == 3){
-                        formData.append('textbox_0', getcontenteditor('textbox_0'));
+                        var textbox_0_id=$(".textbox_0").prop("id");
+                        console.log(textbox_0_id);
+                        console.log($(".textbox_0"));
+                        formData.append('textbox_0', getcontenteditor(textbox_0_id));
                         question_input2=getcontenteditor($(".question_input2").attr('id'))
                         formData.append("question_input2",question_input2);
                     }
@@ -706,7 +698,7 @@
                                         elementContent = `
                                         <div class='answer ${type}' id="${codeofelement}">
                                             <div class="answer_content">
-                                                <div rows="5" name="textbox_0" class="text-input textbox_0" id="textbox_0" placeholder="@lang('additional.forms.answer')">${answer.answer}</div>
+                                                <div rows="5" name="textbox_0" class="text-input textbox_0" id="textbox_0_${codeofelement}" placeholder="@lang('additional.forms.answer')">${answer.answer}</div>
                                             </div>
                                         </div>
                                     `;
@@ -732,6 +724,7 @@
                                 }).join('') : '';
 
                                 var audiotag = '';
+                                
 
                                 if (n.data.type == 5) {
                                     audiotag =
@@ -797,12 +790,16 @@
                                                                 @endforeach
                                                             </select>
                                                         </div>
+                                                        <div style="width:60px">
+                                                            <input type='number' class='form-control' name='order_number' value='${n.data.order_number}' placeholder="Sıra" />
+                                                        </div>
                                                         <button class='btn btn-primary btn-sm submit_answer' type="submit">Təsdiq et</button>
                                                     </div>
                                                 </form>
                                             </div>`;
 
                                 section_and_questions_right.innerHTML = element;
+                                set_type(n.data.type,false);
                                 const dropdownButton = document.getElementById('customDropdownButton');
                                 const dropdownMenu = document.querySelector('.dropdown-menu');
 
@@ -823,13 +820,17 @@
                                     }
                                 });
 
-                                set_type(n.data.type);
+                                
                                 var question_input_id = $(".question_input").prop('id');
                                 if(question_input_id!=null)
                                     createeditor(question_input_id);
                                 var question_input2_id;
 
                                 if(n.data.type==3){
+                                    var textbox_0=$(".textbox_0").prop('id')
+                                    if(textbox_0!=null)
+                                        createeditor(textbox_0);
+
                                     question_input2_id = $(".question_input2").prop('id');
                                     if(question_input2_id!=null)
                                         createeditor(question_input2_id);
@@ -923,7 +924,7 @@
         </script>
     @endif
 
-    <script defer>
+    <script>
         function set_type(type, old = false) {
             try {
                 var question_content_textbox = document.getElementById("question_content_textbox");
@@ -953,23 +954,6 @@
                 var question_input_id = $(".question_input").prop('id');
                 if(question_input_id!=null)
                     createeditor(question_input_id);
-                if (type == 3) {
-                    var textbox_0_id = $(".textbox_0").prop('id');
-                    if(textbox_0_id!=null)
-                        var textbox_0 = createeditor(textbox_0_id);
-
-                    if($(".question_input2").prop('id')!=null)
-                        var question_input2 = createeditor($(".question_input2").prop('id'));
-
-                    var question2_input_area=document.getElementById('question2_input_area');
-                    if(question2_input_area!=null)
-                        question2_input_area.classList.remove("d-none");
-
-                }else{
-                    var question2_input_area=document.getElementById('question2_input_area');
-                    if(question2_input_area!=null)
-                        question2_input_area.classList.add("d-none");
-                }
 
                 question_footer_buttons.classList.remove("hide");
                 question_type.value = type;
@@ -990,6 +974,24 @@
                     }
                     answers_area.innerHTML = answers;
 
+                    if (type == 3) {
+                        var textbox_0_id = $(".textbox_0").prop('id');
+                        if(textbox_0_id!=null)
+                            var textbox_0 = createeditor(textbox_0_id);
+
+                        if($(".question_input2").prop('id')!=null)
+                            var question_input2 = createeditor($(".question_input2").prop('id'));
+
+                        var question2_input_area=document.getElementById('question2_input_area');
+                        if(question2_input_area!=null)
+                            question2_input_area.classList.remove("d-none");
+
+                    }else{
+                        var question2_input_area=document.getElementById('question2_input_area');
+                        if(question2_input_area!=null)
+                            question2_input_area.classList.add("d-none");
+                    }
+
                     var textinput = $(".answer .text-input");
                     if (textinput != null && textinput.length > 0) {
                         textinput.each(function(index, elem) {
@@ -1004,7 +1006,6 @@
                                 createeditor(codeofelement);
                         });
                     }
-
 
                     var matching_element = $(".matching_element");
                     if (matching_element != null && matching_element.length > 0) {
@@ -1028,6 +1029,10 @@
                             }
                         }
                     }
+
+                    var textbox_0_id = $(".textbox_0").prop('id');
+                    if(textbox_0_id!=null)
+                        var textbox_0 = createeditor(textbox_0_id);
 
                 }
             } catch (error) {
@@ -1061,6 +1066,7 @@
 
         function addoreditanswer(type, operation, itemid) {
             try {
+                console.log(type,operation,itemid);
                 var element = document.getElementById(itemid);
                 var answers = document.querySelector('.answers');
                 var answer_elements = document.querySelectorAll('.answer');
@@ -1157,7 +1163,7 @@
     </script>
     {{-- Section Functions --}}
 
-    <script defer>
+    <script>
         function createeditor(id = null) {
             try {
                 var selector = id ? `#${id}` : `.summernote_element`;
@@ -1214,7 +1220,7 @@
                     return tinymce.get(selector);
                 }
             } catch (error) {
-                toast(error, 'error');
+                // toast(error, 'error');
                 console.error('------------createeditorError----------------', error);
             }
         }
