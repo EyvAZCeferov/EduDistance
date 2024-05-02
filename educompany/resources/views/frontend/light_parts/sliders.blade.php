@@ -14,7 +14,7 @@
                     @if (isset($slider->url) && !empty($slider->url))
                         <a href="{{ $slider->url }}" class="btn btn-sm btn-secondary more_button">@lang('additional.buttons.more')
                             &nbsp; <i class="fa-solid fa-arrow-right"></i> </a>
-                    @else
+                    {{-- @else
                         <div class="input-group mb-3 slider_search">
                             <div class="input-group-prepend">
                                 <i class="fa fa-search"></i>
@@ -23,7 +23,7 @@
                             <div class="input-group-append">
                                 <button type="button" onclick="searchnow(event)" class="btn btn-sm" >@lang('additional.forms.search')</button>
                             </div>
-                        </div>
+                        </div> --}}
                     @endif
                 </div>
             </div>

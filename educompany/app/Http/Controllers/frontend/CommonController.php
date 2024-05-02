@@ -316,6 +316,11 @@ class CommonController extends Controller
                 'nextsection'=>$nextsection
             ]);
         } catch (\Exception $e) {
+            Log::info([
+                'status'=> '--------ERRROR finishing----------',
+                'message'=>$e->getMessage(),
+                'line'=>$e->getLine()
+            ]);
             return response()->json(['status' => 'error', 'message' => $e->getMessage(),'line'=>$e->getLine()]);
         } finally {
             dbdeactive();
@@ -345,8 +350,8 @@ class CommonController extends Controller
             $exam_results = ExamResult::where('exam_id', $exam->id)
                 ->with('answers.answer')
                 ->orderByDesc('id')->get();
-            
-            
+
+
             if(!empty($exam_results) && count($exam_results)>0){
                 return view('frontend.exams.results.resultoncompany', compact('exam_results','exam'));
             }else{
@@ -362,7 +367,7 @@ class CommonController extends Controller
                     $point=customRound($exam_result->counted_point);
                     $exam_result->update(['point'=>$point]);
                 }
-    
+
             return view('frontend.exams.resultpage', compact('exam_result'));
         }
     }
@@ -395,11 +400,11 @@ class CommonController extends Controller
                     ->first();
                 $exam_start_pages = collect();
 
-                if(session()->has('selected_section') && (session()->get('selected_section')==$request->selected_section)){
-                    $nexturl=exam_finish_and_calc($request->exam_id,Auth::guard('users')->id());
-                    if(!empty($nexturl))
-                        return redirect($nexturl);
-                }
+                // if(session()->has('selected_section') && (session()->get('selected_section')==$request->selected_section)){
+                //     $nexturl=exam_finish_and_calc($request->exam_id,Auth::guard('users')->id());
+                //     if(!empty($nexturl))
+                //         return redirect($nexturl);
+                // }
 
                 session()->put('selected_section', $request->selected_section ?? 0);
                 session()->put('changedLang', app()->getLocale() ?? 'az');
@@ -437,6 +442,10 @@ class CommonController extends Controller
                                 $exam_start_pages = exam_start_page();
                             }
                             if (empty($exam_start_pages)) {
+                                session()->put('result_id', $exam_result->id);
+                                session()->put('exam_id', $exam_result->exam_id);
+                                session()->put('user_id', $exam_result->user_id);
+
                                 return view("frontend.exams.exam_main_process.index", compact("exam", 'exam_result'));
                             } else {
                                 return view("frontend.exams.exam_main_process.start_page", compact("exam", 'exam_start_pages'));
@@ -445,6 +454,9 @@ class CommonController extends Controller
                     } else {
                         if ($exam_result->payed == true) {
                             if($exam->questionCount()>0){
+                                session()->put('result_id', $exam_result->id);
+                                session()->put('exam_id', $exam_result->exam_id);
+                                session()->put('user_id', $exam_result->user_id);
                                 return view("frontend.exams.exam_main_process.index", compact('exam', 'exam_result'));
                             }else{
                                 $exam_result->delete();
@@ -475,7 +487,13 @@ class CommonController extends Controller
                 return redirect(route('login'))->with('error', trans("additional.headers.login"));
             }
         } catch (\Exception $e) {
+            Log::info([
+                'status'=> '--------ERRROR redirecting----------',
+                'message'=>$e->getMessage(),
+                'line'=>$e->getLine()
+            ]);
             dd([$e->getMessage(),$e->getLine()]);
+
             return redirect()->back()->with("error", $e->getMessage(), $e->getLine());
         } finally {
             dbdeactive();
@@ -539,6 +557,11 @@ class CommonController extends Controller
                     return $this->notfound();
             }
         } catch (\Exception $e) {
+            Log::info([
+                'status'=> '--------Set Exam----------',
+                'message'=>$e->getMessage(),
+                'line'=>$e->getLine()
+            ]);
             dd([$e->getMessage(),$e->getLine()]);
             return redirect()->back()->with("error", $e->getMessage());
         } finally {

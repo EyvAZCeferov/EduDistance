@@ -45,7 +45,7 @@ Route::group([
                 Route::any('/finish', [CommonController::class, 'examFinish'])->name('exam.finish')->middleware('remove.null_value.subdomain');
             });
         });
-        Route::fallback([CommonController::class, 'notfound'])->name('notfound.subdomain');
+        // Route::fallback([CommonController::class, 'notfound'])->name('notfound.subdomain');
 });
 
 Route::post('exams_set_question_value_on_session',[ApisController::class,'set_question_value_on_session']);

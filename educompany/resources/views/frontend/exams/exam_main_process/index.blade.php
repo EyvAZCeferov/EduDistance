@@ -380,6 +380,7 @@
                         } else {
                             var forum = document.getElementById("exam");
                             var formData = new FormData(forum);
+
                             fetch("{{ route('finish_exam') }}", {
                                     method: "POST",
                                     body: formData
@@ -393,18 +394,25 @@
                                 .then(data => {
                                     toast(data.message, data.status);
                                     hideLoader();
-                                    if (data.url != null && data.url != '' && data.url != ' ') {
-                                        redirect_url = data.url;
-                                    }
 
-                                    if (data.nextsection == false) {
-                                        allowReload = true;
-                                        window.location.href = data.url;
-                                    }
+                                    if(data.status=="success"){
 
-                                    if (type == "imtahanzamanibitdi") {
-                                        allowReload = true;
-                                        window.location.href = data.url;
+                                        if (data.url != null && data.url != '' && data.url != ' ') {
+                                            redirect_url = data.url;
+                                        }
+
+                                        if (data.nextsection == false) {
+                                            allowReload = true;
+                                            window.location.href = data.url;
+                                        }
+
+                                        if (type == "imtahanzamanibitdi") {
+                                            allowReload = true;
+                                            window.location.href = data.url;
+                                        }
+                                    }else{
+                                        toast("Şəbəkədə problem var. 3 saniyə ərzində yenidən yoxlanılacaq...",'info');
+                                        setTimeout(()=>tonext(true),3000);
                                     }
                                 })
                                 .catch(error => {
@@ -664,7 +672,7 @@
     {{-- Create Timer --}}
 
     {{-- onchange tab --}}
-    <script>
+     <script>
         let onchangecountdown;
         let loaderVisibleonchange = false;
         let secondsLeftcountdown = 5;
@@ -729,31 +737,38 @@
             }, 1000);
         }
 
-        function checkPageFocus() {
-            if (document.hasFocus() || !document.hidden) {
-                clearInterval(onchangecountdown);
-                setTimeout(() => {
-                    loaderVisibleonchange = !loaderVisibleonchange;
-                    if (loaderVisibleonchange == false) {
-                        var modalshowcountdown = document.getElementById('modalshowcountdown');
-                        setTimeout(() => {
-                            if (modalshowcountdown != null) {
-                                modalshowcountdown.remove();
-                            }
-                        }, 1000);
-                    }
-                }, 400);
-            } else {
-                onchangeShowLoader();
-            }
-        }
+        // function checkPageFocus() {
+        //     if (document.hasFocus() || !document.hidden) {
+        //         clearInterval(onchangecountdown);
+        //         setTimeout(() => {
+        //             loaderVisibleonchange = !loaderVisibleonchange;
+        //             if (loaderVisibleonchange == false) {
+        //                 var modalshowcountdown = document.getElementById('modalshowcountdown');
+        //                 setTimeout(() => {
+        //                     if (modalshowcountdown != null) {
+        //                         modalshowcountdown.remove();
+        //                     }
+        //                 }, 1000);
+        //             }
+        //         }, 400);
+        //     } else {
+        //         onchangeShowLoader();
+        //     }
+        // }
 
-        document.addEventListener("visibilitychange", function() {
-            checkPageFocus();
-        });
+        // document.addEventListener("visibilitychange", function() {
+        //     checkPageFocus();
+        // });
 
-        checkPageFocus();
+        // checkPageFocus();
 
+        
+    </script>
+    {{-- onchange tab --}}
+
+    {{-- Content Functions --}}
+    {{-- References Functions --}}
+    <script defer>
         function stopaudios() {
             var oneTimeAudios = document.querySelectorAll('.only1time');
             if (oneTimeAudios.length > 0) {
@@ -764,12 +779,6 @@
                 });
             }
         }
-    </script>
-    {{-- onchange tab --}}
-
-    {{-- Content Functions --}}
-    {{-- References Functions --}}
-    <script defer>
         function toggle_references_modal_content_element(key) {
             var toggler_button_reference = document.getElementById(`toggler_button_reference_${key}`);
             var body_reference = document.getElementById(`body_reference_${key}`);
@@ -1182,7 +1191,7 @@
                     type_value:type
                 }, function(e, t) {
                     let n = JSON.parse(t);
-                    console.log(n);        
+                    console.log(n);
                 });
             }catch(err){
                 console.log(err);
@@ -1242,7 +1251,7 @@
     {{-- Disable Prtscr --}}
 
     {{-- Disable F5 --}}
-    <script type="text/javascript">
+    {{-- <script type="text/javascript">
         function disableF5(e) {
             if ((e.which || e.keyCode) == 116 || (e.which || e.keyCode) == 82) {
                 e.preventDefault();
@@ -1266,13 +1275,18 @@
                 e.returnValue = '';
             }
         });
-    </script>
+
+        window.onbeforeunload = function(e) {
+            e.preventDefault(); // Prevent refresh
+        };
+
+    </script> --}}
     {{-- Disable F5 --}}
 
     {{-- Page Functions --}}
 
     {{-- Exam Refresh Function --}}
-    <script defer>
+    {{-- <script defer>
         function changeurlpage() {
             var currentUrl = window.location.href;
             var setExamIndex = currentUrl.indexOf('/set_exam');
@@ -1292,6 +1306,6 @@
 
 
         changeurlpage();
-    </script>
+    </script> --}}
     {{-- Exam Refresh Function --}}
 @endpush

@@ -42,6 +42,13 @@
                                 <h5>İmtahanlar</h5>
                             </div>
                             <div class="col-6 text-right">
+                                @if($trashed==true)
+                                    <a href="{{ route('exams.index',['trashed'=>'nottrashed']) }}" class="btn btn-w-m btn-warning">Aktiv List</a>
+                                @else
+                                    <a href="{{ route('exams.index',['trashed'=>'trashed']) }}" class="btn btn-w-m btn-danger">Silinmişlər</a>
+                                @endif
+                            </div>
+                            <div class="col-6 text-right">
                                 <a href="{{ route('exams.create') }}" class="btn btn-w-m btn-primary">Yeni</a>
                             </div>
                         </div>

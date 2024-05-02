@@ -133,7 +133,7 @@
                                                             <div class="tab-pane fade" id="nav-${index}${section.id}${exam_result.id}" role="tabpanel"  data-result="${exam_result.id}"
                                                                 aria-labelledby="nav-${index}${section.id}${exam_result.id}-tab">
                                                                 ${section.questions.map((question, index) => `
-                                                                    <button class="btn btn-sm btn-question ${resulttruefalse[question.id.toString()]}"
+                                                                    <button class="btn btn-sm btn-question ${resulttruefalse && resulttruefalse.hasOwnProperty(question.id.toString()) ==true ? resulttruefalse[question.id.toString()] : 'null'}"
                                                                         type="button">${index + 1}</button>
                                                                 `).join('')}
                                                                 <div class="footer">

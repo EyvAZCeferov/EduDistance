@@ -24,12 +24,24 @@ class ExamController extends Controller
 {
     use AuthorizesRequests;
 
-    public function index()
+    public function index(Request $request)
     {
         $this->authorizeForUser(auth('admins')->user(), 'exam-list');
 
-        $exams = Exam::withoutGlobalScope('active_status')->with(['category'])->orderBy('created_at')->get();
-        return view('backend.pages.exams.index', compact('exams'));
+        $trashed=false;
+
+        if($request->has("trashed")){
+            if($request->trashed=='trashed'){
+                $trashed=true;
+            }
+        }
+
+        if($trashed==true)
+            $exams = Exam::withoutGlobalScope('active_status')->with(['category'])->onlyTrashed()->orderBy('created_at')->get();
+        else
+            $exams = Exam::withoutGlobalScope('active_status')->with(['category'])->orderBy('created_at')->get();
+
+        return view('backend.pages.exams.index', compact('exams','trashed'));
     }
 
     public function create()
@@ -43,8 +55,6 @@ class ExamController extends Controller
         $this->authorizeForUser(auth('admins')->user(), 'exam-create');
 
         $rules = [
-            'duration' => ['required', 'string'],
-            'point' => ['required', 'numeric'],
             'category_id' => ['required', 'exists:categories,id'],
             'content' => ['nullable', 'string'],
         ];
@@ -76,7 +86,7 @@ class ExamController extends Controller
         $model->category_id = $request->input('category_id');
         $model->name = $name;
         $model->slug = Str::slug($name['az_name']);
-        $model->point = $request->input('point');
+        $model->point = $request->input('point')??0;
         $model->content = $description;
         $model->status = $request->input('status') ? 1 : 0;
         $model->order_number = $request->input('order_number') ?? 1;
@@ -97,7 +107,7 @@ class ExamController extends Controller
     public function edit($id)
     {
         $this->authorizeForUser(auth('admins')->user(), 'exam-update');
-        $data = Exam::withoutGlobalScope('active_status')->findOrFail($id);
+        $data = Exam::withoutGlobalScope('active_status')->withTrashed()->findOrFail($id);
         return view('backend.pages.exams.create', compact('data'));
     }
 
@@ -106,15 +116,13 @@ class ExamController extends Controller
         $this->authorizeForUser(auth('admins')->user(), 'exam-update');
 
         $rules = [
-            'duration' => ['required', 'string'],
-            'point' => ['required', 'numeric'],
             'category_id' => ['required', 'exists:categories,id'],
             'content' => ['nullable', 'string']
         ];
 
         $request->validate($rules);
 
-        $model = Exam::withoutGlobalScope('active_status')->findOrFail($id);
+        $model = Exam::withoutGlobalScope('active_status')->withTrashed()->findOrFail($id);
 
         if ($request->hasFile('image')) {
             $image = image_upload($request->file("image"), 'exams');
@@ -138,7 +146,7 @@ class ExamController extends Controller
         $model->category_id = $request->input('category_id');
         $model->name = $name;
         $model->slug = Str::slug($name['az_name']);
-        $model->point = $request->input('point');
+        $model->point = $request->input('point')??0;
         $model->content = $description;
         $model->status = $request->input('status') ? 1 : 0;
         $model->show_calc = $request->input('show_calc') ? 1 : 0;
@@ -187,7 +195,7 @@ class ExamController extends Controller
     {
         $this->authorizeForUser(auth('admins')->user(), 'exam-delete');
 
-        $model = Exam::withoutGlobalScope('active_status')->findOrFail($id);
+        $model = Exam::withoutGlobalScope('active_status')->withTrashed()->findOrFail($id);
         $model->delete();
         dbdeactive();
         return redirect()->route('exams.index')->with(['success' => 'Uğurla!']);

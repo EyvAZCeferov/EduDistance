@@ -36,7 +36,7 @@
                     @endforeach
                 </div>
             </div>
-            <div class="select_box sections @if (!empty($data) && !empty($data['sections']) && count($data['sections']) > 0) active @endif ">
+            {{-- <div class="select_box sections @if (!empty($data) && !empty($data['sections']) && count($data['sections']) > 0) active @endif ">
                 <div class="heading" onclick="toggle_filter_contents(event,'sections')">
                     <span class="prefix"><i class="fa fa-plus-minus"></i></span>
                     <span class="name">@lang('additional.pages.exams.sections')</span>
@@ -55,7 +55,7 @@
                         </div>
                     @endforeach
                 </div>
-            </div>
+            </div> --}}
             <div class="select_box companies @if (!empty($data) && !empty($data['companies']) && count($data['companies']) > 0) active @endif ">
                 <div class="heading" onclick="toggle_filter_contents(event,'companies')">
                     <span class="prefix"><i class="fa fa-building"></i></span>

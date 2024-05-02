@@ -93,6 +93,7 @@ class HomeController extends Controller
                         $sub_categories = $category->sub;
                     }
                 }
+                
                 $exams = Exam::with('sections.questions');
                 if (!empty($category) && isset($category->id) && !empty($category->id)) {
                     $exams = $exams->where('category_id', $category->id);

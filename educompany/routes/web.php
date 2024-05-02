@@ -8,7 +8,9 @@ use App\Http\Controllers\frontend\RoutesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\SetSubdomain;
 
-Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalization::setLocale(), 'middleware' => ['localeSessionRedirect', 'localizationRedirect', 'localeViewPath','setsubdomain']], function () {
+Route::group([
+    'prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalization::setLocale(), 
+    'middleware' => ['localeSessionRedirect', 'localizationRedirect', 'localeViewPath','setsubdomain']], function () {
 
     Route::group([
         'namespace' => 'App\\Http\\Controllers\\frontend',
@@ -47,10 +49,10 @@ Route::group(['prefix' => \Mcamara\LaravelLocalization\Facades\LaravelLocalizati
                 Route::get("exams/redirect_exam", [CommonController::class, 'redirect_exam'])->name("exams.redirect_exam");
                 Route::any("exams/set_exam", [CommonController::class, 'set_exam'])->name("exams.set_exam");
                 // Route::get('/{exam_id}', [CommonController::class, 'exam'])->name('exam');
-                Route::any('/finish', [CommonController::class, 'examFinish'])->name('exam.finish')->middleware('remove.null_value');
+                // Route::any('/finish', [CommonController::class, 'examFinish'])->name('exam.finish')->middleware('remove.null_value');
             });
         });
-        Route::fallback([CommonController::class, 'notfound'])->name('notfound');
+        // Route::fallback([CommonController::class, 'notfound'])->name('notfound');
     });
 });
 
