@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\ExamReferences;
 use App\Models\ExamStartPageIds;
+use Illuminate\Support\Facades\Log;
 
 class CommonController extends Controller
 {
@@ -272,26 +273,18 @@ class CommonController extends Controller
                 } else {
                     $pointlast = session()->has('point') ? session()->get('point') : 0;
                     $point = number_format($pointlast+ calculate_exam_result($result->id), 2);
-                    $time_reply=session()->get("time_reply")??0+$request->time_exam;
+                    $time_reply = session()->has('time_reply') ? session()->get('time_reply') + $request->time_exam : $request->time_exam;
                     app()->setLocale(session()->get('changedLang'));
                     session()->put('language', session()->get('changedLang'));
                     session()->put('lang', session()->get('changedLang'));
-                    if($exam->layout_type=="sat"){
-                        $result->update([
-                            'point' => customRound($point),
-                            'counted_point' => $point,
-                            'time_reply'=>$time_reply
-                        ]);
-                    }else{
-                        $result->update([
-                            'point' => $point,
-                            'counted_point' => $point,
-                            'time_reply'=>$time_reply
-                        ]);
-                    }
-                    session()->forget('point');
-                    session()->forget('time_reply');
-                    session()->forget('selected_section');
+                    $updateData = [
+                        'point' => $exam->layout_type == "sat" ? customRound($point) : $point,
+                        'counted_point' => $point,
+                        'time_reply' => $time_reply,
+                    ];
+                    
+                    $result->update($updateData);                    
+                    session()->forget(['point', 'time_reply', 'selected_section']);
                 }
 
                 $nexturl='';

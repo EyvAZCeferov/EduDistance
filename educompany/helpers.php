@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
-
+use Illuminate\Support\Facades\Log;
 
 if (!function_exists('answerChoice')) {
     function answerChoice($key): string
@@ -57,7 +57,7 @@ if (!function_exists('getImageUrl')) {
 
             return url($tempurl);
         } catch (\Exception $e) {
-            \Log::info([
+            Log::info([
                 '----------------GET IMAGE ERROR-----------------',
                 $e->getMessage(),
                 $e->getLine()
@@ -116,7 +116,7 @@ if (!function_exists('image_upload')) {
             $image->storeAs($clasor, $filename, 'uploads');
             return $filename;
         } catch (\Exception $e) {
-            \Log::info([
+            Log::info([
                 '------------------IMAGE UPLOAD ERROR-----------------',
                 $e->getMessage(),
                 $e->getLine(),
@@ -676,14 +676,14 @@ if (!function_exists('create_dns_record')) {
                 purge_cache();
                 return response()->json(['message' => 'DNS kaydı oluşturuldu.', 'data' => $responseData]);
             } else {
-                \Log::info([
+                Log::info([
                     'CREATE DNS RECORD ERROR',
                     $statusCode
                 ]);
                 return response()->json(['error' => 'API isteği başarısız oldu. Durum Kodu:' . $statusCode]);
             }
         } catch (\Exception $e) {
-            \Log::info([
+            Log::info([
                 'CREATE DNS RECORD ERROR',
                 $e->getMessage(),
                 $e->getLine()
@@ -713,14 +713,14 @@ if (!function_exists('purge_cache')) {
             if ($statusCode === 200) {
                 return response()->json(['message' => 'Önbellek temizlendi.']);
             } else {
-                \Log::info([
+                Log::info([
                     'PURGE CACHE ERROR',
                     $statusCode
                 ]);
                 return response()->json(['error' => 'API isteği başarısız oldu. Durum Kodu:' . $statusCode]);
             }
         } catch (\Exception $e) {
-            \Log::info([
+            Log::info([
                 'PURGE CACHE ERROR',
                 $e->getMessage(),
                 $e->getLine()
@@ -771,9 +771,10 @@ if (!function_exists('calculate_exam_result')) {
                     } else {
                         $model = $examquestionscount > 0 ? ($correctAnswers / $examquestionscount) * $exampoint : $correctAnswers * $exampoint;
                     }
-                    return $model;
+                    return $model??200;
                 }
             }
+            return 200;
         } catch (\Exception $e) {
             return [$e->getMessage(), $e->getLine()];
         }
@@ -823,29 +824,18 @@ if (!function_exists('calculateforsection')) {
 if (!function_exists('customRound')) {
     function customRound($number)
     {
-
         if (is_string($number)) {
-            if (strpos($number, ',') !== false) {
-                $number = str_replace(',', '', $number);
-            }
+            $number = str_replace(',', '', $number);
+
         }
         $number = floatval($number);
 
 
         if (is_float($number)) {
-            $number = round($number);
+            $number = round($number,-1);
         }
 
-        $remainder = $number % 10;
-        $base = $number - $remainder;
-
-        if ($remainder >= 5) {
-            $rounded = $base + 10;
-        } else {
-            $rounded = $base;
-        }
-
-        return $rounded;
+        return $number;
     }
 }
 

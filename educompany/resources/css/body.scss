@@ -1464,7 +1464,23 @@ body {
 
                                     &:hover,
                                     &:focus,
-                                    &:active,
+                                    &:active{
+                                        border: 1px solid #71a2c6;
+                                        cursor:pointer;
+                                        .rowNumber,
+                                        .question,
+                                        .question * {
+                                            color: #71a2c6;
+                                            border-color: #71a2c6;
+
+                                            &.rowNumber {
+                                                background-color: #71a2c6;
+                                                color: #fff
+                                            }
+                                        }
+                                    }
+
+
                                     &.selected {
                                         border: 1px solid $primary-color;
                                         cursor: pointer;
@@ -2177,7 +2193,25 @@ body {
 
                                     &:hover,
                                     &:focus,
-                                    &:active,
+                                    &:active{
+                                        border-color: #333333;
+                                        background-color: #333333;
+                                        color: #fff;
+
+                                        .rowNumber,
+                                        .question,
+                                        .question * {
+                                            color: #fff;
+                                            border-color: #fff;
+
+                                            &.rowNumber {
+                                                background-color: #fff;
+                                                color: #333333;
+                                            }
+                                        }
+                                    }
+                    
+
                                     &.selected {
                                         border-color: #000;
                                         background-color: #000;
